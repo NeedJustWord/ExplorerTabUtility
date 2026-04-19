@@ -1,6 +1,10 @@
 //语言信息
 LanguageName:简体中文
 
+//文件筛选
+JsonFiles:Json文件(*.json)
+AllFiles :所有文件(*.*)
+
 //快捷键菜单
 Shortcuts          :快捷键
 ShortcutsToolTip   :配置键盘和鼠标快捷键
@@ -51,6 +55,7 @@ FirstSupport      :成为首位支持此项目的人！
 SupportMeaning    :您的支持有助于这个项目走的更远
 
 //任务栏菜单
+NotifyIconText        :资源管理器实用工具：强制将新窗口转换为标签页
 KeyboardHook          :键盘钩子
 KeyboardHookToolTip   :启用或禁用键盘快捷键
 MouseHook             :鼠标钩子

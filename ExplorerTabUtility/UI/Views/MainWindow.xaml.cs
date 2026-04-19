@@ -21,6 +21,7 @@ public partial class MainWindow : Window
     private readonly ProfileManager _profileManager;
     private readonly SystemTrayIcon _notifyIconManager;
     private nint _handle;
+    private string _fileFilter;
 
     public MainWindow()
     {
@@ -33,6 +34,7 @@ public partial class MainWindow : Window
         _profileManager = new ProfileManager(ProfilesPanel);
         _hookManager = new HookManager(_profileManager);
         _notifyIconManager = new SystemTrayIcon(_profileManager, _hookManager, ShowWindow);
+        _fileFilter = GetFileFilter();
 
         InitLanguageComboBox();
         SetupEventHandlers();
@@ -101,6 +103,14 @@ public partial class MainWindow : Window
     private void CbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         LangeuageHelper.Instance.CurrentLanguage = (ComboBoxItemInfo)CbLanguage.SelectedItem;
+        _fileFilter = GetFileFilter();
+    }
+
+    private string GetFileFilter()
+    {
+        var jsonFiles = LangeuageHelper.Instance.LanguageFields.JsonFiles;
+        var allFiles = LangeuageHelper.Instance.LanguageFields.AllFiles;
+        return $"{jsonFiles}|*.json|{allFiles}|*.*";
     }
 
     private void StartHooks()
@@ -143,7 +153,7 @@ public partial class MainWindow : Window
         var ofd = new OpenFileDialog
         {
             FileName = Constants.HotKeyProfilesFileName,
-            Filter = Constants.JsonFileFilter
+            Filter = _fileFilter
         };
 
         if (ofd.ShowDialog() != true) return;
@@ -158,7 +168,7 @@ public partial class MainWindow : Window
         var sfd = new SaveFileDialog
         {
             FileName = Constants.HotKeyProfilesFileName,
-            Filter = Constants.JsonFileFilter
+            Filter = _fileFilter
         };
 
         if (sfd.ShowDialog() != true) return;

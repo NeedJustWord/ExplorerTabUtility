@@ -32,6 +32,20 @@ namespace ExplorerTabUtility.Languages.Manager
         private string languageNameDefaultValue = "English";
         #endregion
 
+        #region 文件筛选
+        /// <summary>
+        /// Json文件
+        /// </summary>
+        public string JsonFiles { get => Get(); set => Set(value); }
+        private string jsonFilesDefaultValue = "JSON files (*.json)";
+
+        /// <summary>
+        /// 所有文件
+        /// </summary>
+        public string AllFiles { get => Get(); set => Set(value); }
+        private string allFilesDefaultValue = "All Files";
+        #endregion
+
         #region 快捷键菜单
         /// <summary>
         /// 快捷键
@@ -297,6 +311,12 @@ namespace ExplorerTabUtility.Languages.Manager
         #endregion
 
         #region 任务栏菜单
+        /// <summary>
+        /// 通知图标提示
+        /// </summary>
+        public string NotifyIconText { get => Get(); set => Set(value); }
+        private string notifyIconTextDefaultValue = "Explorer Tab Utility: Force new windows to tabs.";
+
         /// <summary>
         /// 键盘钩子
         /// </summary>
@@ -778,6 +798,10 @@ namespace ExplorerTabUtility.Languages.Manager
             //语言信息
             dictCurrentLanguageFields[nameof(LanguageName)] = new Field(languageNameDefaultValue);
 
+            //文件筛选
+            dictCurrentLanguageFields[nameof(JsonFiles)] = new Field(jsonFilesDefaultValue);
+            dictCurrentLanguageFields[nameof(AllFiles)] = new Field(allFilesDefaultValue);
+
             //快捷键菜单
             dictCurrentLanguageFields[nameof(Shortcuts)] = new Field(shortcutsDefaultValue);
             dictCurrentLanguageFields[nameof(ShortcutsToolTip)] = new Field(shortcutsToolTipDefaultValue);
@@ -828,6 +852,7 @@ namespace ExplorerTabUtility.Languages.Manager
             dictCurrentLanguageFields[nameof(SupportMeaning)] = new Field(supportMeaningDefaultValue);
 
             //任务栏菜单
+            dictCurrentLanguageFields[nameof(NotifyIconText)] = new Field(notifyIconTextDefaultValue);
             dictCurrentLanguageFields[nameof(KeyboardHook)] = new Field(keyboardHookDefaultValue);
             dictCurrentLanguageFields[nameof(KeyboardHookToolTip)] = new Field(keyboardHookToolTipDefaultValue);
             dictCurrentLanguageFields[nameof(MouseHook)] = new Field(mouseHookDefaultValue);
@@ -945,7 +970,9 @@ namespace ExplorerTabUtility.Languages.Manager
             return false;
         }
 
+#pragma warning disable CS8604 // 引用类型参数可能为 null。
         private string Get([CallerMemberName] string? propertyName = null) => GetValue(propertyName);
+#pragma warning restore CS8604 // 引用类型参数可能为 null。
 
         private void Set(string value, [CallerMemberName] string? propertyName = null)
         {

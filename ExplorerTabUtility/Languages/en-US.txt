@@ -1,6 +1,10 @@
 //Language Info
 LanguageName:English
 
+//JsonFileFilter
+JsonFiles:JSON files (*.json)
+AllFiles :All Files
+
 //Shortcuts Menu
 Shortcuts          :Shortcuts
 ShortcutsToolTip   :Configure keyboard and mouse shortcuts
@@ -51,6 +55,7 @@ FirstSupport      :Be the first to support this project!
 SupportMeaning    :Your support helps keep this project alive
 
 //Taskbar Menu
+NotifyIconText        :Explorer Tab Utility: Force new windows to tabs.
 KeyboardHook          :Keyboard Hook
 KeyboardHookToolTip   :Enable or disable keyboard shortcuts
 MouseHook             :Mouse Hook
