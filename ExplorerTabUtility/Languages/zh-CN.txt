@@ -17,7 +17,7 @@ AutoSave           :自动保存
 AutoSaveToolTip    :关闭窗口时自动保存配置
 
 //偏好菜单
-Preferences                  :偏好
+Preferences                  :设置
 PreferencesToolTip           :配置程序设置
 ApplicationSettings          :程序设置
 AutoUpdate                   :自动更新
@@ -39,7 +39,7 @@ AboutToolTip      :关于程序和支持选项
 Profile           :提升您的Windows文件资源管理器使用体验
 Star              :GitHub星标
 SupportProject    :支持项目
-SupportProjectText:如果您觉得这个程序有用，可以考虑通过以下方式之一支持其开发：
+SupportProjectText:如果您觉得这个程序有用，可以考虑通过以下方式支持其开发：
 GitHubSponsors    :GitHub赞助
 Patreon           :Patreon众筹
 Coffee            :请我喝杯咖啡

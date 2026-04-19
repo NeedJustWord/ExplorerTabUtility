@@ -111,8 +111,8 @@
         <Setter Property="MinWidth" Value="100" />
         <Setter Property="behaviors:HoverBrightness.IsEnabled" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="DisplayMemberPath" Value="Value"/>
-        <Setter Property="SelectedValuePath" Value="Value"/>
+        <Setter Property="DisplayMemberPath" Value="Display"/>
+        <Setter Property="SelectedValuePath" Value="Display"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBox">

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.Languages.Manager
 {
     /// <summary>
     /// 语言字段类
     /// </summary>
-    internal class LanguageFields : INotifyPropertyChanged
+    internal class LanguageFields : BindableBase
     {
         class Field
         {
@@ -922,9 +922,11 @@ namespace ExplorerTabUtility.Languages.Manager
         /// <returns></returns>
         public string GetValue(string key)
         {
-#pragma warning disable CS8602 // 解引用可能出现空引用。
-            return dictCurrentLanguageFields.TryGetValue(key, out var field) && field.Value != null ? field.Value : field.DefaultValue;
-#pragma warning restore CS8602 // 解引用可能出现空引用。
+            if (dictCurrentLanguageFields.TryGetValue(key, out var field))
+            {
+                return field.Value ?? field.DefaultValue;
+            }
+            return string.Empty;
         }
 
         /// <summary>
@@ -943,22 +945,18 @@ namespace ExplorerTabUtility.Languages.Manager
             return false;
         }
 
-#pragma warning disable CS8604 // 引用类型参数可能为 null。
         private string Get([CallerMemberName] string? propertyName = null) => GetValue(propertyName);
 
         private void Set(string value, [CallerMemberName] string? propertyName = null)
         {
-            if (SetValue(propertyName, value))
+            if (propertyName != null && SetValue(propertyName, value))
             {
                 RaisePropertyChanged(propertyName);
             }
         }
-#pragma warning restore CS8604 // 引用类型参数可能为 null。
         #endregion
 
-        #region INotifyPropertyChanged接口实现
-        public event PropertyChangedEventHandler? PropertyChanged;
-
+        #region 通知所有属性已更改
         /// <summary>
         /// 通知所有属性已更改
         /// </summary>
@@ -968,16 +966,6 @@ namespace ExplorerTabUtility.Languages.Manager
             {
                 RaisePropertyChanged(key);
             }
-        }
-
-        private void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void OnPropertyChanged(PropertyChangedEventArgs args)
-        {
-            PropertyChanged?.Invoke(this, args);
         }
         #endregion
     }

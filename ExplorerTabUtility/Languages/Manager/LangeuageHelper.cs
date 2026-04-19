@@ -34,17 +34,24 @@ namespace ExplorerTabUtility.Languages.Manager
             get { return currentLanguage; }
             set
             {
-                if (LoadLanguage(value.Key))
+                var change = LoadLanguage(value.Key);
+                if (change)
                 {
                     SettingsManager.Language = value.Key;
                     currentLanguage = value;
                 }
                 else
                 {
-                    LoadLanguage(currentLanguage.Key);
+                    change = LoadLanguage(currentLanguage.Key);
                 }
+
+                if (change) OnLangeuageChanged?.Invoke();
             }
         }
+        #endregion
+
+        #region 事件
+        public event Action? OnLangeuageChanged;
         #endregion
 
         private readonly string languageDir = "Languages";

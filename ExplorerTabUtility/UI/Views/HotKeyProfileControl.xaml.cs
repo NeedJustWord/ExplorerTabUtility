@@ -13,7 +13,7 @@ using ExplorerTabUtility.Languages.Manager;
 namespace ExplorerTabUtility.UI.Views;
 
 // ReSharper disable once RedundantExtendsListEntry
-public partial class HotKeyProfileControl : UserControl
+public partial class HotKeyProfileControl : UserControl, IDisposable
 {
     // Fields
     private Key _lastClickKey;
@@ -94,6 +94,34 @@ public partial class HotKeyProfileControl : UserControl
         CbHandled.Unchecked += CbHandled_CheckedChanged;
         CbOpenAsTab.Checked += CbOpenAsTab_CheckedChanged;
         CbOpenAsTab.Unchecked += CbOpenAsTab_CheckedChanged;
+
+        LangeuageHelper.Instance.OnLangeuageChanged += Instance_OnLangeuageChanged;
+    }
+
+    private void Instance_OnLangeuageChanged()
+    {
+        var scopes = (List<ScopeItem>)CbScope.ItemsSource;
+        foreach (var item in scopes)
+        {
+            item.Display = LangeuageHelper.Instance.LanguageFields.GetValue(item.Key.ToString());
+        }
+
+        var actions = (List<ActionItem>)CbAction.ItemsSource;
+        foreach (var item in actions)
+        {
+            var name = item.Key.ToString();
+            item.Display = LangeuageHelper.Instance.LanguageFields.GetValue(name);
+            item.ToolTip = LangeuageHelper.Instance.LanguageFields.GetValue($"{name}ToolTip");
+        }
+
+        //重新设置选中项，没有的话选中项的不会更新
+        var selectedItem = CbScope.SelectedItem;
+        CbScope.SelectedItem = null;
+        CbScope.SelectedItem = selectedItem;
+
+        selectedItem = CbAction.SelectedItem;
+        CbAction.SelectedItem = null;
+        CbAction.SelectedItem = selectedItem;
     }
 
     // Event handlers
@@ -325,9 +353,9 @@ public partial class HotKeyProfileControl : UserControl
         return actions.Select(t =>
         {
             var name = t.ToString();
-            var value = LangeuageHelper.Instance.LanguageFields.GetValue(name);
+            var display = LangeuageHelper.Instance.LanguageFields.GetValue(name);
             var tooltip = LangeuageHelper.Instance.LanguageFields.GetValue($"{name}ToolTip");
-            return new ActionItem(t, value, tooltip);
+            return new ActionItem(t, display, tooltip);
         }).ToList();
     }
 
@@ -373,5 +401,10 @@ public partial class HotKeyProfileControl : UserControl
     private HotKeyAction GetSelectedHotKeyAction()
     {
         return ((ActionItem)CbAction.SelectedItem)?.Key ?? HotKeyAction.Open;
+    }
+
+    public void Dispose()
+    {
+        LangeuageHelper.Instance.OnLangeuageChanged -= Instance_OnLangeuageChanged;
     }
 }

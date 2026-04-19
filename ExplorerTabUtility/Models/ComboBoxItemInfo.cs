@@ -1,15 +1,48 @@
 ﻿namespace ExplorerTabUtility.Models
 {
-    internal class ComboBoxItemInfo<TKey>(TKey key, string value, string? tooltip = null)
+    internal class ComboBoxItemInfo<TKey> : BindableBase
     {
-        public TKey Key { get; set; } = key;
-        public string Value { get; set; } = value;
-        public string? ToolTip { get; set; } = tooltip;
+        private TKey key;
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public TKey Key
+        {
+            get { return key; }
+            set { SetProperty(ref key, value); }
+        }
+
+        private string display;
+        /// <summary>
+        /// 显示值
+        /// </summary>
+        public string Display
+        {
+            get { return display; }
+            set { SetProperty(ref display, value); }
+        }
+
+        private string? toolTip;
+        /// <summary>
+        /// 提示
+        /// </summary>
+        public string? ToolTip
+        {
+            get { return toolTip; }
+            set { SetProperty(ref toolTip, value); }
+        }
+
+        public ComboBoxItemInfo(TKey key, string display, string? toolTip = null)
+        {
+            this.key = key;
+            this.display = display;
+            this.toolTip = toolTip;
+        }
     }
 
     internal class ComboBoxItemInfo : ComboBoxItemInfo<string>
     {
-        public ComboBoxItemInfo(string key, string value, string? tooltip = null) : base(key, value, tooltip)
+        public ComboBoxItemInfo(string key, string display, string? tooltip = null) : base(key, display, tooltip)
         {
         }
     }
