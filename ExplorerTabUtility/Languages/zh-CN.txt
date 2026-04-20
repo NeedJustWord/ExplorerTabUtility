@@ -92,6 +92,12 @@ HandledToolTip       :阻止在其他应用程序中处理此快捷键
 OpenAsTab            :标签页
 OpenAsTabToolTip     :以标签页形式打开，而非新窗口
 
+//自定义消息弹窗控件
+Ok    :确定
+Cancel:取消
+Yes   :是
+No    :否
+
 //标签页搜索控件
 ClearToolTip:清除已关闭窗口的历史记录
 

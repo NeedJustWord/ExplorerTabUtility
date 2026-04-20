@@ -92,6 +92,12 @@ HandledToolTip       :Prevent further processing of the hotkeys in other applica
 OpenAsTab            :Tab
 OpenAsTabToolTip     :Open as tab instead of a new window
 
+//CustomMessageBox
+Ok    :OK
+Cancel:Cancel
+Yes   :Yes
+No    :No
+
 //TabSearchPopup
 ClearToolTip:Clear closed windows history
 

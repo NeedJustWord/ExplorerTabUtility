@@ -518,6 +518,32 @@ namespace ExplorerTabUtility.Languages.Manager
         private string openAsTabToolTipDefaultValue = "Open as tab instead of a new window";
         #endregion
 
+        #region 自定义消息弹窗控件
+        /// <summary>
+        /// 确定
+        /// </summary>
+        public string Ok { get => Get(); set => Set(value); }
+        private string okDefaultValue = "OK";
+
+        /// <summary>
+        /// 取消
+        /// </summary>
+        public string Cancel { get => Get(); set => Set(value); }
+        private string cancelDefaultValue = "Cancel";
+
+        /// <summary>
+        /// 是
+        /// </summary>
+        public string Yes { get => Get(); set => Set(value); }
+        private string yesDefaultValue = "Yes";
+
+        /// <summary>
+        /// 否
+        /// </summary>
+        public string No { get => Get(); set => Set(value); }
+        private string noDefaultValue = "No";
+        #endregion
+
         #region 标签页搜索控件
         /// <summary>
         /// 清除提示
@@ -888,6 +914,12 @@ namespace ExplorerTabUtility.Languages.Manager
             dictCurrentLanguageFields[nameof(HandledToolTip)] = new Field(handledToolTipDefaultValue);
             dictCurrentLanguageFields[nameof(OpenAsTab)] = new Field(openAsTabDefaultValue);
             dictCurrentLanguageFields[nameof(OpenAsTabToolTip)] = new Field(openAsTabToolTipDefaultValue);
+
+            //自定义消息弹窗控件
+            dictCurrentLanguageFields[nameof(Ok)] = new Field(okDefaultValue);
+            dictCurrentLanguageFields[nameof(Cancel)] = new Field(cancelDefaultValue);
+            dictCurrentLanguageFields[nameof(Yes)] = new Field(yesDefaultValue);
+            dictCurrentLanguageFields[nameof(No)] = new Field(noDefaultValue);
 
             //标签页搜索控件
             dictCurrentLanguageFields[nameof(ClearToolTip)] = new Field(clearToolTipDefaultValue);

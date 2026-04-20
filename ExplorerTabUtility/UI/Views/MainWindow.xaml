@@ -260,7 +260,7 @@
                                                       ToolTip="{Binding LanguageFields.HideTrayIconToolTip,Source={x:Static language:LangeuageHelper.Instance}}" />
                                             <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
                                                 <TextBlock Text="{Binding LanguageFields.SelectLanguage,Source={x:Static language:LangeuageHelper.Instance}}" VerticalAlignment="Center" Margin="0 8 0 8"/>
-                                                <ComboBox x:Name="CbLanguage" Style="{StaticResource CustomComboBoxStyle}" Width="150" Margin="0 0 0 8"
+                                                <ComboBox x:Name="CbLanguage" Style="{StaticResource CustomComboBoxStyle}" MinWidth="150" Margin="0 0 0 8"
                                                           ToolTip="{Binding LanguageFields.SelectLanguageToolTip,Source={x:Static language:LangeuageHelper.Instance}}" />
                                             </StackPanel>
                                         </StackPanel>
