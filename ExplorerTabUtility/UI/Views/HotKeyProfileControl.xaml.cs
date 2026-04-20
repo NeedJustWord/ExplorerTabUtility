@@ -63,8 +63,7 @@ public partial class HotKeyProfileControl : UserControl, IDisposable
         CbScope.ItemsSource = scopes;
         CbScope.SelectedItem = scopes.FirstOrDefault(t => t.Key == _profile.Scope);
 
-        UpdateActionComboBox();
-        CbAction.SelectedItem = _profile.Action;
+        UpdateActionComboBox(_profile.Action);
 
         TxtPath.Text = _profile.Path ?? string.Empty;
         NDelay.Value = _profile.Delay;
@@ -271,12 +270,12 @@ public partial class HotKeyProfileControl : UserControl, IDisposable
     }
 
     // Methods
-    private void UpdateActionComboBox()
+    private void UpdateActionComboBox(HotKeyAction? action = null)
     {
         var allowedActions = GetAllowedActions(_profile.Scope);
 
         // Preserve the current action if it's allowed, otherwise use the first allowed action
-        var currentAction = GetSelectedHotKeyAction();
+        var currentAction = action ?? GetSelectedHotKeyAction();
         var desiredAction = allowedActions.FirstOrDefault(t => t.Key == currentAction)
             ?? allowedActions.FirstOrDefault();
 
