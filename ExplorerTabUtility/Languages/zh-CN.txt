@@ -146,3 +146,7 @@ SnapUp                 :上贴靠
 SnapUpToolTip          :将当前窗口贴靠到屏幕上侧
 SnapDown               :底贴靠
 SnapDownToolTip        :将当前窗口贴靠到屏幕底侧
+BookmarkSave           :保存书签
+BookmarkSaveToolTip    :打开书签保存框，以将标签页路径保存成书签
+BookmarkManage         :管理书签
+BookmarkManageToolTip  :打开书签管理窗口，以管理书签或者在新标签页/窗口打开书签指定的路径

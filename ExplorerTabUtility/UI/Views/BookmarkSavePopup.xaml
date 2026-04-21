@@ -1,0 +1,61 @@
+﻿<controls:BaseWindow x:Class="ExplorerTabUtility.UI.Views.BookmarkSavePopup"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:language="clr-namespace:ExplorerTabUtility.Languages.Manager"
+                     xmlns:behaviors="clr-namespace:ExplorerTabUtility.UI.Behaviors"
+                     xmlns:controls="clr-namespace:ExplorerTabUtility.UI.Views.Controls"
+                     WindowStartupLocation="CenterScreen"
+                     Style="{StaticResource BaseWindowStyle}"
+                     Width="500" MinHeight="200">
+    <Border Style="{StaticResource BaseWindowBorderStyle}">
+        <Grid Margin="10 0 10 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Style="{StaticResource BookmarkTitleTextBlock}"
+                        Text="已添加书签"/>
+
+            <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="名称"/>
+                <TextBox Style="{StaticResource CustomTextBoxStyle}"/>
+            </StackPanel>
+
+            <StackPanel x:Name="SpLocation" Grid.Row="2" Grid.ColumnSpan="2">
+                <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="路径"/>
+                <TextBox Style="{StaticResource CustomTextBoxStyle}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.ColumnSpan="2">
+                <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="文件夹"/>
+            </StackPanel>
+
+            <controls:BookmarkComboBox x:Name="CbSelectSavePath" Grid.Row="4" Grid.ColumnSpan="2" Style="{StaticResource BookmarkComboBoxStyle}"
+                                       behaviors:BookmarkHelper.SelectOtherFolderText="选择其他文件夹"/>
+
+            <TreeView x:Name="TvSelectSavePath" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource BookmarkTreeViewStyle}"/>
+
+            <StackPanel Grid.Row="6" Grid.Column="0" HorizontalAlignment="Left">
+                <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"
+                        Content="新建文件夹"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="BtnSave" Style="{StaticResource BookmarkButtonStyle}"
+                        Content="{Binding LanguageFields.Save,Source={x:Static language:LangeuageHelper.Instance}}"/>
+                <Button x:Name="BtnCancel" Style="{StaticResource BookmarkButtonStyle}"
+                        Content="{Binding LanguageFields.Cancel,Source={x:Static language:LangeuageHelper.Instance}}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</controls:BaseWindow>

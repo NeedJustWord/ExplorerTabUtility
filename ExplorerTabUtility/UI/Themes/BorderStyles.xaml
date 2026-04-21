@@ -16,4 +16,20 @@
         <Setter Property="UseLayoutRounding" Value="True" />
     </Style>
 
+    <!-- BaseWindow Border Style -->
+    <Style x:Key="BaseWindowBorderStyle" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderGradientBrush}"/>
+        <Setter Property="Background" Value="{StaticResource BackgroundGradientBrush}"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="{StaticResource ShadowColor}"
+                              Direction="270"
+                              ShadowDepth="5"
+                              BlurRadius="15"
+                              Opacity="0.4" />
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

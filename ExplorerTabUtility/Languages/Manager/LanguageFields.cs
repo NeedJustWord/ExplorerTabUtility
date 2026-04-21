@@ -796,6 +796,30 @@ namespace ExplorerTabUtility.Languages.Manager
         /// </summary>
         public string SnapDownToolTip { get => Get(); set => Set(value); }
         private string snapDownToolTipDefaultValue = "Snap the current window to the bottom.";
+
+        /// <summary>
+        /// 保存书签
+        /// </summary>
+        public string BookmarkSave { get => Get(); set => Set(value); }
+        private string bookmarkSaveDefaultValue = "BookmarkSave";
+
+        /// <summary>
+        /// 保存书签提示
+        /// </summary>
+        public string BookmarkSaveToolTip { get => Get(); set => Set(value); }
+        private string bookmarkSaveToolTipDefaultValue = "Open bookmark save popup to save tab location as bookmark.";
+
+        /// <summary>
+        /// 管理书签
+        /// </summary>
+        public string BookmarkManage { get => Get(); set => Set(value); }
+        private string bookmarkManageDefaultValue = "BookmarkManage";
+
+        /// <summary>
+        /// 管理书签提示
+        /// </summary>
+        public string BookmarkManageToolTip { get => Get(); set => Set(value); }
+        private string bookmarkManageToolTipDefaultValue = "Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.";
         #endregion
         #endregion
 
@@ -969,13 +993,16 @@ namespace ExplorerTabUtility.Languages.Manager
             dictCurrentLanguageFields[nameof(SnapUpToolTip)] = new Field(snapUpToolTipDefaultValue);
             dictCurrentLanguageFields[nameof(SnapDown)] = new Field(snapDownDefaultValue);
             dictCurrentLanguageFields[nameof(SnapDownToolTip)] = new Field(snapDownToolTipDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkSave)] = new Field(bookmarkSaveDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkSaveToolTip)] = new Field(bookmarkSaveToolTipDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkManage)] = new Field(bookmarkManageDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkManageToolTip)] = new Field(bookmarkManageToolTipDefaultValue);
         }
 
         /// <summary>
         /// 获取值
         /// </summary>
         /// <param name="key"></param>
-        /// 
         /// <returns></returns>
         public string GetValue(string key)
         {

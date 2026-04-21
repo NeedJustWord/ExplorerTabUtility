@@ -146,3 +146,7 @@ SnapUp                 :SnapUp
 SnapUpToolTip          :Snap the current window to the top.
 SnapDown               :SnapDown
 SnapDownToolTip        :Snap the current window to the bottom.
+BookmarkSave           :BookmarkSave
+BookmarkSaveToolTip    :Open bookmark save popup to save tab location as bookmark.
+BookmarkManage         :BookmarkManage
+BookmarkManageToolTip  :Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.

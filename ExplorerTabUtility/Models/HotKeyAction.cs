@@ -38,5 +38,9 @@ public enum HotKeyAction
     [Description("Snap the current window to the top.")]
     SnapUp,
     [Description("Snap the current window to the bottom.")]
-    SnapDown
+    SnapDown,
+    [Description("Open bookmark save popup to save tab location as bookmark.")]
+    BookmarkSave,
+    [Description("Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.")]
+    BookmarkManage,
 }

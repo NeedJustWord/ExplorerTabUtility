@@ -105,6 +105,14 @@ public sealed class HookManager
                 await SnapForegroundWindow(e.Profile.Action, e.Profile.Delay);
                 break;
 
+            case HotKeyAction.BookmarkSave:
+                _syncContext.Post(_ => new BookmarkSavePopup(_windowHook).Show(), null);
+                break;
+
+            case HotKeyAction.BookmarkManage:
+                _syncContext.Post(_ => new BookmarkManagePopup(_windowHook).Show(), null);
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(e.Profile.Action),

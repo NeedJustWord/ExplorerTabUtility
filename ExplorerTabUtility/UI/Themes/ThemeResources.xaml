@@ -9,5 +9,8 @@
         <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/TabControlStyles.xaml" />
         <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/ScrollViewerStyles.xaml" />
         <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/ListBoxStyles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/TextBlockStyles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/TreeViewStyles.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/BaseWindowStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>
