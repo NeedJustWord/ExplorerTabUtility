@@ -200,6 +200,26 @@ public static class SettingsManager
         }
     }
 
+    public static string Bookmarks
+    {
+        get => Settings.Bookmarks;
+        set
+        {
+            Settings.Bookmarks = value;
+            SaveSettings();
+        }
+    }
+
+    public static string LastSaveFolders
+    {
+        get => Settings.LastSaveFolders;
+        set
+        {
+            Settings.LastSaveFolders = value;
+            SaveSettings();
+        }
+    }
+
     public static void SaveSettings()
     {
         try
@@ -231,4 +251,6 @@ internal class AppSettings
     public bool RestorePreviousWindows { get; set; }
     public WindowRecord[]? ClosedWindows { get; set; }
     public string? Language { get; set; }
+    public string Bookmarks { get; set; } = Constants.DefaultBookmarks;
+    public string LastSaveFolders { get; set; } = Constants.DefaultLastSaveFolders;
 }

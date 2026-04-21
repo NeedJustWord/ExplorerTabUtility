@@ -8,7 +8,7 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkManagePopup : BaseWindow
     {
-        public BookmarkManagePopup(ExplorerWatcher explorerWatcher) : base(explorerWatcher)
+        public BookmarkManagePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
             InitializeComponent();
 

@@ -1,18 +1,21 @@
 ﻿using System.Windows;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
     public class BaseWindow : Window
     {
         protected readonly ExplorerWatcher explorerWatcher;
+        protected readonly nint windowHandle;
         private bool _isShowingDialog;
         private bool _isClosing;
 
-        public BaseWindow(ExplorerWatcher explorerWatcher)
+        public BaseWindow(ExplorerWatcher explorerWatcher, nint windowHandle)
         {
             this.explorerWatcher = explorerWatcher;
+            this.windowHandle = windowHandle;
         }
 
         public new void Show()
@@ -44,6 +47,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var result = CustomMessageBox.Show(message, title, buttons, icon, defaultButton);
             _isShowingDialog = false;
             return result;
+        }
+
+        protected WindowRecord? GetCurrentTabWindowRecord()
+        {
+            return explorerWatcher.GetCurrentTabWindowRecord(windowHandle);
         }
     }
 }

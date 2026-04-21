@@ -106,11 +106,11 @@ public sealed class HookManager
                 break;
 
             case HotKeyAction.BookmarkSave:
-                _syncContext.Post(_ => new BookmarkSavePopup(_windowHook).Show(), null);
+                _syncContext.Post(_ => new BookmarkSavePopup(_windowHook, e.ForegroundWindow).Show(), null);
                 break;
 
             case HotKeyAction.BookmarkManage:
-                _syncContext.Post(_ => new BookmarkManagePopup(_windowHook).Show(), null);
+                _syncContext.Post(_ => new BookmarkManagePopup(_windowHook, e.ForegroundWindow).Show(), null);
                 break;
 
             default:

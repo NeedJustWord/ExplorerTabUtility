@@ -293,6 +293,19 @@ public class ExplorerWatcher : IHook
 
         await OpenNewWindowWithSelection(windowRecord);
     }
+    public WindowRecord? GetCurrentTabWindowRecord(nint windowHandle)
+    {
+        var activeTabHandle = GetActiveTabHandle(windowHandle);
+        if (activeTabHandle == 0) return null;
+
+        var window = GetWindowByTabHandle(activeTabHandle);
+        if (window == null) return null;
+
+        var location = _windowEntryDict[window].Value.Location ?? GetLocation(window);
+        var selectedItems = GetSelectedItems(window);
+        var windowRecord = new WindowRecord(location, windowHandle, selectedItems);
+        return windowRecord;
+    }
     public void SetTargetWindow(nint windowHandle)
     {
         if (Helper.IsFileExplorerWindow(windowHandle))
