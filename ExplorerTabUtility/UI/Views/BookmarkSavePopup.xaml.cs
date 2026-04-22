@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Windows;
 using ExplorerTabUtility.Helpers;
@@ -38,7 +36,7 @@ namespace ExplorerTabUtility.UI.Views
             BtnNewFolder.Visibility = Visibility.Collapsed;
             TvSelectSavePath.Visibility = Visibility.Collapsed;
 
-            TxtName.Text = Path.GetFileName(currentWindowRecord.DisplayLocation);
+            TxtName.Text = GetName();
 
             InitCbSelectSavePath();
         }
@@ -49,15 +47,12 @@ namespace ExplorerTabUtility.UI.Views
                 .Select(t => new SaveFolderItem(t.Id, t.Name))
                 .ToList();
             CbSelectSavePath.ItemsSource = lastSaveFolders;
-            CbSelectSavePath.SelectedItem = lastSaveFolders.FirstOrDefault();
+            CbSelectSavePath.SelectedItem = lastSaveFolders.First();
         }
 
         private void InitTvSelectSavePath()
         {
-            var lastSaveFolders = BookmarkManager.Instance.Bookmarks
-                .Select(t => new BookmarkTreeViewItem(t))
-                .ToList();
-            TvSelectSavePath.ItemsSource = new ObservableCollection<BookmarkTreeViewItem>(lastSaveFolders);
+            TvSelectSavePath.SetItems(BookmarkManager.Instance.Bookmarks, BookmarkManager.Instance.LastSaveFolders.First().Id, false);
         }
 
         private SaveFolderItem? GetSaveFolder()
@@ -67,7 +62,7 @@ namespace ExplorerTabUtility.UI.Views
                 case BookmarkSaveType.ComboBox:
                     return (SaveFolderItem)CbSelectSavePath.SelectedItem;
                 case BookmarkSaveType.TreeView:
-                    return (SaveFolderItem)TvSelectSavePath.SelectedItem;
+                    return TvSelectSavePath.GetSaveFolderItem();
                 default:
                     return null;
             }
@@ -82,6 +77,28 @@ namespace ExplorerTabUtility.UI.Views
                 default:
                     return TxtLocation.Text;
             }
+        }
+
+        private string GetName()
+        {
+            string name;
+            switch (currentWindowRecord.DisplayLocation)
+            {
+                case "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}":
+                    name = "此电脑";
+                    break;
+                default:
+                    if (currentWindowRecord.DisplayLocation.EndsWith(":"))
+                    {
+                        name = $"{currentWindowRecord.DisplayLocation.TrimEnd(':')}盘";
+                    }
+                    else
+                    {
+                        name = Path.GetFileName(currentWindowRecord.DisplayLocation);
+                    }
+                    break;
+            }
+            return name;
         }
 
         #region 事件注册
@@ -121,14 +138,10 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
         {
-            var selected = TvSelectSavePath.SelectedItem as BookmarkTreeViewItem;
-            if (selected == null)
+            if (TvSelectSavePath.AddFolder(out var errorMsg) == false)
             {
-                ShowMessage("请选择要新建文件夹的路径", Constants.AppName);
-                return;
+                ShowMessage(errorMsg, Constants.AppName);
             }
-
-            selected.Add(new FolderInfo(Guid.Empty, "新建文件夹"));
         }
 
         private void CbSelectSavePath_SelectOtherFolderClick(object sender, RoutedEventArgs e)

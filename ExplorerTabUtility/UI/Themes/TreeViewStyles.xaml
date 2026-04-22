@@ -1,5 +1,13 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:ExplorerTabUtility.UI.Views.Controls">
+
+    <!--BookmarkTreeViewItem Style-->
+    <Style TargetType="{x:Type controls:BookmarkTreeViewItem}">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MinHeight" Value="30"/>
+    </Style>
 
     <!--Bookmark TreeView Style-->
     <Style x:Key="BookmarkTreeViewStyle" TargetType="TreeView">

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace ExplorerTabUtility.Models
@@ -51,6 +52,8 @@ namespace ExplorerTabUtility.Models
 
     internal class FolderInfo : BaseBookmarkInfo
     {
+        public static readonly FolderInfo Empty = new FolderInfo(Guid.Empty, string.Empty);
+
         /// <summary>
         /// 子项
         /// </summary>
@@ -59,6 +62,11 @@ namespace ExplorerTabUtility.Models
         public FolderInfo(Guid id, string name) : base(id, name)
         {
             Items = new List<BaseBookmarkInfo>();
+        }
+
+        public FolderInfo(Guid id, string name, FolderInfo folder, FolderInfo otherFolder) : base(id, name)
+        {
+            Items = [folder, otherFolder];
         }
 
         [JsonConstructor]
@@ -80,6 +88,27 @@ namespace ExplorerTabUtility.Models
         {
             var index = Items.FindIndex(t => t.Id == id);
             if (index != -1) Items.RemoveAt(index);
+        }
+
+        public bool Search(Guid id, out FolderInfo folder)
+        {
+            var folders = Items.OfType<FolderInfo>();
+            foreach (var item in folders)
+            {
+                if (item.Id == id)
+                {
+                    folder = item;
+                    return true;
+                }
+
+                if (item.Search(id, out folder))
+                {
+                    return true;
+                }
+            }
+
+            folder = Empty;
+            return false;
         }
     }
 

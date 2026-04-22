@@ -34,16 +34,17 @@ namespace ExplorerTabUtility.Managers
             }
         }
 
+        private readonly FolderInfo bookmarks;
         private readonly FolderInfo folderInfo;
         private readonly FolderInfo otherFolderInfo;
         private readonly List<SaveFolderInfo> lastSaveFolders;
 
         private BookmarkManager()
         {
+            lastSaveFolders = new List<SaveFolderInfo>(5);
             folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), "书签栏");
             otherFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000002"), "其他书签");
-            lastSaveFolders = new List<SaveFolderInfo>(5);
-
+            bookmarks = new FolderInfo(Guid.Empty, string.Empty, folderInfo, otherFolderInfo);
             Bookmarks = new ReadOnlyCollection<FolderInfo>([folderInfo, otherFolderInfo]);
 
             LoadBookmark();
@@ -80,15 +81,45 @@ namespace ExplorerTabUtility.Managers
             }
         }
 
+        /// <summary>
+        /// 保存书签
+        /// </summary>
+        /// <param name="folderId"></param>
+        /// <param name="name"></param>
+        /// <param name="location"></param>
         public void Save(Guid folderId, string name, string location)
         {
-            var folder = Bookmarks.FirstOrDefault(t => t.Id == folderId);
-            if (folder == null) return;
+            if (GetTargetFolderInfoFault(folderId, out var targetFolder)) return;
 
             var info = new BookmarkInfo(Guid.NewGuid(), name, location);
-            folder.Add(info);
-            UpdateLastSaveFolders(folder);
+            targetFolder.Add(info);
+            UpdateLastSaveFolders(targetFolder);
             SaveBookmarks();
+        }
+
+        /// <summary>
+        /// 保存文件夹，返回是否成功及新建文件夹信息
+        /// </summary>
+        /// <param name="folderId"></param>
+        /// <param name="name"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public bool Save(Guid folderId, string name, out FolderInfo info)
+        {
+            if (GetTargetFolderInfoFault(folderId, out var targetFolder))
+            {
+                info = FolderInfo.Empty;
+                return false;
+            }
+
+            info = new FolderInfo(Guid.NewGuid(), name);
+            targetFolder.Add(info);
+            return true;
+        }
+
+        private bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)
+        {
+            return bookmarks.Search(folderId, out folder) == false;
         }
 
         private void UpdateLastSaveFolders(FolderInfo folder)
