@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace ExplorerTabUtility.Models
 {
-    internal abstract class BindableBase : INotifyPropertyChanged
+    public abstract class BindableBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -29,6 +29,14 @@ namespace ExplorerTabUtility.UI.Views
             SetupEventHandlers();
         }
 
+        public void AddFolder(BookmarkTreeViewInfo info)
+        {
+            if (TvSelectSavePath.AddFolder(info, out var errorMsg) == false)
+            {
+                ShowMessage(errorMsg, Constants.AppName);
+            }
+        }
+
         private void Init()
         {
             BtnNewFolder.IsEnabled = false;
@@ -101,6 +109,14 @@ namespace ExplorerTabUtility.UI.Views
             return name;
         }
 
+        private void CloseWindow(bool save)
+        {
+            save |= TvSelectSavePath.HaveSave;
+            if (save) BookmarkManager.Instance.SaveConfig();
+
+            CloseWindow();
+        }
+
         #region 事件注册
         private void SetupEventHandlers()
         {
@@ -120,7 +136,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            CloseWindow();
+            CloseWindow(false);
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -133,7 +149,7 @@ namespace ExplorerTabUtility.UI.Views
             }
 
             BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation());
-            CloseWindow();
+            CloseWindow(true);
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
@@ -165,7 +181,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BookmarkSavePopup_Deactivated(object? sender, System.EventArgs e)
         {
-            //if (CanClose()) CloseWindow();
+            //if (CanClose()) CloseWindow(false);
         }
         #endregion
     }

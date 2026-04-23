@@ -1,6 +1,6 @@
 ﻿namespace ExplorerTabUtility.Models
 {
-    internal class ComboBoxItemInfo<TKey> : BindableBase
+    public class ComboBoxItemInfo<TKey> : BindableBase
     {
         private TKey key;
         /// <summary>

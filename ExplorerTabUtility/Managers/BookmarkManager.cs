@@ -84,36 +84,44 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 保存书签
         /// </summary>
-        /// <param name="folderId"></param>
+        /// <param name="parentId"></param>
         /// <param name="name"></param>
         /// <param name="location"></param>
-        public void Save(Guid folderId, string name, string location)
+        public void Save(Guid parentId, string name, string location)
         {
-            if (GetTargetFolderInfoFault(folderId, out var targetFolder)) return;
+            if (GetTargetFolderInfoFault(parentId, out var parentFolder)) return;
 
             var info = new BookmarkInfo(Guid.NewGuid(), name, location);
-            targetFolder.Add(info);
-            UpdateLastSaveFolders(targetFolder);
-            SaveBookmarks();
+            parentFolder.Add(info);
+            UpdateLastSaveFolders(parentFolder);
         }
 
         /// <summary>
         /// 保存文件夹，返回是否成功及新建文件夹信息
         /// </summary>
+        /// <param name="parentId"></param>
         /// <param name="folderId"></param>
         /// <param name="name"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public bool Save(Guid folderId, string name, out FolderInfo info)
+        public bool Save(Guid parentId, Guid folderId, string name, out FolderInfo info)
         {
-            if (GetTargetFolderInfoFault(folderId, out var targetFolder))
+            if (folderId == Guid.Empty)
             {
-                info = FolderInfo.Empty;
-                return false;
+                if (GetTargetFolderInfoFault(parentId, out var parentFolder))
+                {
+                    info = FolderInfo.Empty;
+                    return false;
+                }
+
+                info = new FolderInfo(Guid.NewGuid(), name);
+                parentFolder.Add(info);
+            }
+            else
+            {
+                info = new FolderInfo(folderId, name);
             }
 
-            info = new FolderInfo(Guid.NewGuid(), name);
-            targetFolder.Add(info);
             return true;
         }
 
@@ -147,15 +155,16 @@ namespace ExplorerTabUtility.Managers
             lastSaveFolders.Add(info);
         }
 
-        private void SaveBookmarks()
+        /// <summary>
+        /// 保存配置
+        /// </summary>
+        public void SaveConfig()
         {
             try
             {
-                var json = JsonSerializer.Serialize(Bookmarks);
-                SettingsManager.Bookmarks = json;
-
-                json = JsonSerializer.Serialize(lastSaveFolders);
-                SettingsManager.LastSaveFolders = json;
+                var bookmarks = JsonSerializer.Serialize(Bookmarks);
+                var lastSaveFolders = JsonSerializer.Serialize(this.lastSaveFolders);
+                SettingsManager.SetBookmarksAndLastSaveFolders(bookmarks, lastSaveFolders);
             }
             catch (Exception ex)
             {

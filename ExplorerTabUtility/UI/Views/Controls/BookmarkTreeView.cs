@@ -12,6 +12,33 @@ namespace ExplorerTabUtility.UI.Views.Controls
     internal class BookmarkTreeView : TreeView
     {
         /// <summary>
+        /// 是否有保存
+        /// </summary>
+        public bool HaveSave { get; private set; }
+
+        private string? oldName;
+
+        public BookmarkTreeView()
+        {
+            SetupEventHandlers();
+        }
+
+        private void SetupEventHandlers()
+        {
+            MouseDoubleClick += BookmarkTreeView_MouseDoubleClick;
+        }
+
+        private void BookmarkTreeView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var info = (BookmarkTreeViewInfo)SelectedItem;
+            if (info == null || info.Parent == null) return;
+
+            oldName = info.Name;
+            info.IsEditMode = true;
+            info.IsExpanded = !info.IsExpanded;
+        }
+
+        /// <summary>
         /// 获取选中项的SaveFolderItem
         /// </summary>
         /// <returns></returns>
@@ -34,10 +61,39 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 return false;
             }
 
-            if (BookmarkManager.Instance.Save(selected.SaveFolderItem.Key, "新建文件夹", out var newFolder))
+            oldName = null;
+            var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
+            var newInfo = new BookmarkTreeViewInfo(newFolder, selected.Level + 1, selected, false)
             {
-                var newInfo = CreateItemWithOutBookmark(newFolder, selected.Level, selected, false, newFolder.Id, false);
-                selected.Children.Add(newInfo);
+                IsEditMode = true
+            };
+            selected.Children.Add(newInfo);
+            selected.IsExpanded = true;
+            errorMsg = string.Empty;
+            return true;
+        }
+
+        public bool AddFolder(BookmarkTreeViewInfo newInfo, out string errorMsg)
+        {
+            if (string.IsNullOrWhiteSpace(newInfo.Name))
+            {
+                errorMsg = "文件夹名不能为空";
+                return false;
+            }
+
+            if (oldName == newInfo.Name)
+            {
+                errorMsg = string.Empty;
+                return true;
+            }
+
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+            if (BookmarkManager.Instance.Save(newInfo.Parent.SaveFolderItem.Key, newInfo.CurrentFolder.Id, newInfo.Name, out var newFolder))
+            {
+                HaveSave = true;
+                newInfo.UpdateFolder(newFolder);
+                newInfo.IsEditMode = false;
+
                 errorMsg = string.Empty;
                 return true;
             }
@@ -46,6 +102,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 errorMsg = "保存失败";
                 return false;
             }
+#pragma warning restore CS8602 // 解引用可能出现空引用。
         }
 
         #region 设置数据源

@@ -200,24 +200,15 @@ public static class SettingsManager
         }
     }
 
-    public static string Bookmarks
-    {
-        get => Settings.Bookmarks;
-        set
-        {
-            Settings.Bookmarks = value;
-            SaveSettings();
-        }
-    }
+    public static string Bookmarks => Settings.Bookmarks;
 
-    public static string LastSaveFolders
+    public static string LastSaveFolders => Settings.LastSaveFolders;
+
+    public static void SetBookmarksAndLastSaveFolders(string bookmarks, string lastSaveFolders)
     {
-        get => Settings.LastSaveFolders;
-        set
-        {
-            Settings.LastSaveFolders = value;
-            SaveSettings();
-        }
+        Settings.Bookmarks = bookmarks;
+        Settings.LastSaveFolders = lastSaveFolders;
+        SaveSettings();
     }
 
     public static void SaveSettings()

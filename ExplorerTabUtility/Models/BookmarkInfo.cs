@@ -8,7 +8,7 @@ namespace ExplorerTabUtility.Models
     [JsonDerivedType(typeof(SaveFolderInfo), typeDiscriminator: "SaveFolder")]
     [JsonDerivedType(typeof(BookmarkInfo), typeDiscriminator: "Bookmark")]
     [JsonDerivedType(typeof(FolderInfo), typeDiscriminator: "Folder")]
-    internal abstract class BaseBookmarkInfo
+    public abstract class BaseBookmarkInfo
     {
         /// <summary>
         /// 唯一主键
@@ -32,7 +32,7 @@ namespace ExplorerTabUtility.Models
         }
     }
 
-    internal class BookmarkInfo : BaseBookmarkInfo
+    public class BookmarkInfo : BaseBookmarkInfo
     {
         /// <summary>
         /// 书签路径
@@ -50,7 +50,7 @@ namespace ExplorerTabUtility.Models
         }
     }
 
-    internal class FolderInfo : BaseBookmarkInfo
+    public class FolderInfo : BaseBookmarkInfo
     {
         public static readonly FolderInfo Empty = new FolderInfo(Guid.Empty, string.Empty);
 
@@ -112,7 +112,7 @@ namespace ExplorerTabUtility.Models
         }
     }
 
-    internal class SaveFolderInfo : BaseBookmarkInfo
+    public class SaveFolderInfo : BaseBookmarkInfo
     {
         public SaveFolderInfo(FolderInfo folder) : base(folder.Id, folder.Name)
         {

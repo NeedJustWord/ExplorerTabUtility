@@ -6,7 +6,7 @@ using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
 namespace ExplorerTabUtility.Models
 {
-    internal class BookmarkTreeViewInfo : BindableBase
+    public class BookmarkTreeViewInfo : BindableBase
     {
         #region 属性
         private bool isSelected;
@@ -27,6 +27,16 @@ namespace ExplorerTabUtility.Models
         {
             get { return isExpanded; }
             set { SetProperty(ref isExpanded, value); }
+        }
+
+        private bool isEditMode;
+        /// <summary>
+        /// 是否编辑模式
+        /// </summary>
+        public bool IsEditMode
+        {
+            get { return isEditMode; }
+            set { SetProperty(ref isEditMode, value); }
         }
 
         private string icon;
@@ -102,7 +112,7 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 当前文件夹
         /// </summary>
-        public FolderInfo CurrentFolder { get; }
+        public FolderInfo CurrentFolder { get; private set; }
 
         /// <summary>
         /// 当前书签
@@ -143,6 +153,14 @@ namespace ExplorerTabUtility.Models
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
             name = folderInfo.Name;
+        }
+
+        public void UpdateFolder(FolderInfo folderInfo)
+        {
+            SaveFolderItem.Key = folderInfo.Id;
+            SaveFolderItem.Display = folderInfo.Name;
+            Name = folderInfo.Name;
+            CurrentFolder = folderInfo;
         }
 
         private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)
