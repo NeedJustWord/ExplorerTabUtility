@@ -52,7 +52,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void InitTvSelectSavePath()
         {
-            TvSelectSavePath.SetItems(BookmarkManager.Instance.Bookmarks, BookmarkManager.Instance.LastSaveFolders.First().Id, false);
+            TvSelectSavePath.SetItemsSource(BookmarkManager.Instance.Bookmarks, BookmarkManager.Instance.LastSaveFolders.First().Id, false);
         }
 
         private SaveFolderItem? GetSaveFolder()
@@ -165,7 +165,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BookmarkSavePopup_Deactivated(object? sender, System.EventArgs e)
         {
-            if (CanClose()) CloseWindow();
+            //if (CanClose()) CloseWindow();
         }
         #endregion
     }

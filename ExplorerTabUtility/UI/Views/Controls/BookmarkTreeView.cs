@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using ExplorerTabUtility.Managers;
@@ -16,7 +17,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <returns></returns>
         public SaveFolderItem? GetSaveFolderItem()
         {
-            return ((BookmarkTreeViewItem)SelectedItem)?.SaveFolderItem;
+            return ((BookmarkTreeViewInfo)SelectedItem)?.SaveFolderItem;
         }
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <returns></returns>
         public bool AddFolder(out string errorMsg)
         {
-            var selected = (BookmarkTreeViewItem)SelectedItem;
+            var selected = (BookmarkTreeViewInfo)SelectedItem;
             if (selected == null)
             {
                 errorMsg = "请选择要新建文件夹的路径";
@@ -35,7 +36,8 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
             if (BookmarkManager.Instance.Save(selected.SaveFolderItem.Key, "新建文件夹", out var newFolder))
             {
-                CreateItemWithOutBookmark(selected, newFolder, newFolder.Id, false);
+                var newInfo = CreateItemWithOutBookmark(newFolder, selected.Level, selected, false, newFolder.Id, false);
+                selected.Children.Add(newInfo);
                 errorMsg = string.Empty;
                 return true;
             }
@@ -51,47 +53,55 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// 设置数据源
         /// </summary>
         /// <param name="folders">数据源</param>
+        /// <param name="expandedId">要显示的id</param>
         /// <param name="withBookmark">是否带书签</param>
-        public void SetItems(IReadOnlyCollection<FolderInfo> folders, Guid expandedId, bool withBookmark)
+        public void SetItemsSource(IReadOnlyCollection<FolderInfo> folders, Guid expandedId, bool withBookmark)
         {
-            Items.Clear();
+            var datas = new ObservableCollection<BookmarkTreeViewInfo>();
             if (withBookmark)
             {
+                int index = 0;
                 foreach (var item in folders)
                 {
-                    CreateItemWithBookmark(this, item);
+                    datas.Add(CreateItemWithBookmark(item, 0, null, index == 0));
+                    index++;
                 }
             }
             else
             {
+                int index = 0;
                 foreach (var item in folders)
                 {
-                    CreateItemWithOutBookmark(this, item, expandedId, true);
+                    datas.Add(CreateItemWithOutBookmark(item, 0, null, index == 0, expandedId, true));
+                    index++;
                 }
             }
+            ItemsSource = datas;
         }
 
         /// <summary>
         /// 创建带书签的数据项
         /// </summary>
-        /// <param name="parent"></param>
         /// <param name="folder"></param>
-        private BookmarkTreeViewItem CreateItemWithBookmark(ItemsControl parent, FolderInfo folder)
+        /// <param name="level"></param>
+        /// <param name="parent"></param>
+        /// <param name="isSpecil"></param>
+        /// <returns></returns>
+        private BookmarkTreeViewInfo CreateItemWithBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil)
         {
-            var result = new BookmarkTreeViewItem(folder);
-            parent.Items.Add(result);
-
+            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
             if (folder.Items.Count > 0)
             {
+                level++;
                 foreach (var item in folder.Items)
                 {
                     if (item is FolderInfo folderInfo)
                     {
-                        CreateItemWithBookmark(result, folderInfo);
+                        result.Children.Add(CreateItemWithBookmark(folderInfo, level, result, false));
                     }
                     else if (item is BookmarkInfo bookmarkInfo)
                     {
-                        result.Items.Add(new BookmarkTreeViewItem(bookmarkInfo));
+                        result.Children.Add(new BookmarkTreeViewInfo(bookmarkInfo, level, result));
                     }
                 }
             }
@@ -102,70 +112,51 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <summary>
         /// 创建不带书签的数据项
         /// </summary>
-        /// <param name="parent"></param>
         /// <param name="folder"></param>
+        /// <param name="level"></param>
+        /// <param name="parent"></param>
+        /// <param name="isSpecil"></param>
         /// <param name="expandedId"></param>
         /// <param name="expandedAll"></param>
-        private BookmarkTreeViewItem CreateItemWithOutBookmark(ItemsControl parent, FolderInfo folder, Guid expandedId, bool expandedAll)
+        /// <returns></returns>
+        private BookmarkTreeViewInfo CreateItemWithOutBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedAll)
         {
-            var result = new BookmarkTreeViewItem(folder);
-            parent.Items.Add(result);
-
+            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
             if (folder.Items.Count > 0)
             {
+                level++;
                 var folders = folder.Items.OfType<FolderInfo>();
-                foreach (var item in folders)
+                foreach (var folderInfo in folders)
                 {
-                    CreateItemWithOutBookmark(result, item, expandedId, expandedAll);
+                    result.Children.Add(CreateItemWithOutBookmark(folderInfo, level, result, false, expandedId, expandedAll));
                 }
             }
             if (folder.Id == expandedId)
             {
+                result.IsSelected = true;
                 Expanded(result, expandedAll);
             }
 
             return result;
         }
 
-        private void Expanded(BookmarkTreeViewItem item, bool expandedAll)
+        private void Expanded(BookmarkTreeViewInfo item, bool expandedAll)
         {
             if (expandedAll)
             {
-                var parent = item.Parent as BookmarkTreeViewItem;
+                var parent = item.Parent;
                 while (parent != null)
                 {
                     parent.IsExpanded = true;
-                    parent = parent.Parent as BookmarkTreeViewItem;
+                    parent = parent.Parent;
                 }
             }
             else
             {
-                var parent = item.Parent as BookmarkTreeViewItem;
+                var parent = item.Parent;
                 if (parent != null) parent.IsExpanded = true;
             }
         }
         #endregion
-    }
-
-    internal class BookmarkTreeViewItem : TreeViewItem
-    {
-        private readonly FolderInfo? folder;
-        private readonly BookmarkInfo? bookmark;
-
-        public SaveFolderItem SaveFolderItem { get; private set; }
-
-        public BookmarkTreeViewItem(FolderInfo folder)
-        {
-            this.folder = folder;
-            Header = folder.Name;
-            SaveFolderItem = new SaveFolderItem(folder.Id, folder.Name);
-        }
-
-        public BookmarkTreeViewItem(BookmarkInfo bookmark)
-        {
-            this.bookmark = bookmark;
-            Header = bookmark.Name;
-            SaveFolderItem = new SaveFolderItem(bookmark.Id, bookmark.Name, bookmark.Location);
-        }
     }
 }

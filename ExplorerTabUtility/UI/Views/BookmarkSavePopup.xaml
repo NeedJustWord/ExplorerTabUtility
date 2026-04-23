@@ -43,7 +43,7 @@
             <controls:BookmarkComboBox x:Name="CbSelectSavePath" Grid.Row="4" Grid.ColumnSpan="2" Style="{StaticResource BookmarkComboBoxStyle}"
                                        behaviors:BookmarkHelper.SelectOtherFolderText="选择其他文件夹"/>
 
-            <controls:BookmarkTreeView x:Name="TvSelectSavePath" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource BookmarkTreeViewStyle}"/>
+            <controls:BookmarkTreeView x:Name="TvSelectSavePath" Grid.Row="5" Grid.ColumnSpan="2" Style="{StaticResource BookmarkSaveTreeViewStyle}"/>
 
             <StackPanel Grid.Row="6" Grid.Column="0" HorizontalAlignment="Left">
                 <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"
