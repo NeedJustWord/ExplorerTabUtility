@@ -30,9 +30,14 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         private void BookmarkTreeView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.F2)
+            switch (e.Key)
             {
-                Rename();
+                case Key.F2:
+                    Rename();
+                    break;
+                case Key.Delete:
+                    Delete();
+                    break;
             }
         }
         #endregion
@@ -41,12 +46,22 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <summary>
         /// 重命名
         /// </summary>
-        public void Rename()
+        private void Rename()
         {
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
 
             info.IsEditMode = true;
+        }
+
+        private void Delete()
+        {
+            var info = (BookmarkTreeViewInfo)SelectedItem;
+            if (info == null || info.Parent == null) return;
+
+            BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, info.CurrentFolder, info.GetCurrentAndChildrenIds());
+            info.Parent.Delete(info);
+            HaveSave = true;
         }
 
         /// <summary>

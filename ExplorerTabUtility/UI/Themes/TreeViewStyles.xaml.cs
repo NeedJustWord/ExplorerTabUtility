@@ -19,15 +19,14 @@ namespace ExplorerTabUtility.UI.Themes
             if (isCancel || string.IsNullOrEmpty(info.Name))
             {
                 info.RecoverName();
-            }
-            else
-            {
-                if (info.IsNeedSave && GetParentObjectEx<BookmarkSavePopup>(txt, out var popup))
+                if (info.IsAdd)
                 {
-#pragma warning disable CS8602 // 解引用可能出现空引用。
-                    popup.AddFolder(info);
-#pragma warning restore CS8602 // 解引用可能出现空引用。
+                    AddFolder(txt, info);
                 }
+            }
+            else if (info.IsNeedSave)
+            {
+                AddFolder(txt, info);
             }
 
             isCancel = false;
@@ -47,6 +46,16 @@ namespace ExplorerTabUtility.UI.Themes
                     item.Focus();
 #pragma warning restore CS8602 // 解引用可能出现空引用。
                 }
+            }
+        }
+
+        private void AddFolder(TextBox txt, BookmarkTreeViewInfo info)
+        {
+            if (GetParentObjectEx<BookmarkSavePopup>(txt, out var popup))
+            {
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+                popup.AddFolder(info);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
             }
         }
 

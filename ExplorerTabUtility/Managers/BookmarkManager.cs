@@ -99,14 +99,15 @@ namespace ExplorerTabUtility.Managers
         /// <param name="parentId"></param>
         /// <param name="name"></param>
         /// <param name="location"></param>
-        public void Save(Guid parentId, string name, string location)
+        public bool Save(Guid parentId, string name, string location)
         {
-            if (GetTargetFolderInfoFault(parentId, out var parentFolder)) return;
+            if (GetTargetFolderInfoFault(parentId, out var parentFolder)) return false;
 
             var info = new BookmarkInfo(Guid.NewGuid(), name, location);
             parentFolder.Add(info);
             UpdateLastSaveFolders(parentFolder);
             SaveConfig();
+            return true;
         }
 
         /// <summary>
@@ -126,6 +127,7 @@ namespace ExplorerTabUtility.Managers
                 }
 
                 updateFolder.Id = Guid.NewGuid();
+                updateFolder.Name = name;
                 parentFolder.Add(updateFolder);
             }
             else
@@ -135,6 +137,27 @@ namespace ExplorerTabUtility.Managers
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 删除文件夹
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="current"></param>
+        /// <param name="deleteFolderIds"></param>
+        public void Delete(FolderInfo parent, FolderInfo current, IEnumerable<Guid> deleteFolderIds)
+        {
+            parent.Remove(current.Id);
+
+            var deleteIds = deleteFolderIds.ToList();
+            for (int i = lastSaveFolders.Count - 1; i >= 0; i--)
+            {
+                var folder = lastSaveFolders[i];
+                if (deleteIds.Contains(folder.Id))
+                {
+                    lastSaveFolders.RemoveAt(i);
+                }
+            }
         }
 
         private bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -127,7 +128,12 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 是否需要保存
         /// </summary>
-        public bool IsNeedSave => CurrentFolder.Id == Guid.Empty || name != oldName;
+        public bool IsNeedSave => IsAdd || name != oldName;
+
+        /// <summary>
+        /// 是否是新增
+        /// </summary>
+        public bool IsAdd => Id == Guid.Empty;
 
         /// <summary>
         /// 主键
@@ -182,6 +188,28 @@ namespace ExplorerTabUtility.Models
         {
             SaveFolderItem.Key = CurrentFolder.Id;
             SaveFolderItem.Display = CurrentFolder.Name;
+        }
+
+        public void Delete(BookmarkTreeViewInfo info)
+        {
+            Children.Remove(info);
+        }
+
+        /// <summary>
+        /// 获取当前节点和所有子节点id
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetCurrentAndChildrenIds()
+        {
+            yield return Id;
+
+            foreach (var item in Children)
+            {
+                foreach (var id in item.GetCurrentAndChildrenIds())
+                {
+                    yield return id;
+                }
+            }
         }
 
         private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)

@@ -151,7 +151,12 @@ namespace ExplorerTabUtility.UI.Views
                 return;
             }
 
-            BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation());
+            if (BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation()) == false)
+            {
+                ShowMessage("保存失败", Constants.AppName);
+                return;
+            }
+
             CloseWindow(false);
         }
 
