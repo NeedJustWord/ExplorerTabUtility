@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
 using ExplorerTabUtility.Managers;
@@ -109,18 +110,10 @@ namespace ExplorerTabUtility.UI.Views
             return name;
         }
 
-        private void CloseWindow(bool save)
-        {
-            save |= TvSelectSavePath.HaveSave;
-            if (save) BookmarkManager.Instance.SaveConfig();
-
-            CloseWindow();
-        }
-
         #region 事件注册
         private void SetupEventHandlers()
         {
-            Deactivated += BookmarkSavePopup_Deactivated;
+            KeyDown += BookmarkSavePopup_KeyDown;
             SizeChanged += BookmarkSavePopup_SizeChanged;
             CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
             BtnNewFolder.Click += BtnNewFolder_Click;
@@ -136,7 +129,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            CloseWindow(false);
+            CloseWindow();
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -149,7 +142,7 @@ namespace ExplorerTabUtility.UI.Views
             }
 
             BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation());
-            CloseWindow(true);
+            CloseWindow();
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
@@ -179,9 +172,12 @@ namespace ExplorerTabUtility.UI.Views
             if (e.PreviousSize.Height != 0) Top -= (e.NewSize.Height - e.PreviousSize.Height) / 2;
         }
 
-        private void BookmarkSavePopup_Deactivated(object? sender, System.EventArgs e)
+        private void BookmarkSavePopup_KeyDown(object sender, KeyEventArgs e)
         {
-            //if (CanClose()) CloseWindow(false);
+            if (e.Key == Key.Escape)
+            {
+                CloseWindow();
+            }
         }
         #endregion
     }

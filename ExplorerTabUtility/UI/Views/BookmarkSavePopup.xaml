@@ -28,12 +28,14 @@
 
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                 <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="名称"/>
-                <TextBox x:Name="TxtName" Style="{StaticResource CustomTextBoxStyle}"/>
+                <TextBox x:Name="TxtName" Style="{StaticResource CustomTextBoxStyle}"
+                         Tag="名称"/>
             </StackPanel>
 
             <StackPanel x:Name="SpLocation" Grid.Row="2" Grid.ColumnSpan="2">
                 <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="路径"/>
-                <TextBox x:Name="TxtLocation" Style="{StaticResource CustomTextBoxStyle}"/>
+                <TextBox x:Name="TxtLocation" Style="{StaticResource CustomTextBoxStyle}"
+                         Tag="路径"/>
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.ColumnSpan="2">

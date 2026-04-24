@@ -94,32 +94,32 @@ namespace ExplorerTabUtility.Managers
             var info = new BookmarkInfo(Guid.NewGuid(), name, location);
             parentFolder.Add(info);
             UpdateLastSaveFolders(parentFolder);
+            SaveConfig();
         }
 
         /// <summary>
-        /// 保存文件夹，返回是否成功及新建文件夹信息
+        /// 保存文件夹，返回是否成功
         /// </summary>
         /// <param name="parentId"></param>
-        /// <param name="folderId"></param>
+        /// <param name="updateFolder"></param>
         /// <param name="name"></param>
-        /// <param name="info"></param>
         /// <returns></returns>
-        public bool Save(Guid parentId, Guid folderId, string name, out FolderInfo info)
+        public bool Save(Guid parentId, FolderInfo updateFolder, string name)
         {
-            if (folderId == Guid.Empty)
+            if (updateFolder.Id == Guid.Empty)
             {
                 if (GetTargetFolderInfoFault(parentId, out var parentFolder))
                 {
-                    info = FolderInfo.Empty;
                     return false;
                 }
 
-                info = new FolderInfo(Guid.NewGuid(), name);
-                parentFolder.Add(info);
+                updateFolder.Id = Guid.NewGuid();
+                parentFolder.Add(updateFolder);
             }
             else
             {
-                info = new FolderInfo(folderId, name);
+                updateFolder.Name = name;
+                UpdateLastSaveFolderName(updateFolder);
             }
 
             return true;
@@ -128,6 +128,18 @@ namespace ExplorerTabUtility.Managers
         private bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)
         {
             return bookmarks.Search(folderId, out folder) == false;
+        }
+
+        private void UpdateLastSaveFolderName(FolderInfo folder)
+        {
+            foreach (var item in lastSaveFolders)
+            {
+                if (item.Id == folder.Id)
+                {
+                    item.Name = folder.Name;
+                    break;
+                }
+            }
         }
 
         private void UpdateLastSaveFolders(FolderInfo folder)

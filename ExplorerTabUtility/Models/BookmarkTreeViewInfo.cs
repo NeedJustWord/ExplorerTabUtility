@@ -123,7 +123,19 @@ namespace ExplorerTabUtility.Models
         /// 节点等级
         /// </summary>
         public int Level { get; }
+
+        /// <summary>
+        /// 是否需要保存
+        /// </summary>
+        public bool IsNeedSave => CurrentFolder.Id == Guid.Empty || name != oldName;
+
+        /// <summary>
+        /// 主键
+        /// </summary>
+        public Guid Id => SaveFolderItem.Key;
         #endregion
+
+        private string oldName;
 
         public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent)
         {
@@ -137,7 +149,7 @@ namespace ExplorerTabUtility.Models
             leftMargin = GetMargin(level);
             icon = GetIcon(true, false, false);
             expandedIcon = icon;
-            name = bookmarkInfo.Name;
+            oldName = name = bookmarkInfo.Name;
         }
 
         public BookmarkTreeViewInfo(FolderInfo folderInfo, int level, BookmarkTreeViewInfo? parent, bool isSpecil)
@@ -152,15 +164,24 @@ namespace ExplorerTabUtility.Models
             leftMargin = GetMargin(level);
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
-            name = folderInfo.Name;
+            oldName = name = folderInfo.Name;
         }
 
-        public void UpdateFolder(FolderInfo folderInfo)
+        /// <summary>
+        /// 恢复名称
+        /// </summary>
+        public void RecoverName()
         {
-            SaveFolderItem.Key = folderInfo.Id;
-            SaveFolderItem.Display = folderInfo.Name;
-            Name = folderInfo.Name;
-            CurrentFolder = folderInfo;
+            Name = oldName;
+        }
+
+        /// <summary>
+        /// 更新文件夹信息
+        /// </summary>
+        public void UpdateFolder()
+        {
+            SaveFolderItem.Key = CurrentFolder.Id;
+            SaveFolderItem.Display = CurrentFolder.Name;
         }
 
         private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)

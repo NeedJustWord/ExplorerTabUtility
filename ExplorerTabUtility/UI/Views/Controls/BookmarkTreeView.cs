@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
@@ -11,31 +12,36 @@ namespace ExplorerTabUtility.UI.Views.Controls
 {
     internal class BookmarkTreeView : TreeView
     {
-        /// <summary>
-        /// 是否有保存
-        /// </summary>
-        public bool HaveSave { get; private set; }
-
-        private string? oldName;
-
         public BookmarkTreeView()
         {
             SetupEventHandlers();
         }
 
+        #region 事件注册
         private void SetupEventHandlers()
         {
-            MouseDoubleClick += BookmarkTreeView_MouseDoubleClick;
+            KeyDown += BookmarkTreeView_KeyDown;
         }
 
-        private void BookmarkTreeView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void BookmarkTreeView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.F2)
+            {
+                Rename();
+            }
+        }
+        #endregion
+
+        #region 功能
+        /// <summary>
+        /// 重命名
+        /// </summary>
+        public void Rename()
         {
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
 
-            oldName = info.Name;
             info.IsEditMode = true;
-            info.IsExpanded = !info.IsExpanded;
         }
 
         /// <summary>
@@ -61,7 +67,6 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 return false;
             }
 
-            oldName = null;
             var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
             var newInfo = new BookmarkTreeViewInfo(newFolder, selected.Level + 1, selected, false)
             {
@@ -73,25 +78,19 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return true;
         }
 
+        /// <summary>
+        /// 新建文件夹，返回是否成功
+        /// </summary>
+        /// <param name="newInfo"></param>
+        /// <param name="errorMsg"></param>
+        /// <returns></returns>
         public bool AddFolder(BookmarkTreeViewInfo newInfo, out string errorMsg)
         {
-            if (string.IsNullOrWhiteSpace(newInfo.Name))
-            {
-                errorMsg = "文件夹名不能为空";
-                return false;
-            }
-
-            if (oldName == newInfo.Name)
-            {
-                errorMsg = string.Empty;
-                return true;
-            }
-
 #pragma warning disable CS8602 // 解引用可能出现空引用。
-            if (BookmarkManager.Instance.Save(newInfo.Parent.SaveFolderItem.Key, newInfo.CurrentFolder.Id, newInfo.Name, out var newFolder))
+            if (BookmarkManager.Instance.Save(newInfo.Parent.Id, newInfo.CurrentFolder, newInfo.Name))
+#pragma warning restore CS8602 // 解引用可能出现空引用。
             {
-                HaveSave = true;
-                newInfo.UpdateFolder(newFolder);
+                newInfo.UpdateFolder();
                 newInfo.IsEditMode = false;
 
                 errorMsg = string.Empty;
@@ -102,8 +101,8 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 errorMsg = "保存失败";
                 return false;
             }
-#pragma warning restore CS8602 // 解引用可能出现空引用。
         }
+        #endregion
 
         #region 设置数据源
         /// <summary>

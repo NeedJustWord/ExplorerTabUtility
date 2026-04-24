@@ -47,7 +47,7 @@
             <TextBlock x:Name="Icon" Text="{Binding Icon}" Style="{StaticResource BookmarkIconStyle}"/>
             <TextBlock Text="{Binding Name}" Style="{StaticResource BookmarkDisplayStyle}"
                        Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-            <TextBox Text="{Binding Name}" Tag="{Binding}" Style="{StaticResource BookmarkEditStyle}"
+            <TextBox Text="{Binding Name}" Tag="文件夹名" Style="{StaticResource BookmarkEditStyle}"
                      behaviors:BookmarkHelper.IsFocused="{Binding IsEditMode}"
                      Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Visible}}"
                      LostFocus="BookmarkEdit_LostFocus" KeyDown="BookmarkEdit_KeyDown"/>
