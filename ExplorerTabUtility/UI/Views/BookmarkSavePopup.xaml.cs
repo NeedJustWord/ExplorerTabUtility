@@ -110,6 +110,16 @@ namespace ExplorerTabUtility.UI.Views
             return name;
         }
 
+        private void CloseWindow(bool isCancel)
+        {
+            if (isCancel && TvSelectSavePath.HaveSave)
+            {
+                BookmarkManager.Instance.RecoverConfig();
+            }
+
+            CloseWindow();
+        }
+
         #region 事件注册
         private void SetupEventHandlers()
         {
@@ -129,7 +139,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
-            CloseWindow();
+            CloseWindow(true);
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -142,7 +152,7 @@ namespace ExplorerTabUtility.UI.Views
             }
 
             BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation());
-            CloseWindow();
+            CloseWindow(false);
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
@@ -176,7 +186,7 @@ namespace ExplorerTabUtility.UI.Views
         {
             if (e.Key == Key.Escape)
             {
-                CloseWindow();
+                CloseWindow(true);
             }
         }
         #endregion

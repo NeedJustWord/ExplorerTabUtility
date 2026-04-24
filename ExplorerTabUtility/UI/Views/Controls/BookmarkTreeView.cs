@@ -12,6 +12,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
 {
     internal class BookmarkTreeView : TreeView
     {
+        /// <summary>
+        /// 是否有保存
+        /// </summary>
+        public bool HaveSave { get; private set; }
+
         public BookmarkTreeView()
         {
             SetupEventHandlers();
@@ -90,6 +95,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             if (BookmarkManager.Instance.Save(newInfo.Parent.Id, newInfo.CurrentFolder, newInfo.Name))
 #pragma warning restore CS8602 // 解引用可能出现空引用。
             {
+                HaveSave = true;
                 newInfo.UpdateFolder();
                 newInfo.IsEditMode = false;
 

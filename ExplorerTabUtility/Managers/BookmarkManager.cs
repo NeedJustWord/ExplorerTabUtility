@@ -50,6 +50,18 @@ namespace ExplorerTabUtility.Managers
             LoadBookmark();
         }
 
+        /// <summary>
+        /// 恢复配置
+        /// </summary>
+        public void RecoverConfig()
+        {
+            lastSaveFolders.Clear();
+            folderInfo.Items.Clear();
+            otherFolderInfo.Items.Clear();
+
+            LoadBookmark();
+        }
+
         private void LoadBookmark()
         {
             try
