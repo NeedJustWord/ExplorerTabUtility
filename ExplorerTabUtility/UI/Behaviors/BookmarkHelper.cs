@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using ExplorerTabUtility.Helpers;
+using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Behaviors
 {
@@ -111,23 +112,35 @@ namespace ExplorerTabUtility.UI.Behaviors
             }
         }
 
+        private static TreeViewItem? lastBringItem;
+
         private static void Item_Selected(object sender, RoutedEventArgs e)
         {
             // 确保只有当前选中的项触发，避免冒泡导致的问题
             if (e.OriginalSource is TreeViewItem selectedItem)
             {
+                if (lastBringItem == selectedItem) return;
+
+                lastBringItem = selectedItem;
                 selectedItem.BringIntoView();
 
                 var scrollViewer = VisualTreeHelperEx.GetParent<ScrollViewer>(selectedItem);
                 if (scrollViewer != null)
                 {
-                    scrollViewer.ScrollToRightEnd();
-                }
-            }
+                    var info = (BookmarkTreeViewInfo)selectedItem.DataContext;
+                    var left = info.Level * 20;
 
-            if (sender is TreeViewItem item)
-            {
-                item.Selected -= Item_Selected;
+                    var svWidth = scrollViewer.ActualWidth;
+                    var offset = scrollViewer.HorizontalOffset;
+
+                    var diff = left - offset;
+                    if (diff > 0 && diff < svWidth / 2)
+                    {
+                        diff = 0;
+                    }
+
+                    scrollViewer.ScrollToHorizontalOffset(offset + diff);
+                }
             }
         }
         #endregion
