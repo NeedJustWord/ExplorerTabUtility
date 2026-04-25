@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views;
 
@@ -40,40 +40,21 @@ namespace ExplorerTabUtility.UI.Themes
                 if (isCancel) e.Handled = true;
 
                 var txt = (TextBox)sender;
-                if (GetParentObjectEx<TreeViewItem>(txt, out var item))
+                var item = VisualTreeHelperEx.GetParent<TreeViewItem>(txt);
+                if (item != null)
                 {
-#pragma warning disable CS8602 // 解引用可能出现空引用。
                     item.Focus();
-#pragma warning restore CS8602 // 解引用可能出现空引用。
                 }
             }
         }
 
         private void AddFolder(TextBox txt, BookmarkTreeViewInfo info)
         {
-            if (GetParentObjectEx<BookmarkSavePopup>(txt, out var popup))
+            var popup = VisualTreeHelperEx.GetParent<BookmarkSavePopup>(txt);
+            if (popup != null)
             {
-#pragma warning disable CS8602 // 解引用可能出现空引用。
                 popup.AddFolder(info);
-#pragma warning restore CS8602 // 解引用可能出现空引用。
             }
-        }
-
-        private bool GetParentObjectEx<TreeViewItem>(DependencyObject obj, out TreeViewItem? result) where TreeViewItem : FrameworkElement
-        {
-            DependencyObject parent = VisualTreeHelper.GetParent(obj);
-            while (parent != null)
-            {
-                if (parent is TreeViewItem item)
-                {
-                    result = item;
-                    return true;
-                }
-                parent = VisualTreeHelper.GetParent(parent);
-            }
-
-            result = null;
-            return false;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using ExplorerTabUtility.Helpers;
 
 namespace ExplorerTabUtility.UI.Behaviors
 {
@@ -74,6 +75,60 @@ namespace ExplorerTabUtility.UI.Behaviors
         private static void FrameworkElement_LostFocus(object sender, RoutedEventArgs e)
         {
             ((FrameworkElement)sender).SetValue(IsFocusedProperty, false);
+        }
+        #endregion
+
+        #region 聚焦到选中行
+        public static readonly DependencyProperty IsBringIntoViewWhenSelectedProperty =
+            DependencyProperty.RegisterAttached(
+                "IsBringIntoViewWhenSelected",
+                typeof(bool),
+                typeof(BookmarkHelper),
+                new PropertyMetadata(false, OnIsBringIntoViewWhenSelectedChanged));
+
+        public static bool GetIsBringIntoViewWhenSelected(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsBringIntoViewWhenSelectedProperty);
+        }
+
+        public static void SetIsBringIntoViewWhenSelected(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsBringIntoViewWhenSelectedProperty, value);
+        }
+
+        private static void OnIsBringIntoViewWhenSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is TreeViewItem item)
+            {
+                if ((bool)e.NewValue)
+                {
+                    item.Selected += Item_Selected;
+                }
+                else
+                {
+                    item.Selected -= Item_Selected;
+                }
+            }
+        }
+
+        private static void Item_Selected(object sender, RoutedEventArgs e)
+        {
+            // 确保只有当前选中的项触发，避免冒泡导致的问题
+            if (e.OriginalSource is TreeViewItem selectedItem)
+            {
+                selectedItem.BringIntoView();
+
+                var scrollViewer = VisualTreeHelperEx.GetParent<ScrollViewer>(selectedItem);
+                if (scrollViewer != null)
+                {
+                    scrollViewer.ScrollToRightEnd();
+                }
+            }
+
+            if (sender is TreeViewItem item)
+            {
+                item.Selected -= Item_Selected;
+            }
         }
         #endregion
     }
