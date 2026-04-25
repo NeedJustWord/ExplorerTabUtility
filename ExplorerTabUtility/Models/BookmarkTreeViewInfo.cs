@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows;
 using System.Windows.Controls;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
@@ -68,16 +67,6 @@ namespace ExplorerTabUtility.Models
         {
             get { return clickMode; }
             set { SetProperty(ref clickMode, value); }
-        }
-
-        private Thickness leftMargin;
-        /// <summary>
-        /// 左侧偏移量
-        /// </summary>
-        public Thickness LeftMargin
-        {
-            get { return leftMargin; }
-            set { SetProperty(ref leftMargin, value); }
         }
 
         private string name;
@@ -152,7 +141,6 @@ namespace ExplorerTabUtility.Models
             Level = level;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
-            leftMargin = GetMargin(level);
             icon = GetIcon(true, false, false);
             expandedIcon = icon;
             oldName = name = bookmarkInfo.Name;
@@ -167,7 +155,6 @@ namespace ExplorerTabUtility.Models
             Level = level;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
-            leftMargin = GetMargin(level);
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
             oldName = name = folderInfo.Name;
@@ -217,11 +204,6 @@ namespace ExplorerTabUtility.Models
             if (isBookmark) return "📄";
             if (isSpecil) return "⭐";
             return isExpanded ? "📂" : "📁";
-        }
-
-        private Thickness GetMargin(int level)
-        {
-            return new Thickness(level * 30, 0, 0, 0);
         }
     }
 }

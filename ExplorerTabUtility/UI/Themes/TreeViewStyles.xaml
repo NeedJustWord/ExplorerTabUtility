@@ -3,13 +3,58 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:models="clr-namespace:ExplorerTabUtility.Models"
                     xmlns:behaviors="clr-namespace:ExplorerTabUtility.UI.Behaviors"
-                    xmlns:converters="clr-namespace:ExplorerTabUtility.UI.Converters">
+                    xmlns:converters="clr-namespace:ExplorerTabUtility.UI.Converters"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/ExplorerTabUtility;component/UI/Themes/TextBoxStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <system:Double x:Key="MarginLeftUnit">20</system:Double>
+
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    <converters:LevelToThicknessConverter x:Key="LevelToThicknessConverter"/>
+
+    <!--展开按钮图标和样式-->
+    <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+    <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Width" Value="16"/>
+        <Setter Property="Height" Value="16"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+                        <Path x:Name="ExpandPath" Data="{StaticResource TreeArrow}" Fill="{StaticResource TextPrimaryBrush}" Stroke="{StaticResource TextPrimaryBrush}">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="135" CenterY="3" CenterX="3"/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="RenderTransform" TargetName="ExpandPath">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180" CenterY="3" CenterX="3"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!--焦点样式-->
+    <Style x:Key="TreeViewItemFocusVisual">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <!--图标样式-->
     <Style x:Key="BookmarkIconStyle" TargetType="TextBlock">
@@ -43,18 +88,46 @@
 
     <!--保存书签的显示样式-->
     <HierarchicalDataTemplate x:Key="BookmarkSaveDisplayStyle" DataType="{x:Type models:BookmarkTreeViewInfo}" ItemsSource="{Binding Children}">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock x:Name="Icon" Text="{Binding Icon}" Style="{StaticResource BookmarkIconStyle}"/>
-            <TextBlock Text="{Binding Name}" Style="{StaticResource BookmarkDisplayStyle}"
-                       Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-            <TextBox Text="{Binding Name}" Tag="文件夹名" Style="{StaticResource BookmarkEditStyle}"
-                     behaviors:BookmarkHelper.IsFocused="{Binding IsEditMode}"
-                     Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Visible}}"
-                     LostFocus="BookmarkEdit_LostFocus" KeyDown="BookmarkEdit_KeyDown"/>
-        </StackPanel>
+        <Border x:Name="RowBorder" CornerRadius="4" BorderThickness="1" Background="{StaticResource ControlBackgroundBrush}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition MinWidth="19" Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <ToggleButton x:Name="Expander" ClickMode="Press" Style="{StaticResource ExpandCollapseToggleStyle}" IsChecked="{Binding IsExpanded}"
+                              Margin="{Binding Level,Converter={StaticResource LevelToThicknessConverter},ConverterParameter={StaticResource MarginLeftUnit}}"/>
+
+                <TextBlock x:Name="Icon" Grid.Column="1" Text="{Binding Icon}" Style="{StaticResource BookmarkIconStyle}"/>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" Style="{StaticResource BookmarkDisplayStyle}"
+                               Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
+                    <TextBox Text="{Binding Name}" Tag="文件夹名" Style="{StaticResource BookmarkEditStyle}"
+                             behaviors:BookmarkHelper.IsFocused="{Binding IsEditMode}"
+                             LostFocus="BookmarkEdit_LostFocus" KeyDown="BookmarkEdit_KeyDown"
+                             Visibility="{Binding IsEditMode,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Visible}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
         <HierarchicalDataTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsExpanded, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+            <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="False">
+                <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsExpanded}" Value="true"/>
+                    <Condition Binding="{Binding HasItems, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="true"/>
+                </MultiDataTrigger.Conditions>
                 <Setter TargetName="Icon" Property="Text" Value="{Binding ExpandedIcon}"/>
+            </MultiDataTrigger>
+            <Trigger SourceName="RowBorder" Property="IsMouseOver" Value="True">
+                <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                <Setter TargetName="RowBorder" Property="BorderBrush" Value="{StaticResource PrimaryBrush}" />
+            </Trigger>
+            <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="True">
+                <Setter TargetName="RowBorder" Property="Background" Value="{StaticResource PrimaryBrush}"/>
             </DataTrigger>
         </HierarchicalDataTemplate.Triggers>
     </HierarchicalDataTemplate>
@@ -63,13 +136,48 @@
     <Style x:Key="BookmarkSaveItemContainerStyle" TargetType="{x:Type TreeViewItem}">
         <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource TreeViewItemFocusVisual}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <ContentPresenter x:Name="PART_Header" ContentSource="Header" HorizontalAlignment="Stretch" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        <ItemsPresenter x:Name="ItemsHost" Grid.Column="0" Grid.Row="1"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="false">
+                            <Setter Property="Visibility" TargetName="ItemsHost" Value="Collapsed"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                <Setter Property="ItemsPanel">
+                    <Setter.Value>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel/>
+                        </ItemsPanelTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!--保存书签的树形控件样式-->
     <Style x:Key="BookmarkSaveTreeViewStyle" TargetType="TreeView">
         <Setter Property="Height" Value="300"/>
         <Setter Property="Margin" Value="4 0 4 0"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
         <Setter Property="ItemTemplate" Value="{StaticResource BookmarkSaveDisplayStyle}"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource BookmarkSaveItemContainerStyle}"/>
     </Style>
