@@ -12,9 +12,19 @@ namespace ExplorerTabUtility.Managers
         public static BookmarkManager Instance { get; } = new BookmarkManager();
 
         /// <summary>
-        /// 书签
+        /// 书签集合
         /// </summary>
         public IReadOnlyList<FolderInfo> Bookmarks { get; }
+
+        /// <summary>
+        /// 书签
+        /// </summary>
+        public FolderInfo Folder => folderInfo;
+
+        /// <summary>
+        /// 其他书签
+        /// </summary>
+        public FolderInfo OtherFolder => otherFolderInfo;
 
         /// <summary>
         /// 上次保存路径

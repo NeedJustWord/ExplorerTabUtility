@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="ExplorerTabUtility.UI.Views.Controls.BookmarkBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!--主书签-->
+        <Menu Grid.Column="0" x:Name="MnuMainBookmarks" Style="{StaticResource BookmarkBarMenuStyle}"/>
+
+        <!--溢出书签-->
+        <Menu Grid.Column="1" x:Name="MnuOverflowBookmarks" Style="{StaticResource BookmarkBarMenuStyle}"/>
+
+        <!--分隔符-->
+        <Border Grid.Column="2" Background="{StaticResource ControlBackgroundBrush}">
+            <TextBlock x:Name="TxtSeparator" Text="|" Style="{StaticResource BookmarkBarDisplayStyle}"/>
+        </Border>
+
+        <!--其他书签-->
+        <Menu Grid.Column="3" x:Name="MnuOtherBookmarks" Style="{StaticResource BookmarkBarMenuStyle}"/>
+    </Grid>
+</UserControl>
