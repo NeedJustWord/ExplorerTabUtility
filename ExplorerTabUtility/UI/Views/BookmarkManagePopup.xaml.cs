@@ -37,10 +37,10 @@ namespace ExplorerTabUtility.UI.Views
             switch (args.OpenType)
             {
                 case BookmarkOpenType.CurrentTab:
-                    await explorerWatcher.Open(args.Bookmark.Location, true, windowHandle);
+                    await explorerWatcher.Open(args.Bookmark.Location, true, windowHandle, inCurrentTab: true);
                     break;
                 case BookmarkOpenType.NewTab:
-                    explorerWatcher.OpenNewTab(windowHandle, args.Bookmark.Location);
+                    await explorerWatcher.Open(args.Bookmark.Location, true, windowHandle, inCurrentTab: false);
                     break;
                 case BookmarkOpenType.NewWindow:
                     await explorerWatcher.Open(args.Bookmark.Location, false, windowHandle);

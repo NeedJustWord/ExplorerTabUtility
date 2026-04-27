@@ -187,7 +187,7 @@ public class ExplorerWatcher : IHook
         if (bringToFront)
             WinApi.RestoreWindowToForeground(windowHandle);
     }
-    public async Task Open(string? location, bool asTab, nint windowHandle, int delay = 0)
+    public async Task Open(string? location, bool asTab, nint windowHandle, int delay = 0, bool inCurrentTab = false)
     {
         if (delay > 0)
             await Task.Delay(delay);
@@ -224,15 +224,15 @@ public class ExplorerWatcher : IHook
 
         if (_windowEntryDict.Count > 0)
         {
-            OpenNewTab(windowHandle, normalizedPath);
+            OpenInTab(windowHandle, normalizedPath, inCurrentTab);
             return;
         }
 
         await OpenNewWindowWithSelection(new WindowRecord(normalizedPath));
     }
-    public void OpenNewTab(nint windowHandle, string location)
+    public void OpenInTab(nint windowHandle, string location, bool inCurrentTab)
     {
-        _ = OpenTabNavigateWithSelection(new WindowRecord(location, windowHandle), windowHandle);
+        _ = OpenTabNavigateWithSelection(new WindowRecord(location, windowHandle), windowHandle, inCurrentTab: inCurrentTab);
     }
     public async Task DuplicateActiveTab(nint windowHandle, bool asTab)
     {
@@ -601,7 +601,7 @@ public class ExplorerWatcher : IHook
                 _toOpenWindowsLock.Release();
         }
     }
-    private async Task OpenTabNavigateWithSelection(WindowRecord windowToOpen, nint windowHandle = 0, bool isDuplicate = false, bool forceTabReuse = false)
+    private async Task OpenTabNavigateWithSelection(WindowRecord windowToOpen, nint windowHandle = 0, bool isDuplicate = false, bool forceTabReuse = false, bool inCurrentTab = false)
     {
         await _toOpenWindowsLock.WaitAsync();
         try
@@ -629,18 +629,26 @@ public class ExplorerWatcher : IHook
                 return;
             }
 
-            // Store the current tabs
-            var currentTabs = Helper.GetAllExplorerTabs(mainWindowHWnd).ToArray();
+            nint openTabHandle;
+            if (inCurrentTab)
+            {
+                openTabHandle = GetActiveTabHandle(windowHandle);
+            }
+            else
+            {
+                // Store the current tabs
+                var currentTabs = Helper.GetAllExplorerTabs(mainWindowHWnd).ToArray();
 
-            // Request to open a new tab
-            await RequestToOpenNewTab(mainWindowHWnd, lockToOpenWindows: false);
+                // Request to open a new tab
+                await RequestToOpenNewTab(mainWindowHWnd, lockToOpenWindows: false);
 
-            // Wait for the new tab
-            var newTabHandle = await Helper.ListenForNewExplorerTabAsync(mainWindowHWnd, currentTabs, 2_000);
-            if (newTabHandle == 0) return;
+                // Wait for the new tab
+                openTabHandle = await Helper.ListenForNewExplorerTabAsync(mainWindowHWnd, currentTabs, 2_000);
+            }
+            if (openTabHandle == 0) return;
 
             // Get the window object
-            var window = await Helper.DoUntilNotDefaultAsync(() => GetWindowByTabHandle(newTabHandle), 2_000, 50);
+            var window = await Helper.DoUntilNotDefaultAsync(() => GetWindowByTabHandle(openTabHandle), 2_000, 50);
             if (window == null) return;
 
             var tcs = new TaskCompletionSource<bool>();
