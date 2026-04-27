@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -215,14 +216,40 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             allBookmarks.Remove(info);
             mainBookmarks.Remove(info);
+
+            //todo:添加是否需要更新布局的判断
+            UpdateMenuLayout();
         }
 
-        public void FolderRename(BookmarkBarInfo info, string newName)
+        public void RenameFolder(BookmarkBarInfo info, string newName)
         {
             info.Name = newName;
 
             if (info.FirstLevel == false) return;
 
+            info.Width = 0;
+            UpdateMenuLayout();
+        }
+
+        public void EditBookmark(BookmarkBarInfo info, BookmarkInfo bookmark)
+        {
+            info.Name = bookmark.Name;
+
+            if (info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
+
+            if (info.Parent.CurrentFolder.Id != bookmark.ParentId)
+            {
+                info.Parent.Delete(info);
+
+                var searchInfo = new BookmarkBarInfo(allBookmarks.Union(otherBookmarks));
+                var newParent = searchInfo.SearchFolder(bookmark.ParentId);
+                if (newParent != null)
+                {
+                    newParent.Add(info);
+                }
+            }
+
+            //todo:添加是否需要更新布局的判断
             info.Width = 0;
             UpdateMenuLayout();
         }

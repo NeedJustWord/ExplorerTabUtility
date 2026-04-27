@@ -85,6 +85,7 @@ namespace ExplorerTabUtility.Managers
         public void FolderRename(FolderInfo info, string newName)
         {
             info.Name = newName;
+            UpdateLastSaveFolderName(info);
             SaveConfig();
         }
 
@@ -134,16 +135,34 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 保存书签
         /// </summary>
-        /// <param name="parentId"></param>
-        /// <param name="name"></param>
-        /// <param name="location"></param>
-        public bool Save(Guid parentId, string name, string location)
+        /// <param name="lastParentId">上次的父节点id</param>
+        /// <param name="currentParentId">这次的父节点id</param>
+        /// <param name="bookmark">书签</param>
+        /// <param name="newName">新书签名称</param>
+        /// <param name="newLocation">新书签路径</param>
+        /// <returns></returns>
+        public bool Save(Guid lastParentId, Guid currentParentId, BookmarkInfo bookmark, string newName, string newLocation)
         {
-            if (GetTargetFolderInfoFault(parentId, out var parentFolder)) return false;
+            if (GetTargetFolderInfoFault(currentParentId, out var currentParentFolder)) return false;
 
-            var info = new BookmarkInfo(Guid.NewGuid(), name, location);
-            parentFolder.Add(info);
-            UpdateLastSaveFolders(parentFolder);
+            bookmark.Name = newName;
+            bookmark.Location = newLocation;
+            if (lastParentId == Guid.Empty)
+            {
+                //上次父节点为空，新增书签
+                bookmark.Id = Guid.NewGuid();
+            }
+            else
+            {
+                //上次父节点非空，修改书签
+                if (GetTargetFolderInfoFault(lastParentId, out var lastParentFolder) == false)
+                {
+                    lastParentFolder.Remove(bookmark.Id);
+                }
+            }
+
+            currentParentFolder.Add(bookmark);
+            UpdateLastSaveFolders(currentParentFolder);
             SaveConfig();
             return true;
         }

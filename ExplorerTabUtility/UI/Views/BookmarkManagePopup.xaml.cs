@@ -42,7 +42,7 @@ namespace ExplorerTabUtility.UI.Views
                     EntryDialog();
                     if (popup.ShowDialog() == true)
                     {
-                        BookmarkBar.FolderRename(info, folder.Name);
+                        BookmarkBar.RenameFolder(info, folder.Name);
                     }
                     ExitDialog();
                     break;
@@ -66,6 +66,13 @@ namespace ExplorerTabUtility.UI.Views
                     CloseWindow();
                     break;
                 case BookmarkBarAction.Edit:
+                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, bookmark, info.Parent.CurrentFolder.Id);
+                    EntryDialog();
+                    if (popup.ShowDialog() == true)
+                    {
+                        BookmarkBar.EditBookmark(info, bookmark);
+                    }
+                    ExitDialog();
                     break;
             }
         }

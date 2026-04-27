@@ -37,6 +37,12 @@ namespace ExplorerTabUtility.Models
         public static readonly BookmarkInfo Empty = new BookmarkInfo(Guid.Empty, string.Empty, string.Empty);
 
         /// <summary>
+        /// 父节点Id
+        /// </summary>
+        [JsonIgnore]
+        public Guid ParentId { get; set; }
+
+        /// <summary>
         /// 书签路径
         /// </summary>
         public string Location { get; set; }

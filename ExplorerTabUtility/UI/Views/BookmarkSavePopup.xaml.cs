@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -16,17 +17,19 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkSavePopup : BaseWindow
     {
+        private Guid parentId;
         private BookmarkSaveType saveType;
-        private WindowRecord currentWindowRecord;
+        private BookmarkInfo currentBookmarkInfo;
         private FolderInfo currentFolderInfo;
 
         public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
             InitializeComponent();
 
+            var location = GetLocation();
+            currentBookmarkInfo = new BookmarkInfo(Guid.Empty, GetName(location), location);
             currentFolderInfo = FolderInfo.Empty;
             saveType = BookmarkSaveType.ComboBox;
-            currentWindowRecord = explorerWatcher.GetCurrentTabWindowRecord(windowHandle) ?? new WindowRecord(string.Empty, windowHandle);
 
             Init();
             SetupEventHandlers();
@@ -37,12 +40,26 @@ namespace ExplorerTabUtility.UI.Views
             InitializeComponent();
 
             TxtTitle.Text = "重命名";
+            currentBookmarkInfo = BookmarkInfo.Empty;
             currentFolderInfo = folderInfo;
             saveType = BookmarkSaveType.FolderRename;
-            currentWindowRecord = new WindowRecord(string.Empty);
 
             Init();
             SetupBaseEventHandlers();
+        }
+
+        public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle, BookmarkInfo bookmarkInfo, Guid parentId) : base(explorerWatcher, windowHandle)
+        {
+            InitializeComponent();
+
+            this.parentId = parentId;
+            TxtTitle.Text = "编辑";
+            currentBookmarkInfo = bookmarkInfo;
+            currentFolderInfo = FolderInfo.Empty;
+            saveType = BookmarkSaveType.TreeView;
+
+            Init();
+            SetupEventHandlers();
         }
 
         public void AddFolder(BookmarkTreeViewInfo info)
@@ -55,25 +72,36 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Init()
         {
-            if (saveType == BookmarkSaveType.FolderRename)
+            switch (saveType)
             {
-                TxtName.Text = currentFolderInfo.Name;
-                SpLocation.Visibility = Visibility.Collapsed;
-                BtnNewFolder.Visibility = Visibility.Collapsed;
-                TxtFolder.Visibility = Visibility.Collapsed;
-                CbSelectSavePath.Visibility = Visibility.Collapsed;
-                TvSelectSavePath.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                BtnNewFolder.IsEnabled = false;
-                SpLocation.Visibility = Visibility.Collapsed;
-                BtnNewFolder.Visibility = Visibility.Collapsed;
-                TvSelectSavePath.Visibility = Visibility.Collapsed;
+                case BookmarkSaveType.FolderRename:
+                    TxtName.Text = currentFolderInfo.Name;
+                    SpLocation.Visibility = Visibility.Collapsed;
+                    BtnNewFolder.Visibility = Visibility.Collapsed;
+                    TxtFolder.Visibility = Visibility.Collapsed;
+                    CbSelectSavePath.Visibility = Visibility.Collapsed;
+                    TvSelectSavePath.Visibility = Visibility.Collapsed;
+                    break;
+                case BookmarkSaveType.ComboBox:
+                    BtnNewFolder.IsEnabled = false;
+                    SpLocation.Visibility = Visibility.Collapsed;
+                    BtnNewFolder.Visibility = Visibility.Collapsed;
+                    TvSelectSavePath.Visibility = Visibility.Collapsed;
 
-                TxtName.Text = GetName();
+                    TxtName.Text = GetName(currentBookmarkInfo.Location);
 
-                InitCbSelectSavePath();
+                    InitCbSelectSavePath();
+                    break;
+                case BookmarkSaveType.TreeView:
+                    BtnNewFolder.IsEnabled = false;
+                    CbSelectSavePath.Visibility = Visibility.Collapsed;
+
+                    TxtName.Text = currentBookmarkInfo.Name;
+                    TxtLocation.Text = currentBookmarkInfo.Location;
+                    TxtLocation.ToolTip = currentBookmarkInfo.Location;
+
+                    InitTvSelectSavePath(parentId);
+                    break;
             }
         }
 
@@ -86,9 +114,9 @@ namespace ExplorerTabUtility.UI.Views
             CbSelectSavePath.SelectedItem = lastSaveFolders.First();
         }
 
-        private void InitTvSelectSavePath()
+        private void InitTvSelectSavePath(Guid parentId)
         {
-            TvSelectSavePath.SetItemsSource(BookmarkManager.Instance.Bookmarks, BookmarkManager.Instance.LastSaveFolders.First().Id, false);
+            TvSelectSavePath.SetItemsSource(BookmarkManager.Instance.Bookmarks, parentId, false);
         }
 
         private SaveFolderItem? GetSaveFolder()
@@ -109,28 +137,34 @@ namespace ExplorerTabUtility.UI.Views
             switch (saveType)
             {
                 case BookmarkSaveType.ComboBox:
-                    return currentWindowRecord.DisplayLocation;
+                    return currentBookmarkInfo.Location;
                 default:
                     return TxtLocation.Text;
             }
         }
 
-        private string GetName()
+        private string GetLocation()
+        {
+            var record = explorerWatcher.GetCurrentTabWindowRecord(windowHandle);
+            return record == null ? string.Empty : record.DisplayLocation;
+        }
+
+        private string GetName(string location)
         {
             string name;
-            switch (currentWindowRecord.DisplayLocation)
+            switch (location)
             {
                 case "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}":
                     name = "此电脑";
                     break;
                 default:
-                    if (currentWindowRecord.DisplayLocation.EndsWith(":"))
+                    if (location.EndsWith(":"))
                     {
-                        name = $"{currentWindowRecord.DisplayLocation.TrimEnd(':')}盘";
+                        name = $"{location.TrimEnd(':')}盘";
                     }
                     else
                     {
-                        name = Path.GetFileName(currentWindowRecord.DisplayLocation);
+                        name = Path.GetFileName(location);
                     }
                     break;
             }
@@ -160,9 +194,13 @@ namespace ExplorerTabUtility.UI.Views
             SetupBaseEventHandlers();
 
             SizeChanged += BookmarkSavePopup_SizeChanged;
-            CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
             BtnNewFolder.Click += BtnNewFolder_Click;
             TvSelectSavePath.SelectedItemChanged += TvSelectSavePath_SelectedItemChanged;
+
+            if (saveType == BookmarkSaveType.ComboBox)
+            {
+                CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
+            }
         }
 
         private void TvSelectSavePath_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -191,11 +229,14 @@ namespace ExplorerTabUtility.UI.Views
                     return;
                 }
 
-                if (BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation()) == false)
+                if (BookmarkManager.Instance.Save(parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
                 {
                     ShowMessage("保存失败", Constants.AppName);
                     return;
                 }
+
+                currentBookmarkInfo.ParentId = saveFolder.Key;
+                if (parentId != Guid.Empty) DialogResult = true;
             }
 
             CloseWindow(false);
@@ -217,10 +258,10 @@ namespace ExplorerTabUtility.UI.Views
             CbSelectSavePath.Visibility = Visibility.Collapsed;
 
             saveType = BookmarkSaveType.TreeView;
-            TxtLocation.Text = currentWindowRecord.DisplayLocation;
-            TxtLocation.ToolTip = currentWindowRecord.DisplayLocation;
+            TxtLocation.Text = currentBookmarkInfo.Location;
+            TxtLocation.ToolTip = currentBookmarkInfo.Location;
 
-            InitTvSelectSavePath();
+            InitTvSelectSavePath(BookmarkManager.Instance.LastSaveFolders.First().Id);
         }
 
         private void BookmarkSavePopup_SizeChanged(object sender, SizeChangedEventArgs e)

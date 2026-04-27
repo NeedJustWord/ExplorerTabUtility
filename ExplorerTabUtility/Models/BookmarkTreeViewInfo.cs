@@ -135,7 +135,7 @@ namespace ExplorerTabUtility.Models
         {
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(bookmarkInfo.Id, bookmarkInfo.Name, bookmarkInfo.Location);
-            CurrentFolder = new FolderInfo(Guid.Empty, string.Empty);
+            CurrentFolder = FolderInfo.Empty;
             CurrentBookmark = bookmarkInfo;
             Level = level;
 
@@ -150,7 +150,7 @@ namespace ExplorerTabUtility.Models
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(folderInfo.Id, folderInfo.Name);
             CurrentFolder = folderInfo;
-            CurrentBookmark = new BookmarkInfo(Guid.Empty, string.Empty, string.Empty);
+            CurrentBookmark = BookmarkInfo.Empty;
             Level = level;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
