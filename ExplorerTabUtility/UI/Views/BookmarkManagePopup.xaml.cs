@@ -29,24 +29,38 @@ namespace ExplorerTabUtility.UI.Views
             Deactivated += BookmarkManagePopup_Deactivated;
             KeyDown += BookmarkManagePopup_KeyDown;
 
-            BookmarkBar.Click += BookmarkBar_Click;
+            BookmarkBar.BookmarkHandle += BookmarkBar_BookmarkHandle;
+            BookmarkBar.FolderHandle += BookmarkBar_FolderHandle;
         }
 
-        private async void BookmarkBar_Click(BookmarkBarClickArgs args)
+        private void BookmarkBar_FolderHandle(FolderInfo info, BookmarkBarAction action)
         {
-            switch (args.OpenType)
+            switch (action)
             {
-                case BookmarkOpenType.CurrentTab:
-                    await explorerWatcher.Open(args.Bookmark.Location, true, windowHandle, inCurrentTab: true);
-                    break;
-                case BookmarkOpenType.NewTab:
-                    await explorerWatcher.Open(args.Bookmark.Location, true, windowHandle, inCurrentTab: false);
-                    break;
-                case BookmarkOpenType.NewWindow:
-                    await explorerWatcher.Open(args.Bookmark.Location, false, windowHandle);
+                case BookmarkBarAction.Rename:
                     break;
             }
-            CloseWindow();
+        }
+
+        private async void BookmarkBar_BookmarkHandle(BookmarkInfo info, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.OpenInCurrentTab:
+                    await explorerWatcher.Open(info.Location, true, windowHandle, inCurrentTab: true);
+                    CloseWindow();
+                    break;
+                case BookmarkBarAction.OpenInNewTab:
+                    await explorerWatcher.Open(info.Location, true, windowHandle, inCurrentTab: false);
+                    CloseWindow();
+                    break;
+                case BookmarkBarAction.OpenInNewWindow:
+                    await explorerWatcher.Open(info.Location, false, windowHandle);
+                    CloseWindow();
+                    break;
+                case BookmarkBarAction.Edit:
+                    break;
+            }
         }
 
         private void BookmarkManagePopup_KeyDown(object sender, KeyEventArgs e)

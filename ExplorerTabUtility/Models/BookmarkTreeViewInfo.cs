@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
@@ -180,23 +179,6 @@ namespace ExplorerTabUtility.Models
         public void Delete(BookmarkTreeViewInfo info)
         {
             Children.Remove(info);
-        }
-
-        /// <summary>
-        /// 获取当前节点和所有子节点id
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<Guid> GetCurrentAndChildrenIds()
-        {
-            yield return Id;
-
-            foreach (var item in Children)
-            {
-                foreach (var id in item.GetCurrentAndChildrenIds())
-                {
-                    yield return id;
-                }
-            }
         }
 
         private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)

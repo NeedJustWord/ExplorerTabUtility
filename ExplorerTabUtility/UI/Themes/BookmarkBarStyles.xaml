@@ -30,6 +30,35 @@
         <Setter Property="Margin" Value="4" />
     </Style>
 
+    <!-- 文件夹的右键菜单 -->
+    <ContextMenu x:Key="FolderContextMenu">
+        <MenuItem Header="重命名"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.Rename}"/>
+        <MenuItem Header="删除"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+    </ContextMenu>
+
+    <!-- 书签的右键菜单 -->
+    <ContextMenu x:Key="BookmarkContextMenu">
+        <MenuItem Header="在当前标签页打开"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInCurrentTab}"/>
+        <MenuItem Header="在新标签页打开"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInNewTab}"/>
+        <MenuItem Header="在新窗口打开"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInNewWindow}"/>
+        <MenuItem Header="编辑"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.Edit}"/>
+        <MenuItem Header="删除"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+    </ContextMenu>
+
     <!--子项容器样式-->
     <HierarchicalDataTemplate x:Key="BookmarkBarSubItemStyle" DataType="{x:Type model:BookmarkBarInfo}" ItemsSource="{Binding Path=Children}">
     </HierarchicalDataTemplate>
@@ -76,6 +105,14 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsFolder}" Value="True">
+                <Setter Property="ContextMenu" Value="{StaticResource FolderContextMenu}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                <Setter Property="ContextMenu" Value="{StaticResource BookmarkContextMenu}"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!--菜单样式-->

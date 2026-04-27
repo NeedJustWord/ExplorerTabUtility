@@ -79,16 +79,33 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 点击事件
         /// </summary>
-        public ICommand? ClickCommand { get; private set; }
+        public ICommand? ClickCommand { get; }
+
+        /// <summary>
+        /// 菜单点击事件
+        /// </summary>
+        public ICommand? MenuClickCommand { get; }
+
+        /// <summary>
+        /// 当前书签
+        /// </summary>
+        public BookmarkInfo CurrentBookmark { get; }
+
+        /// <summary>
+        /// 当前文件夹
+        /// </summary>
+        public FolderInfo CurrentFolder { get; }
+
+        /// <summary>
+        /// 父节点
+        /// </summary>
+        public BookmarkBarInfo? Parent { get; }
         #endregion
 
         /// <summary>
         /// 非溢出书签和其他书签文件夹
         /// </summary>
         private bool isNotOverflowAndOtherFolder;
-        private BookmarkBarInfo? parent;
-        private BookmarkInfo? bookmark;
-        private FolderInfo? folder;
         private static ObservableCollection<BookmarkBarInfo> emptyChildren = new ObservableCollection<BookmarkBarInfo>();
 
         /// <summary>
@@ -97,12 +114,17 @@ namespace ExplorerTabUtility.Models
         /// <param name="bookmarkInfo"></param>
         /// <param name="level"></param>
         /// <param name="parent"></param>
-        /// <param name="action"></param>
-        public BookmarkBarInfo(BookmarkInfo bookmarkInfo, int level, BookmarkBarInfo? parent, Action<BookmarkInfo> action)
+        /// <param name="clickAction"></param>
+        public BookmarkBarInfo(BookmarkInfo bookmarkInfo,
+                               int level,
+                               BookmarkBarInfo? parent,
+                               Action<BookmarkInfo> clickAction,
+                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> menuClickAction)
         {
             isNotOverflowAndOtherFolder = true;
-            this.parent = parent;
-            bookmark = bookmarkInfo;
+            Parent = parent;
+            CurrentBookmark = bookmarkInfo;
+            CurrentFolder = FolderInfo.Empty;
             name = bookmarkInfo.Name;
             icon = "📄";
             Init(false, level);
@@ -110,7 +132,14 @@ namespace ExplorerTabUtility.Models
             children = emptyChildren;
             ClickCommand = new RelayCommand((args) =>
             {
-                action.Invoke(bookmark);
+                clickAction.Invoke(CurrentBookmark);
+            });
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkBarAction action)
+                {
+                    menuClickAction.Invoke(this, CurrentBookmark, action);
+                }
             });
         }
 
@@ -120,19 +149,34 @@ namespace ExplorerTabUtility.Models
         /// <param name="folderInfo"></param>
         /// <param name="level"></param>
         /// <param name="parent"></param>
-        /// <param name="action"></param>
+        /// <param name="bookmarkClickAction"></param>
         /// <param name="isNotOverflowAndOtherFolder">非溢出书签和其他书签</param>
-        public BookmarkBarInfo(FolderInfo folderInfo, int level, BookmarkBarInfo? parent, Action<BookmarkInfo> action, bool isNotOverflowAndOtherFolder)
+        public BookmarkBarInfo(FolderInfo folderInfo,
+                               int level,
+                               BookmarkBarInfo? parent,
+                               Action<BookmarkInfo> bookmarkClickAction,
+                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
+                               Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction,
+                               bool isNotOverflowAndOtherFolder)
         {
             this.isNotOverflowAndOtherFolder = isNotOverflowAndOtherFolder;
-            this.parent = parent;
-            folder = folderInfo;
+            Parent = parent;
+            CurrentBookmark = BookmarkInfo.Empty;
+            CurrentFolder = folderInfo;
             name = folderInfo.Name;
             icon = "📁";
             Init(true, level);
 
             children = new ObservableCollection<BookmarkBarInfo>();
-            CreateChildren(folderInfo, level, action);
+            CreateChildren(folderInfo, level, bookmarkClickAction, bookmarkMenuClickAction, folderMenuClickAction);
+
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkBarAction action)
+                {
+                    folderMenuClickAction.Invoke(this, CurrentFolder, action);
+                }
+            });
         }
 
         /// <summary>
@@ -144,13 +188,23 @@ namespace ExplorerTabUtility.Models
         public BookmarkBarInfo(FolderInfo folderInfo, int level, BookmarkBarInfo? parent)
         {
             isNotOverflowAndOtherFolder = false;
-            this.parent = parent;
-            folder = folderInfo;
+            Parent = parent;
+            CurrentBookmark = BookmarkInfo.Empty;
+            CurrentFolder = folderInfo;
             name = folderInfo.Name;
             icon = "";
             Init(true, level);
 
             children = new ObservableCollection<BookmarkBarInfo>();
+        }
+
+        /// <summary>
+        /// 删除节点
+        /// </summary>
+        /// <param name="deleteInfo"></param>
+        public void Delete(BookmarkBarInfo deleteInfo)
+        {
+            Children.Remove(deleteInfo);
         }
 
         private void Init(bool isFolder, int level)
@@ -161,7 +215,11 @@ namespace ExplorerTabUtility.Models
             PlacementMode = FirstLevel ? PlacementMode.Bottom : PlacementMode.Right;
         }
 
-        private void CreateChildren(FolderInfo folder, int level, Action<BookmarkInfo> action)
+        private void CreateChildren(FolderInfo folder,
+                                    int level,
+                                    Action<BookmarkInfo> bookmarkClickAction,
+                                    Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
+                                    Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction)
         {
             if (folder.Items.Count > 0)
             {
@@ -170,11 +228,11 @@ namespace ExplorerTabUtility.Models
                 {
                     if (item is FolderInfo folderInfo)
                     {
-                        children.Add(new BookmarkBarInfo(folderInfo, level, this, action, true));
+                        children.Add(new BookmarkBarInfo(folderInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction, folderMenuClickAction, true));
                     }
                     else if (item is BookmarkInfo bookmarkInfo)
                     {
-                        children.Add(new BookmarkBarInfo(bookmarkInfo, level, this, action));
+                        children.Add(new BookmarkBarInfo(bookmarkInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction));
                     }
                 }
             }

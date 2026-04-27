@@ -34,6 +34,8 @@ namespace ExplorerTabUtility.Models
 
     public class BookmarkInfo : BaseBookmarkInfo
     {
+        public static readonly BookmarkInfo Empty = new BookmarkInfo(Guid.Empty, string.Empty, string.Empty);
+
         /// <summary>
         /// 书签路径
         /// </summary>
@@ -109,6 +111,26 @@ namespace ExplorerTabUtility.Models
 
             folder = Empty;
             return false;
+        }
+
+        /// <summary>
+        /// 获取文件夹节点id
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetFolderIds()
+        {
+            yield return Id;
+
+            foreach (var item in Items)
+            {
+                if (item is FolderInfo folder)
+                {
+                    foreach (var id in folder.GetFolderIds())
+                    {
+                        yield return id;
+                    }
+                }
+            }
         }
     }
 

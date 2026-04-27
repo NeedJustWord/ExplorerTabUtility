@@ -36,7 +36,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             if (_isClosing) return;
             _isClosing = true;
-            Close();
+
+            Dispatcher.BeginInvoke(() =>
+            {
+                Close();
+            });
         }
 
         protected MessageBoxResult ShowMessage(string message, string title,

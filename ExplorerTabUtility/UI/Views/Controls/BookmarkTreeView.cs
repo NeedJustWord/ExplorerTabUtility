@@ -57,9 +57,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
         private void Delete()
         {
             var info = (BookmarkTreeViewInfo)SelectedItem;
-            if (info == null || info.Parent == null) return;
+            if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
 
-            BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, info.CurrentFolder, info.GetCurrentAndChildrenIds());
+            BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, info.CurrentFolder);
             info.Parent.Delete(info);
             HaveSave = true;
         }

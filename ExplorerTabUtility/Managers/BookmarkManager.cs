@@ -150,16 +150,25 @@ namespace ExplorerTabUtility.Managers
         }
 
         /// <summary>
+        /// 删除书签
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="current"></param>
+        public void Delete(FolderInfo parent, BookmarkInfo current)
+        {
+            parent.Remove(current.Id);
+        }
+
+        /// <summary>
         /// 删除文件夹
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="current"></param>
-        /// <param name="deleteFolderIds"></param>
-        public void Delete(FolderInfo parent, FolderInfo current, IEnumerable<Guid> deleteFolderIds)
+        public void Delete(FolderInfo parent, FolderInfo current)
         {
             parent.Remove(current.Id);
 
-            var deleteIds = deleteFolderIds.ToList();
+            var deleteIds = current.GetFolderIds().ToList();
             for (int i = lastSaveFolders.Count - 1; i >= 0; i--)
             {
                 var folder = lastSaveFolders[i];

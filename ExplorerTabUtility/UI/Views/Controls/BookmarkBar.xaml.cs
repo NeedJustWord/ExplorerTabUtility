@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
@@ -13,8 +14,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
     public partial class BookmarkBar : UserControl
     {
         #region 事件
-        public delegate void BookmarkBarClickEventHandler(BookmarkBarClickArgs args);
-        public event BookmarkBarClickEventHandler? Click;
+        public delegate void BookmarkEventHandler(BookmarkInfo info, BookmarkBarAction action);
+        public event BookmarkEventHandler? BookmarkHandle;
+
+        public delegate void FolderEventHandler(FolderInfo info, BookmarkBarAction action);
+        public event FolderEventHandler? FolderHandle;
         #endregion
 
         private ObservableCollection<BookmarkBarInfo> allBookmarks;
@@ -37,10 +41,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         public void InitBookmark(FolderInfo folder, FolderInfo otherFolder)
         {
-            var otherBookmark = new BookmarkBarInfo(otherFolder, 0, null, ClickAction, false);
+            var otherBookmark = new BookmarkBarInfo(otherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false);
             otherBookmarks.Add(otherBookmark);
 
-            foreach (var item in new BookmarkBarInfo(folder, -1, null, ClickAction, true).Children)
+            foreach (var item in new BookmarkBarInfo(folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true).Children)
             {
                 allBookmarks.Add(item);
             }
@@ -130,24 +134,70 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return count;
         }
 
-        private void ClickAction(BookmarkInfo info)
+        private void BookmarkClickAction(BookmarkInfo info)
         {
-            BookmarkOpenType type;
+            BookmarkBarAction action;
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
             {
-                type = BookmarkOpenType.NewTab;
+                action = BookmarkBarAction.OpenInNewTab;
             }
             else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
             {
-                type = BookmarkOpenType.NewWindow;
+                action = BookmarkBarAction.OpenInNewWindow;
             }
             else
             {
-                type = BookmarkOpenType.CurrentTab;
+                action = BookmarkBarAction.OpenInCurrentTab;
             }
 
-            var args = new BookmarkBarClickArgs(info, type);
-            Click?.Invoke(args);
+            BookmarkHandle?.Invoke(info, action);
+        }
+
+        private void BookmarkMenuClickAction(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.OpenInCurrentTab:
+                case BookmarkBarAction.OpenInNewTab:
+                case BookmarkBarAction.OpenInNewWindow:
+                case BookmarkBarAction.Edit:
+                    BookmarkHandle?.Invoke(bookmark, action);
+                    break;
+                case BookmarkBarAction.Delete:
+                    if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
+
+                    BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, bookmark);
+                    BookmarkManager.Instance.SaveConfig();
+
+                    info.Parent.Delete(info);
+                    Delete(info);
+                    break;
+            }
+        }
+
+        private void FolderMenuClickAction(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.Rename:
+                    FolderHandle?.Invoke(folder, action);
+                    break;
+                case BookmarkBarAction.Delete:
+                    if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
+
+                    BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, folder);
+                    BookmarkManager.Instance.SaveConfig();
+
+                    info.Parent.Delete(info);
+                    Delete(info);
+                    break;
+            }
+        }
+
+        private void Delete(BookmarkBarInfo info)
+        {
+            allBookmarks.Remove(info);
+            mainBookmarks.Remove(info);
         }
     }
 }
