@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
-using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
@@ -53,9 +52,14 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return result;
         }
 
-        protected WindowRecord? GetCurrentTabWindowRecord()
+        protected void EntryDialog()
         {
-            return explorerWatcher.GetCurrentTabWindowRecord(windowHandle);
+            _isShowingDialog = true;
+        }
+
+        protected void ExitDialog()
+        {
+            _isShowingDialog = false;
         }
     }
 }

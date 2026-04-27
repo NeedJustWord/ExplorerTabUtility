@@ -33,29 +33,36 @@ namespace ExplorerTabUtility.UI.Views
             BookmarkBar.FolderHandle += BookmarkBar_FolderHandle;
         }
 
-        private void BookmarkBar_FolderHandle(FolderInfo info, BookmarkBarAction action)
+        private void BookmarkBar_FolderHandle(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action)
         {
             switch (action)
             {
                 case BookmarkBarAction.Rename:
+                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, folder);
+                    EntryDialog();
+                    if (popup.ShowDialog() == true)
+                    {
+                        BookmarkBar.FolderRename(info, folder.Name);
+                    }
+                    ExitDialog();
                     break;
             }
         }
 
-        private async void BookmarkBar_BookmarkHandle(BookmarkInfo info, BookmarkBarAction action)
+        private async void BookmarkBar_BookmarkHandle(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
         {
             switch (action)
             {
                 case BookmarkBarAction.OpenInCurrentTab:
-                    await explorerWatcher.Open(info.Location, true, windowHandle, inCurrentTab: true);
+                    await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: true);
                     CloseWindow();
                     break;
                 case BookmarkBarAction.OpenInNewTab:
-                    await explorerWatcher.Open(info.Location, true, windowHandle, inCurrentTab: false);
+                    await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: false);
                     CloseWindow();
                     break;
                 case BookmarkBarAction.OpenInNewWindow:
-                    await explorerWatcher.Open(info.Location, false, windowHandle);
+                    await explorerWatcher.Open(bookmark.Location, false, windowHandle);
                     CloseWindow();
                     break;
                 case BookmarkBarAction.Edit:

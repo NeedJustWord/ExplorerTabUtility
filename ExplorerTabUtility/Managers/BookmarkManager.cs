@@ -27,6 +27,11 @@ namespace ExplorerTabUtility.Managers
         public FolderInfo OtherFolder => otherFolderInfo;
 
         /// <summary>
+        /// 溢出书签
+        /// </summary>
+        public FolderInfo OverflowFolder => overflowFolderInfo;
+
+        /// <summary>
         /// 上次保存路径
         /// </summary>
         public IReadOnlyList<SaveFolderInfo> LastSaveFolders
@@ -47,6 +52,7 @@ namespace ExplorerTabUtility.Managers
         private readonly FolderInfo bookmarks;
         private readonly FolderInfo folderInfo;
         private readonly FolderInfo otherFolderInfo;
+        private readonly FolderInfo overflowFolderInfo;
         private readonly List<SaveFolderInfo> lastSaveFolders;
 
         private BookmarkManager()
@@ -54,10 +60,32 @@ namespace ExplorerTabUtility.Managers
             lastSaveFolders = new List<SaveFolderInfo>(5);
             folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), "书签栏");
             otherFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000002"), "其他书签");
+            overflowFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000003"), ">>");
             bookmarks = new FolderInfo(Guid.Empty, string.Empty, folderInfo, otherFolderInfo);
             Bookmarks = new ReadOnlyCollection<FolderInfo>([folderInfo, otherFolderInfo]);
 
             LoadBookmark();
+        }
+
+        /// <summary>
+        /// 判断是否其他书签或溢出书签
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public bool IsOtherOrOverflowFolder(FolderInfo info)
+        {
+            return info.Id == otherFolderInfo.Id || info.Id == overflowFolderInfo.Id;
+        }
+
+        /// <summary>
+        /// 文件夹重命名
+        /// </summary>
+        /// <param name="info"></param>
+        /// <param name="newName"></param>
+        public void FolderRename(FolderInfo info, string newName)
+        {
+            info.Name = newName;
+            SaveConfig();
         }
 
         /// <summary>

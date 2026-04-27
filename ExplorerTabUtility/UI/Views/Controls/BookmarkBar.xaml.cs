@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
@@ -14,10 +15,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
     public partial class BookmarkBar : UserControl
     {
         #region 事件
-        public delegate void BookmarkEventHandler(BookmarkInfo info, BookmarkBarAction action);
+        public delegate void BookmarkEventHandler(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action);
         public event BookmarkEventHandler? BookmarkHandle;
 
-        public delegate void FolderEventHandler(FolderInfo info, BookmarkBarAction action);
+        public delegate void FolderEventHandler(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action);
         public event FolderEventHandler? FolderHandle;
         #endregion
 
@@ -32,11 +33,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
             allBookmarks = new ObservableCollection<BookmarkBarInfo>();
             mainBookmarks = new ObservableCollection<BookmarkBarInfo>();
-            overflowBookmarks = new ObservableCollection<BookmarkBarInfo>();
             otherBookmarks = new ObservableCollection<BookmarkBarInfo>();
-
-            var overflowFolder = new FolderInfo(Guid.Empty, ">>");
-            overflowBookmarks.Add(new BookmarkBarInfo(overflowFolder, 0, null));
+            overflowBookmarks = new ObservableCollection<BookmarkBarInfo>
+            {
+                new BookmarkBarInfo(BookmarkManager.Instance.OverflowFolder, 0, null)
+            };
         }
 
         public void InitBookmark(FolderInfo folder, FolderInfo otherFolder)
@@ -75,31 +76,47 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var otherBookmark = otherBookmarks[0];
             if (otherBookmark.Children.Count > 0)
             {
-                availableWidth -= GetItemWidth(otherBookmark.Name);
+                if (otherBookmark.Width == 0)
+                {
+                    otherBookmark.Width = GetItemWidth(otherBookmark.DisplayName);
+                }
+
+                availableWidth -= otherBookmark.Width;
             }
 
             //减去溢出书签的宽度
-            availableWidth -= GetItemWidth(overflowBookmark.Name);
+            if (overflowBookmark.Width == 0)
+            {
+                overflowBookmark.Width = GetItemWidth(overflowBookmark.DisplayName);
+            }
+            availableWidth -= overflowBookmark.Width;
 
             //主书签
             int index;
+            BookmarkBarInfo item;
             for (index = 0; index < allBookmarks.Count; index++)
             {
-                var item = allBookmarks[index];
-                var itemWidth = GetItemWidth(item.Name);
+                item = allBookmarks[index];
+                if (item.Width == 0)
+                {
+                    item.Width = GetItemWidth(item.DisplayName);
+                }
 
-                if (availableWidth < itemWidth)
+                if (availableWidth < item.Width)
                 {
                     break;
                 }
 
+                item.PlacementMode = PlacementMode.Bottom;
                 mainBookmarks.Add(item);
-                availableWidth -= itemWidth;
+                availableWidth -= item.Width;
             }
 
             //溢出书签
             for (; index < allBookmarks.Count; index++)
             {
+                item = allBookmarks[index];
+                item.PlacementMode = PlacementMode.Right;
                 overflowBookmark.Children.Add(allBookmarks[index]);
             }
         }
@@ -134,7 +151,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return count;
         }
 
-        private void BookmarkClickAction(BookmarkInfo info)
+        private void BookmarkClickAction(BookmarkBarInfo info, BookmarkInfo bookmark)
         {
             BookmarkBarAction action;
             if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
@@ -150,7 +167,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 action = BookmarkBarAction.OpenInCurrentTab;
             }
 
-            BookmarkHandle?.Invoke(info, action);
+            BookmarkHandle?.Invoke(info, bookmark, action);
         }
 
         private void BookmarkMenuClickAction(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
@@ -161,7 +178,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 case BookmarkBarAction.OpenInNewTab:
                 case BookmarkBarAction.OpenInNewWindow:
                 case BookmarkBarAction.Edit:
-                    BookmarkHandle?.Invoke(bookmark, action);
+                    BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
                 case BookmarkBarAction.Delete:
                     if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
@@ -180,7 +197,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             switch (action)
             {
                 case BookmarkBarAction.Rename:
-                    FolderHandle?.Invoke(folder, action);
+                    FolderHandle?.Invoke(info, folder, action);
                     break;
                 case BookmarkBarAction.Delete:
                     if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
@@ -198,6 +215,16 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             allBookmarks.Remove(info);
             mainBookmarks.Remove(info);
+        }
+
+        public void FolderRename(BookmarkBarInfo info, string newName)
+        {
+            info.Name = newName;
+
+            if (info.FirstLevel == false) return;
+
+            info.Width = 0;
+            UpdateMenuLayout();
         }
     }
 }

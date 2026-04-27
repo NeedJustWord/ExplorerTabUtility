@@ -18,16 +18,31 @@ namespace ExplorerTabUtility.UI.Views
     {
         private BookmarkSaveType saveType;
         private WindowRecord currentWindowRecord;
+        private FolderInfo currentFolderInfo;
 
         public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
             InitializeComponent();
 
+            currentFolderInfo = FolderInfo.Empty;
             saveType = BookmarkSaveType.ComboBox;
-            currentWindowRecord = GetCurrentTabWindowRecord() ?? new WindowRecord(string.Empty, windowHandle);
+            currentWindowRecord = explorerWatcher.GetCurrentTabWindowRecord(windowHandle) ?? new WindowRecord(string.Empty, windowHandle);
 
             Init();
             SetupEventHandlers();
+        }
+
+        public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle, FolderInfo folderInfo) : base(explorerWatcher, windowHandle)
+        {
+            InitializeComponent();
+
+            TxtTitle.Text = "重命名";
+            currentFolderInfo = folderInfo;
+            saveType = BookmarkSaveType.FolderRename;
+            currentWindowRecord = new WindowRecord(string.Empty);
+
+            Init();
+            SetupBaseEventHandlers();
         }
 
         public void AddFolder(BookmarkTreeViewInfo info)
@@ -40,14 +55,26 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Init()
         {
-            BtnNewFolder.IsEnabled = false;
-            SpLocation.Visibility = Visibility.Collapsed;
-            BtnNewFolder.Visibility = Visibility.Collapsed;
-            TvSelectSavePath.Visibility = Visibility.Collapsed;
+            if (saveType == BookmarkSaveType.FolderRename)
+            {
+                TxtName.Text = currentFolderInfo.Name;
+                SpLocation.Visibility = Visibility.Collapsed;
+                BtnNewFolder.Visibility = Visibility.Collapsed;
+                TxtFolder.Visibility = Visibility.Collapsed;
+                CbSelectSavePath.Visibility = Visibility.Collapsed;
+                TvSelectSavePath.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                BtnNewFolder.IsEnabled = false;
+                SpLocation.Visibility = Visibility.Collapsed;
+                BtnNewFolder.Visibility = Visibility.Collapsed;
+                TvSelectSavePath.Visibility = Visibility.Collapsed;
 
-            TxtName.Text = GetName();
+                TxtName.Text = GetName();
 
-            InitCbSelectSavePath();
+                InitCbSelectSavePath();
+            }
         }
 
         private void InitCbSelectSavePath()
@@ -121,14 +148,20 @@ namespace ExplorerTabUtility.UI.Views
         }
 
         #region 事件注册
-        private void SetupEventHandlers()
+        private void SetupBaseEventHandlers()
         {
             KeyDown += BookmarkSavePopup_KeyDown;
+            BtnSave.Click += BtnSave_Click;
+            BtnCancel.Click += BtnCancel_Click;
+        }
+
+        private void SetupEventHandlers()
+        {
+            SetupBaseEventHandlers();
+
             SizeChanged += BookmarkSavePopup_SizeChanged;
             CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
             BtnNewFolder.Click += BtnNewFolder_Click;
-            BtnSave.Click += BtnSave_Click;
-            BtnCancel.Click += BtnCancel_Click;
             TvSelectSavePath.SelectedItemChanged += TvSelectSavePath_SelectedItemChanged;
         }
 
@@ -144,17 +177,25 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            var saveFolder = GetSaveFolder();
-            if (saveFolder == null)
+            if (saveType == BookmarkSaveType.FolderRename)
             {
-                ShowMessage("请选择要保存的路径", Constants.AppName);
-                return;
+                BookmarkManager.Instance.FolderRename(currentFolderInfo, TxtName.Text);
+                DialogResult = true;
             }
-
-            if (BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation()) == false)
+            else
             {
-                ShowMessage("保存失败", Constants.AppName);
-                return;
+                var saveFolder = GetSaveFolder();
+                if (saveFolder == null)
+                {
+                    ShowMessage("请选择要保存的路径", Constants.AppName);
+                    return;
+                }
+
+                if (BookmarkManager.Instance.Save(saveFolder.Key, TxtName.Text, GetSaveLocation()) == false)
+                {
+                    ShowMessage("保存失败", Constants.AppName);
+                    return;
+                }
             }
 
             CloseWindow(false);

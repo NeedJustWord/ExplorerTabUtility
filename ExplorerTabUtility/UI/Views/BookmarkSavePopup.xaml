@@ -6,7 +6,7 @@
                      xmlns:controls="clr-namespace:ExplorerTabUtility.UI.Views.Controls"
                      WindowStartupLocation="CenterScreen"
                      Style="{StaticResource BaseWindowStyle}"
-                     Width="500" MinHeight="200">
+                     Width="500" MinHeight="100">
     <Border Style="{StaticResource BaseWindowBorderStyle}">
         <Grid Margin="10 0 10 0">
             <Grid.RowDefinitions>
@@ -23,8 +23,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Style="{StaticResource BookmarkTitleTextBlock}"
-                        Text="已添加书签"/>
+            <TextBlock x:Name="TxtTitle" Grid.Row="0" Style="{StaticResource BookmarkTitleTextBlock}"
+                        Text="添加书签"/>
 
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                 <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="名称"/>
@@ -39,7 +39,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.ColumnSpan="2">
-                <TextBlock Style="{StaticResource BookmarkTextBlock}" Text="文件夹"/>
+                <TextBlock x:Name="TxtFolder" Style="{StaticResource BookmarkTextBlock}" Text="文件夹"/>
             </StackPanel>
 
             <controls:BookmarkComboBox x:Name="CbSelectSavePath" Grid.Row="4" Grid.ColumnSpan="2" Style="{StaticResource BookmarkComboBoxStyle}"

@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.UI.Commands;
 
 namespace ExplorerTabUtility.Models
 {
-    class BookmarkBarInfo : BindableBase
+    public class BookmarkBarInfo : BindableBase
     {
         #region 属性
         private string name;
@@ -16,7 +19,31 @@ namespace ExplorerTabUtility.Models
         public string Name
         {
             get { return name; }
-            set { SetProperty(ref name, value); }
+            set
+            {
+                SetProperty(ref name, value);
+                DisplayName = GetDisplayName(name);
+            }
+        }
+
+        private string displayName;
+        /// <summary>
+        /// 显示名称
+        /// </summary>
+        public string DisplayName
+        {
+            get { return displayName; }
+            set { SetProperty(ref displayName, value); }
+        }
+
+        private string? nameTooltip;
+        /// <summary>
+        /// 名称提示
+        /// </summary>
+        public string? NameTooltip
+        {
+            get { return nameTooltip; }
+            set { SetProperty(ref nameTooltip, value); }
         }
 
         private string icon;
@@ -100,6 +127,16 @@ namespace ExplorerTabUtility.Models
         /// 父节点
         /// </summary>
         public BookmarkBarInfo? Parent { get; }
+
+        /// <summary>
+        /// 宽度
+        /// </summary>
+        public int Width { get; set; }
+
+        /// <summary>
+        /// 是否显示右键菜单
+        /// </summary>
+        public bool IsShowContextMenu { get; } = true;
         #endregion
 
         /// <summary>
@@ -118,7 +155,7 @@ namespace ExplorerTabUtility.Models
         public BookmarkBarInfo(BookmarkInfo bookmarkInfo,
                                int level,
                                BookmarkBarInfo? parent,
-                               Action<BookmarkInfo> clickAction,
+                               Action<BookmarkBarInfo, BookmarkInfo> clickAction,
                                Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> menuClickAction)
         {
             isNotOverflowAndOtherFolder = true;
@@ -126,13 +163,14 @@ namespace ExplorerTabUtility.Models
             CurrentBookmark = bookmarkInfo;
             CurrentFolder = FolderInfo.Empty;
             name = bookmarkInfo.Name;
+            displayName = GetDisplayName(name);
             icon = "📄";
             Init(false, level);
 
             children = emptyChildren;
             ClickCommand = new RelayCommand((args) =>
             {
-                clickAction.Invoke(CurrentBookmark);
+                clickAction.Invoke(this, CurrentBookmark);
             });
             MenuClickCommand = new RelayCommand((args) =>
             {
@@ -154,16 +192,18 @@ namespace ExplorerTabUtility.Models
         public BookmarkBarInfo(FolderInfo folderInfo,
                                int level,
                                BookmarkBarInfo? parent,
-                               Action<BookmarkInfo> bookmarkClickAction,
+                               Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
                                Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
                                Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction,
                                bool isNotOverflowAndOtherFolder)
         {
+            IsShowContextMenu = BookmarkManager.Instance.IsOtherOrOverflowFolder(folderInfo) == false;
             this.isNotOverflowAndOtherFolder = isNotOverflowAndOtherFolder;
             Parent = parent;
             CurrentBookmark = BookmarkInfo.Empty;
             CurrentFolder = folderInfo;
             name = folderInfo.Name;
+            displayName = GetDisplayName(name);
             icon = "📁";
             Init(true, level);
 
@@ -187,11 +227,13 @@ namespace ExplorerTabUtility.Models
         /// <param name="parent"></param>
         public BookmarkBarInfo(FolderInfo folderInfo, int level, BookmarkBarInfo? parent)
         {
+            IsShowContextMenu = false;
             isNotOverflowAndOtherFolder = false;
             Parent = parent;
             CurrentBookmark = BookmarkInfo.Empty;
             CurrentFolder = folderInfo;
             name = folderInfo.Name;
+            displayName = GetDisplayName(name);
             icon = "";
             Init(true, level);
 
@@ -217,7 +259,7 @@ namespace ExplorerTabUtility.Models
 
         private void CreateChildren(FolderInfo folder,
                                     int level,
-                                    Action<BookmarkInfo> bookmarkClickAction,
+                                    Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
                                     Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
                                     Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction)
         {
@@ -236,6 +278,51 @@ namespace ExplorerTabUtility.Models
                     }
                 }
             }
+        }
+
+        private string GetDisplayName(string name)
+        {
+            var checkCount = 30;
+            var array = GetByteCount(name);
+            if (array.Sum() > checkCount)
+            {
+                NameTooltip = name;
+                return $"{name.Substring(0, GetSubLength(array, checkCount))}...";
+            }
+            else
+            {
+                NameTooltip = null;
+                return name;
+            }
+        }
+
+        /// <summary>
+        /// 获取截断长度
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private int GetSubLength(List<int> list, int count)
+        {
+            int index;
+            for (index = 0; index < list.Count; index++)
+            {
+                count -= list[index];
+                if (count <= 0)
+                {
+                    break;
+                }
+            }
+            return index + 1;
+        }
+
+        /// <summary>
+        /// 获取字符数，大于255当汉字两个字符
+        /// </summary>
+        /// <returns></returns>
+        private List<int> GetByteCount(string str)
+        {
+            return str.Select(c => c > 255 ? 2 : 1).ToList();
         }
     }
 }

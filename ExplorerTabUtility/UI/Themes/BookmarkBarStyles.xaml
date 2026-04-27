@@ -79,7 +79,8 @@
                         <TextBlock Grid.Column="0" Text="{Binding Icon}" Style="{StaticResource BookmarkBarIconStyle}"
                                    Visibility="{Binding IsVisibility,Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Visible}}" />
 
-                        <TextBlock x:Name="TxtName" Grid.Column="1" Text="{Binding Name}" Style="{StaticResource BookmarkBarDisplayStyle}"
+                        <TextBlock x:Name="TxtName" Grid.Column="1" Text="{Binding DisplayName}" Style="{StaticResource BookmarkBarDisplayStyle}"
+                                   ToolTip="{Binding NameTooltip}"
                                    Visibility="{Binding IsVisibility,Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Visible}}" />
 
                         <TextBlock Grid.Column="2" Text=">" Style="{StaticResource BookmarkBarIconStyle}"
@@ -106,9 +107,13 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsFolder}" Value="True">
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsFolder}" Value="True"/>
+                    <Condition Binding="{Binding IsShowContextMenu}" Value="True"/>
+                </MultiDataTrigger.Conditions>
                 <Setter Property="ContextMenu" Value="{StaticResource FolderContextMenu}"/>
-            </DataTrigger>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding IsFolder}" Value="False">
                 <Setter Property="ContextMenu" Value="{StaticResource BookmarkContextMenu}"/>
             </DataTrigger>

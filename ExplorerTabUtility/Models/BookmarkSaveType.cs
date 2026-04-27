@@ -4,5 +4,6 @@
     {
         ComboBox,
         TreeView,
+        FolderRename,
     }
 }
