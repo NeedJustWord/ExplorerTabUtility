@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
@@ -131,7 +132,21 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         private void ClickAction(BookmarkInfo info)
         {
-            var args = new BookmarkBarClickArgs(info, BookmarkOpenType.CurrentTab);
+            BookmarkOpenType type;
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                type = BookmarkOpenType.NewTab;
+            }
+            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                type = BookmarkOpenType.NewWindow;
+            }
+            else
+            {
+                type = BookmarkOpenType.CurrentTab;
+            }
+
+            var args = new BookmarkBarClickArgs(info, type);
             Click?.Invoke(args);
         }
     }
