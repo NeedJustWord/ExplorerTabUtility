@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
@@ -23,7 +24,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         public event FolderEventHandler? FolderHandle;
         #endregion
 
-        private ObservableCollection<BookmarkBarInfo> allBookmarks;
+        private BookmarkBarInfo allBookmark;
         private ObservableCollection<BookmarkBarInfo> mainBookmarks;
         private ObservableCollection<BookmarkBarInfo> overflowBookmarks;
         private ObservableCollection<BookmarkBarInfo> otherBookmarks;
@@ -32,35 +33,33 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             InitializeComponent();
 
-            allBookmarks = new ObservableCollection<BookmarkBarInfo>();
+            allBookmark = new BookmarkBarInfo(BookmarkManager.Instance.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
             mainBookmarks = new ObservableCollection<BookmarkBarInfo>();
-            otherBookmarks = new ObservableCollection<BookmarkBarInfo>();
             overflowBookmarks = new ObservableCollection<BookmarkBarInfo>
             {
                 new BookmarkBarInfo(BookmarkManager.Instance.OverflowFolder, 0, null)
             };
+            otherBookmarks = new ObservableCollection<BookmarkBarInfo>
+            {
+                new BookmarkBarInfo(BookmarkManager.Instance.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false)
+            };
         }
 
-        public void InitBookmark(FolderInfo folder, FolderInfo otherFolder)
+        /// <summary>
+        /// 初始化布局
+        /// </summary>
+        public void InitLayout()
         {
-            var otherBookmark = new BookmarkBarInfo(otherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false);
-            otherBookmarks.Add(otherBookmark);
-
-            foreach (var item in new BookmarkBarInfo(folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true).Children)
-            {
-                allBookmarks.Add(item);
-            }
-
             UpdateMenuLayout();
 
             MnuMainBookmarks.ItemsSource = mainBookmarks;
             MnuOverflowBookmarks.ItemsSource = overflowBookmarks;
             MnuOtherBookmarks.ItemsSource = otherBookmarks;
-            TxtSeparator.Visibility = otherBookmark.IsVisibility ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void UpdateMenuLayout()
         {
+            var allBookmarks = allBookmark.Children;
             var overflowBookmark = overflowBookmarks[0];
 
             //清空主书签和溢出书签
@@ -108,6 +107,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     break;
                 }
 
+                item.Parent = allBookmark;
                 item.PlacementMode = PlacementMode.Bottom;
                 mainBookmarks.Add(item);
                 availableWidth -= item.Width;
@@ -117,9 +117,12 @@ namespace ExplorerTabUtility.UI.Views.Controls
             for (; index < allBookmarks.Count; index++)
             {
                 item = allBookmarks[index];
+                item.Parent = overflowBookmark;
                 item.PlacementMode = PlacementMode.Right;
                 overflowBookmark.Children.Add(allBookmarks[index]);
             }
+
+            TxtSeparator.Visibility = otherBookmark.IsVisibility ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private int GetItemWidth(string name)
@@ -214,21 +217,26 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         private void Delete(BookmarkBarInfo info)
         {
-            allBookmarks.Remove(info);
+            var needUpdateLayout = NeedUpdateMenuLayout(info, Guid.Empty);
+
+            allBookmark.Children.Remove(info);
             mainBookmarks.Remove(info);
 
-            //todo:添加是否需要更新布局的判断
-            UpdateMenuLayout();
+            if (needUpdateLayout)
+            {
+                UpdateMenuLayout();
+            }
         }
 
         public void RenameFolder(BookmarkBarInfo info, string newName)
         {
             info.Name = newName;
 
-            if (info.FirstLevel == false) return;
-
-            info.Width = 0;
-            UpdateMenuLayout();
+            if (NeedUpdateMenuLayout(info, Guid.Empty))
+            {
+                info.Width = 0;
+                UpdateMenuLayout();
+            }
         }
 
         public void EditBookmark(BookmarkBarInfo info, BookmarkInfo bookmark)
@@ -237,21 +245,33 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
             if (info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
 
+            var needUpdateLayout = NeedUpdateMenuLayout(info, bookmark.ParentId);
             if (info.Parent.CurrentFolder.Id != bookmark.ParentId)
             {
                 info.Parent.Delete(info);
 
-                var searchInfo = new BookmarkBarInfo(allBookmarks.Union(otherBookmarks));
-                var newParent = searchInfo.SearchFolder(bookmark.ParentId);
+                var searchData = otherBookmarks.Union(new List<BookmarkBarInfo>() { allBookmark });
+                var newParent = BookmarkBarInfo.SearchFolder(searchData, bookmark.ParentId);
                 if (newParent != null)
                 {
                     newParent.Add(info);
                 }
             }
 
-            //todo:添加是否需要更新布局的判断
-            info.Width = 0;
-            UpdateMenuLayout();
+            if (needUpdateLayout)
+            {
+                info.Width = 0;
+                UpdateMenuLayout();
+            }
+        }
+
+        private bool NeedUpdateMenuLayout(BookmarkBarInfo info, Guid newParentId)
+        {
+            //简单判断：涉及主书签和其他书签就更新菜单布局
+            if (mainBookmarks.Contains(info) || otherBookmarks.First().Children.Contains(info)) return true;
+            if (newParentId == Guid.Empty) return false;
+
+            return newParentId == BookmarkManager.Instance.Folder.Id || newParentId == BookmarkManager.Instance.OtherFolder.Id;
         }
     }
 }

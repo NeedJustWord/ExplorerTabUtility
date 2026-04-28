@@ -17,6 +17,7 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkSavePopup : BaseWindow
     {
+        private bool isEdit;
         private Guid parentId;
         private BookmarkSaveType saveType;
         private BookmarkInfo currentBookmarkInfo;
@@ -53,6 +54,7 @@ namespace ExplorerTabUtility.UI.Views
             InitializeComponent();
 
             this.parentId = parentId;
+            isEdit = true;
             TxtTitle.Text = "编辑";
             currentBookmarkInfo = bookmarkInfo;
             currentFolderInfo = FolderInfo.Empty;
@@ -229,14 +231,14 @@ namespace ExplorerTabUtility.UI.Views
                     return;
                 }
 
-                if (BookmarkManager.Instance.Save(parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
+                if (BookmarkManager.Instance.Save(isEdit, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
                 {
                     ShowMessage("保存失败", Constants.AppName);
                     return;
                 }
 
                 currentBookmarkInfo.ParentId = saveFolder.Key;
-                if (parentId != Guid.Empty) DialogResult = true;
+                if (isEdit) DialogResult = true;
             }
 
             CloseWindow(false);

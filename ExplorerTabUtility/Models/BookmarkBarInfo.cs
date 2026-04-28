@@ -126,7 +126,7 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 父节点
         /// </summary>
-        public BookmarkBarInfo? Parent { get; private set; }
+        public BookmarkBarInfo? Parent { get; set; }
 
         /// <summary>
         /// 宽度
@@ -245,7 +245,7 @@ namespace ExplorerTabUtility.Models
         /// 搜索专用
         /// </summary>
         /// <param name="child"></param>
-        public BookmarkBarInfo(IEnumerable<BookmarkBarInfo> child)
+        private BookmarkBarInfo(IEnumerable<BookmarkBarInfo> child)
         {
             CurrentFolder = FolderInfo.Empty;
             children = new ObservableCollection<BookmarkBarInfo>(child);
@@ -253,11 +253,23 @@ namespace ExplorerTabUtility.Models
 #pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 "required" 修饰符或声明为可为 null。
 
         /// <summary>
+        /// 搜索
+        /// </summary>
+        /// <param name="searchData"></param>
+        /// <param name="searchFolderId"></param>
+        /// <returns></returns>
+        public static BookmarkBarInfo? SearchFolder(IEnumerable<BookmarkBarInfo> searchData, Guid searchFolderId)
+        {
+            var info = new BookmarkBarInfo(searchData);
+            return info.SearchFolder(searchFolderId);
+        }
+
+        /// <summary>
         /// 查找指定id父节点
         /// </summary>
         /// <param name="folderId"></param>
         /// <returns></returns>
-        public BookmarkBarInfo? SearchFolder(Guid folderId)
+        private BookmarkBarInfo? SearchFolder(Guid folderId)
         {
             if (CurrentFolder.Id == folderId)
             {
@@ -286,7 +298,7 @@ namespace ExplorerTabUtility.Models
         {
             Children.Add(info);
             info.Parent = this;
-            //todo:更新属性
+            NoticeChanged();
         }
 
         /// <summary>
@@ -296,7 +308,29 @@ namespace ExplorerTabUtility.Models
         public void Delete(BookmarkBarInfo deleteInfo)
         {
             Children.Remove(deleteInfo);
-            //todo:更新属性
+            NoticeChanged();
+        }
+
+        private void NoticeChanged()
+        {
+            RaisePropertyChanged(nameof(IsShowSubIcon));
+            RaisePropertyChanged(nameof(IsVisibility));
+        }
+
+        /// <summary>
+        /// 获取父节点id
+        /// </summary>
+        /// <returns></returns>
+        public Guid GetParentId()
+        {
+            if (Parent == null) return Guid.Empty;
+
+            var parentId = Parent.CurrentFolder.Id;
+            if (parentId == BookmarkManager.Instance.OverflowFolder.Id)
+            {
+                parentId = BookmarkManager.Instance.Folder.Id;
+            }
+            return parentId;
         }
 
         private void Init(bool isFolder, int level)

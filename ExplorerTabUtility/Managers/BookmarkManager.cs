@@ -135,30 +135,29 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 保存书签
         /// </summary>
+        /// <param name="isEdit">是否是编辑</param>
         /// <param name="lastParentId">上次的父节点id</param>
         /// <param name="currentParentId">这次的父节点id</param>
         /// <param name="bookmark">书签</param>
         /// <param name="newName">新书签名称</param>
         /// <param name="newLocation">新书签路径</param>
         /// <returns></returns>
-        public bool Save(Guid lastParentId, Guid currentParentId, BookmarkInfo bookmark, string newName, string newLocation)
+        public bool Save(bool isEdit, Guid lastParentId, Guid currentParentId, BookmarkInfo bookmark, string newName, string newLocation)
         {
             if (GetTargetFolderInfoFault(currentParentId, out var currentParentFolder)) return false;
 
             bookmark.Name = newName;
             bookmark.Location = newLocation;
-            if (lastParentId == Guid.Empty)
+            if (isEdit)
             {
-                //上次父节点为空，新增书签
-                bookmark.Id = Guid.NewGuid();
-            }
-            else
-            {
-                //上次父节点非空，修改书签
                 if (GetTargetFolderInfoFault(lastParentId, out var lastParentFolder) == false)
                 {
                     lastParentFolder.Remove(bookmark.Id);
                 }
+            }
+            else
+            {
+                bookmark.Id = Guid.NewGuid();
             }
 
             currentParentFolder.Add(bookmark);
@@ -226,6 +225,12 @@ namespace ExplorerTabUtility.Managers
             }
         }
 
+        /// <summary>
+        /// 查找目标目录是否失败
+        /// </summary>
+        /// <param name="folderId"></param>
+        /// <param name="folder"></param>
+        /// <returns></returns>
         private bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)
         {
             return bookmarks.Search(folderId, out folder) == false;

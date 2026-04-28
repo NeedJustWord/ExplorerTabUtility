@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using ExplorerTabUtility.Hooks;
-using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
 
@@ -18,7 +17,7 @@ namespace ExplorerTabUtility.UI.Views
 
             Top = Left = 10;
             BookmarkBar.Width = Width = SystemParameters.WorkArea.Width - Top * 2;
-            BookmarkBar.InitBookmark(BookmarkManager.Instance.Folder, BookmarkManager.Instance.OtherFolder);
+            BookmarkBar.InitLayout();
 
             SetupEventHandlers();
         }
@@ -66,7 +65,7 @@ namespace ExplorerTabUtility.UI.Views
                     CloseWindow();
                     break;
                 case BookmarkBarAction.Edit:
-                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, bookmark, info.Parent.CurrentFolder.Id);
+                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, bookmark, info.GetParentId());
                     EntryDialog();
                     if (popup.ShowDialog() == true)
                     {
