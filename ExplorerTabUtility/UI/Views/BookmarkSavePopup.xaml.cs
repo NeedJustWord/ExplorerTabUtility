@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -17,7 +16,7 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkSavePopup : BaseWindow
     {
-        private bool isEdit;
+        private bool? isEdit;
         private Guid parentId;
         private BookmarkSaveType saveType;
         private BookmarkInfo currentBookmarkInfo;
@@ -27,8 +26,7 @@ namespace ExplorerTabUtility.UI.Views
         {
             InitializeComponent();
 
-            var location = GetLocation();
-            currentBookmarkInfo = new BookmarkInfo(Guid.Empty, GetName(location), location);
+            currentBookmarkInfo = CreateCurrentLocationBookmark();
             currentFolderInfo = FolderInfo.Empty;
             saveType = BookmarkSaveType.ComboBox;
 
@@ -36,11 +34,12 @@ namespace ExplorerTabUtility.UI.Views
             SetupEventHandlers();
         }
 
-        public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle, FolderInfo folderInfo) : base(explorerWatcher, windowHandle)
+        public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle, FolderInfo folderInfo, Guid parentId) : base(explorerWatcher, windowHandle)
         {
             InitializeComponent();
 
-            TxtTitle.Text = "重命名";
+            this.parentId = parentId;
+            TxtTitle.Text = folderInfo.Id == Guid.Empty ? "新建文件夹" : "重命名";
             currentBookmarkInfo = BookmarkInfo.Empty;
             currentFolderInfo = folderInfo;
             saveType = BookmarkSaveType.FolderRename;
@@ -54,8 +53,8 @@ namespace ExplorerTabUtility.UI.Views
             InitializeComponent();
 
             this.parentId = parentId;
-            isEdit = true;
-            TxtTitle.Text = "编辑";
+            isEdit = bookmarkInfo.Id != Guid.Empty;
+            TxtTitle.Text = isEdit.Value ? "编辑" : "添加书签";
             currentBookmarkInfo = bookmarkInfo;
             currentFolderInfo = FolderInfo.Empty;
             saveType = BookmarkSaveType.TreeView;
@@ -145,34 +144,6 @@ namespace ExplorerTabUtility.UI.Views
             }
         }
 
-        private string GetLocation()
-        {
-            var record = explorerWatcher.GetCurrentTabWindowRecord(windowHandle);
-            return record == null ? string.Empty : record.DisplayLocation;
-        }
-
-        private string GetName(string location)
-        {
-            string name;
-            switch (location)
-            {
-                case "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}":
-                    name = "此电脑";
-                    break;
-                default:
-                    if (location.EndsWith(":"))
-                    {
-                        name = $"{location.TrimEnd(':')}盘";
-                    }
-                    else
-                    {
-                        name = Path.GetFileName(location);
-                    }
-                    break;
-            }
-            return name;
-        }
-
         private void CloseWindow(bool isCancel)
         {
             if (isCancel && TvSelectSavePath.HaveSave)
@@ -219,7 +190,12 @@ namespace ExplorerTabUtility.UI.Views
         {
             if (saveType == BookmarkSaveType.FolderRename)
             {
-                BookmarkManager.Instance.FolderRename(currentFolderInfo, TxtName.Text);
+                if (BookmarkManager.Instance.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
+                {
+                    ShowMessage("保存失败", Constants.AppName);
+                    return;
+                }
+
                 DialogResult = true;
             }
             else
@@ -231,14 +207,14 @@ namespace ExplorerTabUtility.UI.Views
                     return;
                 }
 
-                if (BookmarkManager.Instance.Save(isEdit, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
+                if (BookmarkManager.Instance.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
                 {
                     ShowMessage("保存失败", Constants.AppName);
                     return;
                 }
 
                 currentBookmarkInfo.ParentId = saveFolder.Key;
-                if (isEdit) DialogResult = true;
+                if (isEdit.HasValue) DialogResult = true;
             }
 
             CloseWindow(false);

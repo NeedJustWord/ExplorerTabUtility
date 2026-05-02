@@ -78,18 +78,6 @@ namespace ExplorerTabUtility.Managers
         }
 
         /// <summary>
-        /// 文件夹重命名
-        /// </summary>
-        /// <param name="info"></param>
-        /// <param name="newName"></param>
-        public void FolderRename(FolderInfo info, string newName)
-        {
-            info.Name = newName;
-            UpdateLastSaveFolderName(info);
-            SaveConfig();
-        }
-
-        /// <summary>
         /// 恢复配置
         /// </summary>
         public void RecoverConfig()
@@ -150,17 +138,21 @@ namespace ExplorerTabUtility.Managers
             bookmark.Location = newLocation;
             if (isEdit)
             {
-                if (GetTargetFolderInfoFault(lastParentId, out var lastParentFolder) == false)
+                if (lastParentId != currentParentId)
                 {
-                    lastParentFolder.Remove(bookmark.Id);
+                    if (GetTargetFolderInfoFault(lastParentId, out var lastParentFolder) == false)
+                    {
+                        lastParentFolder.Remove(bookmark.Id);
+                    }
+                    currentParentFolder.Add(bookmark);
                 }
             }
             else
             {
                 bookmark.Id = Guid.NewGuid();
+                currentParentFolder.Add(bookmark);
             }
 
-            currentParentFolder.Add(bookmark);
             UpdateLastSaveFolders(currentParentFolder);
             SaveConfig();
             return true;
@@ -169,27 +161,33 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 保存文件夹，返回是否成功
         /// </summary>
-        /// <param name="parentId"></param>
-        /// <param name="updateFolder"></param>
-        /// <param name="name"></param>
+        /// <param name="parentId">父节点id</param>
+        /// <param name="saveFolder">要保存的文件夹</param>
+        /// <param name="newName">新文件夹名</param>
+        /// <param name="saveConfig">是否保存配置</param>
         /// <returns></returns>
-        public bool Save(Guid parentId, FolderInfo updateFolder, string name)
+        public bool Save(Guid parentId, FolderInfo saveFolder, string newName, bool saveConfig)
         {
-            if (updateFolder.Id == Guid.Empty)
+            if (saveFolder.Id == Guid.Empty)
             {
                 if (GetTargetFolderInfoFault(parentId, out var parentFolder))
                 {
                     return false;
                 }
 
-                updateFolder.Id = Guid.NewGuid();
-                updateFolder.Name = name;
-                parentFolder.Add(updateFolder);
+                saveFolder.Id = Guid.NewGuid();
+                saveFolder.Name = newName;
+                parentFolder.Add(saveFolder);
             }
             else
             {
-                updateFolder.Name = name;
-                UpdateLastSaveFolderName(updateFolder);
+                saveFolder.Name = newName;
+                UpdateLastSaveFolderName(saveFolder);
+            }
+
+            if (saveConfig)
+            {
+                SaveConfig();
             }
 
             return true;
@@ -212,7 +210,14 @@ namespace ExplorerTabUtility.Managers
         /// <param name="current"></param>
         public void Delete(FolderInfo parent, FolderInfo current)
         {
-            parent.Remove(current.Id);
+            if (parent == overflowFolderInfo)
+            {
+                folderInfo.Remove(current.Id);
+            }
+            else
+            {
+                parent.Remove(current.Id);
+            }
 
             var deleteIds = current.GetFolderIds().ToList();
             for (int i = lastSaveFolders.Count - 1; i >= 0; i--)

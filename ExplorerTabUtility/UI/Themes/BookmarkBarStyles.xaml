@@ -32,12 +32,22 @@
 
     <!-- 文件夹的右键菜单 -->
     <ContextMenu x:Key="FolderContextMenu">
+        <MenuItem Header="新建文件夹"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.NewFolder}"/>
+        <MenuItem Header="新建书签"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.NewBookmark}"/>
         <MenuItem Header="重命名"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static model:BookmarkBarAction.Rename}"/>
         <MenuItem Header="删除"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+        <Separator/>
+        <MenuItem Header="书签管理"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.BookmarkManager}"/>
     </ContextMenu>
 
     <!-- 书签的右键菜单 -->
@@ -51,12 +61,23 @@
         <MenuItem Header="在新窗口打开"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static model:BookmarkBarAction.OpenInNewWindow}"/>
+        <Separator/>
+        <MenuItem Header="新建文件夹"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.NewFolder}"/>
+        <MenuItem Header="新建书签"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.NewBookmark}"/>
         <MenuItem Header="编辑"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static model:BookmarkBarAction.Edit}"/>
         <MenuItem Header="删除"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+        <Separator/>
+        <MenuItem Header="书签管理"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static model:BookmarkBarAction.BookmarkManager}"/>
     </ContextMenu>
 
     <!--子项容器样式-->

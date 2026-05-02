@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Input;
 using ExplorerTabUtility.Hooks;
 using ExplorerTabUtility.Models;
@@ -22,6 +23,41 @@ namespace ExplorerTabUtility.UI.Views
             SetupEventHandlers();
         }
 
+        private void BookmarkManager()
+        {
+            var popup = new BookmarkManagePopup(explorerWatcher, windowHandle);
+            EntryDialog();
+            if (popup.ShowDialog() == true)
+            {
+                BookmarkBar.Refresh();
+            }
+            ExitDialog();
+        }
+
+        private void NewBookmark(Guid parentId)
+        {
+            var bookmark = CreateCurrentLocationBookmark();
+            var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, bookmark, parentId);
+            EntryDialog();
+            if (popup.ShowDialog() == true)
+            {
+                BookmarkBar.NewBookmark(bookmark);
+            }
+            ExitDialog();
+        }
+
+        private void NewFolder(BookmarkBarInfo info)
+        {
+            var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
+            var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, newFolder, info.GetCurrentFolderId());
+            EntryDialog();
+            if (popup.ShowDialog() == true)
+            {
+                BookmarkBar.NewFolder(info, newFolder);
+            }
+            ExitDialog();
+        }
+
         #region 事件注册
         private void SetupEventHandlers()
         {
@@ -37,13 +73,22 @@ namespace ExplorerTabUtility.UI.Views
             switch (action)
             {
                 case BookmarkBarAction.Rename:
-                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, folder);
+                    var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, folder, Guid.Empty);
                     EntryDialog();
                     if (popup.ShowDialog() == true)
                     {
                         BookmarkBar.RenameFolder(info, folder.Name);
                     }
                     ExitDialog();
+                    break;
+                case BookmarkBarAction.BookmarkManager:
+                    BookmarkManager();
+                    break;
+                case BookmarkBarAction.NewBookmark:
+                    NewBookmark(folder.Id);
+                    break;
+                case BookmarkBarAction.NewFolder:
+                    NewFolder(info);
                     break;
             }
         }
@@ -72,6 +117,17 @@ namespace ExplorerTabUtility.UI.Views
                         BookmarkBar.EditBookmark(info, bookmark);
                     }
                     ExitDialog();
+                    break;
+                case BookmarkBarAction.BookmarkManager:
+                    BookmarkManager();
+                    break;
+                case BookmarkBarAction.NewBookmark:
+                    NewBookmark(info.GetParentId());
+                    break;
+                case BookmarkBarAction.NewFolder:
+#pragma warning disable CS8604 // 引用类型参数可能为 null。
+                    NewFolder(info.Parent);
+#pragma warning restore CS8604 // 引用类型参数可能为 null。
                     break;
             }
         }

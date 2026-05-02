@@ -98,10 +98,19 @@ namespace ExplorerTabUtility.Models
         /// </summary>
         public int Level { get; private set; }
 
+        private bool firstLevel;
         /// <summary>
         /// 是否是第一级
         /// </summary>
-        public bool FirstLevel { get; private set; }
+        public bool FirstLevel
+        {
+            get { return firstLevel; }
+            set
+            {
+                SetProperty(ref firstLevel, value);
+                RaisePropertyChanged(nameof(IsShowSubIcon));
+            }
+        }
 
         /// <summary>
         /// 点击事件
@@ -331,6 +340,20 @@ namespace ExplorerTabUtility.Models
                 parentId = BookmarkManager.Instance.Folder.Id;
             }
             return parentId;
+        }
+
+        /// <summary>
+        /// 获取当前文件夹id
+        /// </summary>
+        /// <returns></returns>
+        public Guid GetCurrentFolderId()
+        {
+            var id = CurrentFolder.Id;
+            if (id == BookmarkManager.Instance.OverflowFolder.Id)
+            {
+                id = BookmarkManager.Instance.Folder.Id;
+            }
+            return id;
         }
 
         private void Init(bool isFolder, int level)

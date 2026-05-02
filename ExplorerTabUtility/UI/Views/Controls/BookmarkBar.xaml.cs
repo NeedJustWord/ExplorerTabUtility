@@ -107,6 +107,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     break;
                 }
 
+                item.FirstLevel = true;
                 item.Parent = allBookmark;
                 item.PlacementMode = PlacementMode.Bottom;
                 mainBookmarks.Add(item);
@@ -117,9 +118,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
             for (; index < allBookmarks.Count; index++)
             {
                 item = allBookmarks[index];
+                item.FirstLevel = false;
                 item.Parent = overflowBookmark;
                 item.PlacementMode = PlacementMode.Right;
-                overflowBookmark.Children.Add(allBookmarks[index]);
+                overflowBookmark.Children.Add(item);
             }
 
             TxtSeparator.Visibility = otherBookmark.IsVisibility ? Visibility.Visible : Visibility.Collapsed;
@@ -178,6 +180,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             switch (action)
             {
+                case BookmarkBarAction.BookmarkManager:
+                case BookmarkBarAction.NewBookmark:
+                case BookmarkBarAction.NewFolder:
                 case BookmarkBarAction.OpenInCurrentTab:
                 case BookmarkBarAction.OpenInNewTab:
                 case BookmarkBarAction.OpenInNewWindow:
@@ -185,9 +190,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
                 case BookmarkBarAction.Delete:
-                    if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
-
+#pragma warning disable CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, bookmark);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Instance.SaveConfig();
 
                     info.Parent.Delete(info);
@@ -200,13 +205,16 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             switch (action)
             {
+                case BookmarkBarAction.BookmarkManager:
+                case BookmarkBarAction.NewBookmark:
+                case BookmarkBarAction.NewFolder:
                 case BookmarkBarAction.Rename:
                     FolderHandle?.Invoke(info, folder, action);
                     break;
                 case BookmarkBarAction.Delete:
-                    if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
-
+#pragma warning disable CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, folder);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Instance.SaveConfig();
 
                     info.Parent.Delete(info);
@@ -250,8 +258,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             {
                 info.Parent.Delete(info);
 
-                var searchData = otherBookmarks.Union(new List<BookmarkBarInfo>() { allBookmark });
-                var newParent = BookmarkBarInfo.SearchFolder(searchData, bookmark.ParentId);
+                var newParent = SearchFolder(bookmark.ParentId);
                 if (newParent != null)
                 {
                     newParent.Add(info);
@@ -263,6 +270,57 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 info.Width = 0;
                 UpdateMenuLayout();
             }
+        }
+
+        public void Refresh()
+        {
+            allBookmark = new BookmarkBarInfo(BookmarkManager.Instance.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
+            otherBookmarks[0] = new BookmarkBarInfo(BookmarkManager.Instance.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false);
+
+            UpdateMenuLayout();
+        }
+
+        public void NewBookmark(BookmarkInfo bookmark)
+        {
+            var parent = SearchFolder(bookmark.ParentId);
+            if (parent != null)
+            {
+                var info = new BookmarkBarInfo(bookmark, parent.Level + 1, parent, BookmarkClickAction, BookmarkMenuClickAction);
+                parent.Add(info);
+
+                var needUpdateLayout = NeedUpdateMenuLayout(info, bookmark.ParentId);
+                if (needUpdateLayout)
+                {
+                    UpdateMenuLayout();
+                }
+            }
+        }
+
+        public void NewFolder(BookmarkBarInfo info, FolderInfo folder)
+        {
+            var parentId = info.GetCurrentFolderId();
+            var newInfo = new BookmarkBarInfo(folder, info.Level + 1, info, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
+
+            if (parentId == BookmarkManager.Instance.Folder.Id)
+            {
+                allBookmark.Add(newInfo);
+            }
+            else
+            {
+                info.Add(newInfo);
+            }
+
+            var needUpdateLayout = NeedUpdateMenuLayout(info, parentId);
+            if (needUpdateLayout)
+            {
+                UpdateMenuLayout();
+            }
+        }
+
+        private BookmarkBarInfo? SearchFolder(Guid searchId)
+        {
+            var searchData = otherBookmarks.Union(new List<BookmarkBarInfo>() { allBookmark });
+            return BookmarkBarInfo.SearchFolder(searchData, searchId);
         }
 
         private bool NeedUpdateMenuLayout(BookmarkBarInfo info, Guid newParentId)

@@ -34,5 +34,20 @@
         /// 删除
         /// </summary>
         Delete,
+
+        /// <summary>
+        /// 新建书签
+        /// </summary>
+        NewBookmark,
+
+        /// <summary>
+        /// 新建文件夹
+        /// </summary>
+        NewFolder,
+
+        /// <summary>
+        /// 书签管理
+        /// </summary>
+        BookmarkManager,
     }
 }

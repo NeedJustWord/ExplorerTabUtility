@@ -1,6 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.IO;
+using System.Windows;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
@@ -24,6 +27,44 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
             Helper.BypassWinForegroundRestrictions();
             Activate();
+        }
+
+        /// <summary>
+        /// 创建当前标签页书签
+        /// </summary>
+        /// <returns></returns>
+        protected BookmarkInfo CreateCurrentLocationBookmark()
+        {
+            var record = explorerWatcher.GetCurrentTabWindowRecord(windowHandle);
+            var location = record == null ? string.Empty : record.DisplayLocation;
+            return new BookmarkInfo(Guid.Empty, GetName(location), location);
+        }
+
+        /// <summary>
+        /// 根据路径获取名称
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        protected string GetName(string location)
+        {
+            string name;
+            switch (location)
+            {
+                case "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}":
+                    name = "此电脑";
+                    break;
+                default:
+                    if (location.EndsWith(":"))
+                    {
+                        name = $"{location.TrimEnd(':')}盘";
+                    }
+                    else
+                    {
+                        name = Path.GetFileName(location);
+                    }
+                    break;
+            }
+            return name;
         }
 
         protected bool CanClose()
