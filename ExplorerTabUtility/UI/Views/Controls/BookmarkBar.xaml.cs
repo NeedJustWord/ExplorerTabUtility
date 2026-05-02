@@ -246,7 +246,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             if (info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
 
             var needUpdateLayout = NeedUpdateMenuLayout(info, bookmark.ParentId);
-            if (info.Parent.CurrentFolder.Id != bookmark.ParentId)
+            if (info.GetParentId() != bookmark.ParentId)
             {
                 info.Parent.Delete(info);
 

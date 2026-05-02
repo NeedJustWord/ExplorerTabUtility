@@ -149,4 +149,6 @@ SnapDownToolTip        :将当前窗口贴靠到屏幕底侧
 BookmarkSave           :保存书签
 BookmarkSaveToolTip    :打开书签保存框，以将标签页路径保存成书签
 BookmarkManage         :管理书签
-BookmarkManageToolTip  :打开书签管理窗口，以管理书签或者在新标签页/窗口打开书签指定的路径
+BookmarkManageToolTip  :打开书签管理窗口，以管理书签
+BookmarkNavigate       :导航书签
+BookmarkNavigateToolTip:打开书签导航窗口，以在新标签页/窗口打开书签指定的路径

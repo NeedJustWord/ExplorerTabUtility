@@ -113,6 +113,10 @@ public sealed class HookManager
                 _syncContext.Post(_ => new BookmarkManagePopup(_windowHook, e.ForegroundWindow).Show(), null);
                 break;
 
+            case HotKeyAction.BookmarkNavigate:
+                _syncContext.Post(_ => new BookmarkNavigatePopup(_windowHook, e.ForegroundWindow).Show(), null);
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(e.Profile.Action),

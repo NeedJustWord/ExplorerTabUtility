@@ -149,4 +149,6 @@ SnapDownToolTip        :Snap the current window to the bottom.
 BookmarkSave           :BookmarkSave
 BookmarkSaveToolTip    :Open bookmark save popup to save tab location as bookmark.
 BookmarkManage         :BookmarkManage
-BookmarkManageToolTip  :Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.
+BookmarkManageToolTip  :Open bookmark manage popup to manage bookmarks.
+BookmarkNavigate       :BookmarkNavigate
+BookmarkNavigateToolTip:Open bookmark navigate popup to open a new tab/window with the bookmark location.

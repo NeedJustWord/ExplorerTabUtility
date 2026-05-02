@@ -41,6 +41,8 @@ public enum HotKeyAction
     SnapDown,
     [Description("Open bookmark save popup to save tab location as bookmark.")]
     BookmarkSave,
-    [Description("Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.")]
+    [Description("Open bookmark manage popup to manage bookmarks.")]
     BookmarkManage,
+    [Description("Open bookmark navigate popup to open a new tab/window with the bookmark location.")]
+    BookmarkNavigate,
 }

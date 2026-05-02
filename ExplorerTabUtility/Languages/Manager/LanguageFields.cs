@@ -819,7 +819,19 @@ namespace ExplorerTabUtility.Languages.Manager
         /// 管理书签提示
         /// </summary>
         public string BookmarkManageToolTip { get => Get(); set => Set(value); }
-        private string bookmarkManageToolTipDefaultValue = "Open bookmark manage popup to manage bookmarks or open a new tab/window with the bookmark location.";
+        private string bookmarkManageToolTipDefaultValue = "Open bookmark manage popup to manage bookmarks.";
+
+        /// <summary>
+        /// 管理书签
+        /// </summary>
+        public string BookmarkNavigate { get => Get(); set => Set(value); }
+        private string bookmarkNavigateDefaultValue = "BookmarkNavigate";
+
+        /// <summary>
+        /// 管理书签提示
+        /// </summary>
+        public string BookmarkNavigateToolTip { get => Get(); set => Set(value); }
+        private string bookmarkNavigateToolTipDefaultValue = "Open bookmark navigate popup to open a new tab/window with the bookmark location.";
         #endregion
         #endregion
 
@@ -997,6 +1009,8 @@ namespace ExplorerTabUtility.Languages.Manager
             dictCurrentLanguageFields[nameof(BookmarkSaveToolTip)] = new Field(bookmarkSaveToolTipDefaultValue);
             dictCurrentLanguageFields[nameof(BookmarkManage)] = new Field(bookmarkManageDefaultValue);
             dictCurrentLanguageFields[nameof(BookmarkManageToolTip)] = new Field(bookmarkManageToolTipDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkNavigate)] = new Field(bookmarkNavigateDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkNavigateToolTip)] = new Field(bookmarkNavigateToolTipDefaultValue);
         }
 
         /// <summary>
