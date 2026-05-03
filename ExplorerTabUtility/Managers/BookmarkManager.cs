@@ -194,6 +194,27 @@ namespace ExplorerTabUtility.Managers
         }
 
         /// <summary>
+        /// 保存
+        /// </summary>
+        /// <param name="folders"></param>
+        public void Save(List<FolderInfo> folders)
+        {
+            foreach (var item in folders)
+            {
+                if (item.Id == folderInfo.Id)
+                {
+                    folderInfo.Items = item.Items;
+                }
+                else if (item.Id == otherFolderInfo.Id)
+                {
+                    otherFolderInfo.Items = item.Items;
+                }
+            }
+
+            SaveConfig();
+        }
+
+        /// <summary>
         /// 删除书签
         /// </summary>
         /// <param name="parent"></param>

@@ -34,7 +34,7 @@ namespace ExplorerTabUtility.Models
 
     public class BookmarkInfo : BaseBookmarkInfo
     {
-        public static readonly BookmarkInfo Empty = new BookmarkInfo(Guid.Empty, string.Empty, string.Empty);
+        public static readonly BookmarkInfo Empty = new BookmarkInfo();
 
         /// <summary>
         /// 父节点Id
@@ -56,11 +56,20 @@ namespace ExplorerTabUtility.Models
         private BookmarkInfo() : this(Guid.Empty, string.Empty, string.Empty)
         {
         }
+
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <returns></returns>
+        public BookmarkInfo Copy()
+        {
+            return new BookmarkInfo(Id, Name, Location);
+        }
     }
 
     public class FolderInfo : BaseBookmarkInfo
     {
-        public static readonly FolderInfo Empty = new FolderInfo(Guid.Empty, string.Empty);
+        public static readonly FolderInfo Empty = new FolderInfo();
 
         /// <summary>
         /// 子项
@@ -80,6 +89,15 @@ namespace ExplorerTabUtility.Models
         [JsonConstructor]
         private FolderInfo() : this(Guid.Empty, string.Empty)
         {
+        }
+
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <returns></returns>
+        public FolderInfo Copy()
+        {
+            return new FolderInfo(Id, Name);
         }
 
         public void AddRange(IEnumerable<BaseBookmarkInfo> items)

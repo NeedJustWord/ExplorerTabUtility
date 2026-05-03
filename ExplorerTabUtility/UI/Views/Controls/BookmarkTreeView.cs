@@ -44,6 +44,22 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         #region 功能
         /// <summary>
+        /// 复制文件夹信息
+        /// <para>树形结构转化而来</para>
+        /// </summary>
+        /// <returns></returns>
+        public List<FolderInfo> CopyFolderInfos()
+        {
+            var list = new List<FolderInfo>();
+            var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
+            foreach (var item in datas)
+            {
+                list.Add(item.CopyFolderInfo());
+            }
+            return list;
+        }
+
+        /// <summary>
         /// 搜索
         /// </summary>
         /// <param name="key"></param>

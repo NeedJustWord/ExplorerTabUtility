@@ -3,6 +3,7 @@
                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                      xmlns:language="clr-namespace:ExplorerTabUtility.Languages.Manager"
                      xmlns:controls="clr-namespace:ExplorerTabUtility.UI.Views.Controls"
+                     xmlns:dd="urn:gong-wpf-dragdrop"
                      WindowStartupLocation="CenterScreen"
                      SizeToContent="Manual"
                      Style="{StaticResource BaseWindowStyle}"
@@ -27,9 +28,13 @@
 
             <TextBox x:Name="TxtSearch" Grid.Row="1" Grid.Column="2" Style="{StaticResource BookmarkSearchTextBoxStyle}" Tag="搜索书签"/>
 
-            <controls:BookmarkTreeView x:Name="TvFolder" Grid.Row="2" Grid.Column="0" Style="{StaticResource BookmarkSaveTreeViewStyle}"/>
+            <controls:BookmarkTreeView x:Name="TvFolder" Grid.Row="2" Grid.Column="0" Style="{StaticResource BookmarkSaveTreeViewStyle}"
+                                       dd:DragDrop.IsDropTarget="True"
+                                       dd:DragDrop.IsDragSource="True"/>
 
-            <ListBox x:Name="LbChildren" Grid.Row="2" Grid.Column="2" Style="{StaticResource BookmarkListBoxStyle}"/>
+            <ListBox x:Name="LbChildren" Grid.Row="2" Grid.Column="2" Style="{StaticResource BookmarkListBoxStyle}"
+                     dd:DragDrop.IsDropTarget="True"
+                     dd:DragDrop.IsDragSource="True"/>
 
             <StackPanel Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left">
                 <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"

@@ -206,6 +206,27 @@ namespace ExplorerTabUtility.Models
         }
 
         /// <summary>
+        /// 复制文件夹信息
+        /// </summary>
+        /// <returns></returns>
+        public FolderInfo CopyFolderInfo()
+        {
+            var folder = CurrentFolder.Copy();
+            foreach (var item in children)
+            {
+                if (item.CurrentBookmark != BookmarkInfo.Empty)
+                {
+                    folder.Add(item.CurrentBookmark.Copy());
+                }
+                else
+                {
+                    folder.Add(item.CopyFolderInfo());
+                }
+            }
+            return folder;
+        }
+
+        /// <summary>
         /// 恢复名称
         /// </summary>
         public void RecoverName()

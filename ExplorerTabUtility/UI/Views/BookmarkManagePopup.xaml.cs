@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Text.Json;
+using System.Windows;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
@@ -14,6 +15,7 @@ namespace ExplorerTabUtility.UI.Views
     public partial class BookmarkManagePopup : BaseWindow
     {
         private bool needDialogResult;
+        private string initBookmarkJson;
 
         public BookmarkManagePopup(ExplorerWatcher explorerWatcher, nint windowHandle, bool needDialogResult) : base(explorerWatcher, windowHandle)
         {
@@ -21,6 +23,8 @@ namespace ExplorerTabUtility.UI.Views
 
             Init(needDialogResult);
             SetupEventHandlers();
+
+            initBookmarkJson = GetJson(TvFolder.CopyFolderInfos());
         }
 
         public void AddFolder(BookmarkTreeViewInfo info)
@@ -40,12 +44,34 @@ namespace ExplorerTabUtility.UI.Views
 
         private void CloseWindow(bool isCancel)
         {
-            if (isCancel && TvFolder.HaveSave)
+            var dialogResult = false;
+            var infos = TvFolder.CopyFolderInfos();
+            var afterJson = GetJson(infos);
+
+            if (afterJson != initBookmarkJson)
             {
-                BookmarkManager.Instance.RecoverConfig();
+                if (isCancel)
+                {
+                    BookmarkManager.Instance.RecoverConfig();
+                }
+                else
+                {
+                    dialogResult = true;
+                    BookmarkManager.Instance.Save(infos);
+                }
+            }
+
+            if (needDialogResult)
+            {
+                DialogResult = dialogResult;
             }
 
             CloseWindow();
+        }
+
+        private string GetJson<T>(T t)
+        {
+            return JsonSerializer.Serialize(t);
         }
         #endregion
 
@@ -77,7 +103,7 @@ namespace ExplorerTabUtility.UI.Views
         private void TvFolder_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             var info = (BookmarkTreeViewInfo)e.NewValue;
-            LbChildren.ItemsSource = info.Children;
+            if (info != null) LbChildren.ItemsSource = info.Children;
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
@@ -90,12 +116,6 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (needDialogResult)
-            {
-                DialogResult = false;
-                //todo:set DialogResult
-            }
-
             CloseWindow(false);
         }
 
