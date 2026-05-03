@@ -54,6 +54,13 @@ namespace ExplorerTabUtility.UI.Themes
             if (popup != null)
             {
                 popup.AddFolder(info);
+                return;
+            }
+
+            var managePopup = VisualTreeHelperEx.GetParent<BookmarkManagePopup>(txt);
+            if (managePopup != null)
+            {
+                managePopup.AddFolder(info);
             }
         }
     }

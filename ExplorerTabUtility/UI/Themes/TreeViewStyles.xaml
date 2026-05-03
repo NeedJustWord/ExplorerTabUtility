@@ -88,7 +88,8 @@
 
     <!--保存书签的显示样式-->
     <HierarchicalDataTemplate x:Key="BookmarkSaveDisplayStyle" DataType="{x:Type models:BookmarkTreeViewInfo}" ItemsSource="{Binding Children}">
-        <Border x:Name="RowBorder" CornerRadius="4" BorderThickness="1" Background="{StaticResource ControlBackgroundBrush}">
+        <Border x:Name="RowBorder" CornerRadius="4" BorderThickness="1" Background="{StaticResource ControlBackgroundBrush}"
+                Visibility="{Binding Visibility}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition MinWidth="19" Width="auto"/>
@@ -112,13 +113,13 @@
             </Grid>
         </Border>
         <HierarchicalDataTemplate.Triggers>
-            <DataTrigger Binding="{Binding HasItems, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="False">
+            <DataTrigger Binding="{Binding HasVisibilityItems}" Value="False">
                 <Setter TargetName="Expander" Property="Visibility" Value="Hidden"/>
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsExpanded}" Value="true"/>
-                    <Condition Binding="{Binding HasItems, RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}}" Value="true"/>
+                    <Condition Binding="{Binding HasVisibilityItems}" Value="true"/>
                 </MultiDataTrigger.Conditions>
                 <Setter TargetName="Icon" Property="Text" Value="{Binding ExpandedIcon}"/>
             </MultiDataTrigger>
@@ -176,7 +177,7 @@
 
     <!--保存书签的树形控件样式-->
     <Style x:Key="BookmarkSaveTreeViewStyle" TargetType="TreeView">
-        <Setter Property="Margin" Value="4 0 4 0"/>
+        <Setter Property="Margin" Value="4"/>
         <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
         <Setter Property="ItemTemplate" Value="{StaticResource BookmarkSaveDisplayStyle}"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource BookmarkSaveItemContainerStyle}"/>

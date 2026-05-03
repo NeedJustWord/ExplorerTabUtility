@@ -6,7 +6,7 @@
                      WindowStartupLocation="CenterScreen"
                      SizeToContent="Manual"
                      Style="{StaticResource BaseWindowStyle}"
-                     Width="800" Height="600">
+                     Width="1000" Height="800">
     <Border Style="{StaticResource BaseWindowBorderStyle}">
         <Grid Margin="10 5 10 0">
             <Grid.RowDefinitions>
@@ -18,18 +18,18 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Text="书签管理" Style="{StaticResource BookmarkTitleTextBlock}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="书签文件夹" Style="{StaticResource BookmarkTitleTextBlock}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="书签文件夹" Style="{StaticResource BookmarkTextBlock}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="书签列表" Style="{StaticResource BookmarkTitleTextBlock}"/>
+            <TextBox x:Name="TxtSearch" Grid.Row="1" Grid.Column="2" Style="{StaticResource BookmarkSearchTextBoxStyle}" Tag="搜索书签"/>
 
-            <controls:BookmarkTreeView x:Name="TvSelectSavePath" Grid.Row="2" Grid.Column="0" Style="{StaticResource BookmarkSaveTreeViewStyle}"/>
+            <controls:BookmarkTreeView x:Name="TvFolder" Grid.Row="2" Grid.Column="0" Style="{StaticResource BookmarkSaveTreeViewStyle}"/>
 
-            <ListBox Grid.Row="2" Grid.Column="2"/>
+            <ListBox x:Name="LbChildren" Grid.Row="2" Grid.Column="2" Style="{StaticResource BookmarkListBoxStyle}"/>
 
             <StackPanel Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left">
                 <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"

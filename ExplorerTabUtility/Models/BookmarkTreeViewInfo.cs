@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
@@ -127,6 +130,16 @@ namespace ExplorerTabUtility.Models
         /// 主键
         /// </summary>
         public Guid Id => SaveFolderItem.Key;
+
+        /// <summary>
+        /// 是否显示
+        /// </summary>
+        public Visibility Visibility { get; set; }
+
+        /// <summary>
+        /// 是否有显示的子项
+        /// </summary>
+        public bool HasVisibilityItems => children.Any(t => t.Visibility == Visibility.Visible);
         #endregion
 
         private string oldName;
@@ -138,6 +151,7 @@ namespace ExplorerTabUtility.Models
             CurrentFolder = FolderInfo.Empty;
             CurrentBookmark = bookmarkInfo;
             Level = level;
+            Visibility = Visibility.Collapsed;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
             icon = GetIcon(true, false, false);
@@ -152,11 +166,43 @@ namespace ExplorerTabUtility.Models
             CurrentFolder = folderInfo;
             CurrentBookmark = BookmarkInfo.Empty;
             Level = level;
+            Visibility = Visibility.Visible;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
             oldName = name = folderInfo.Name;
+        }
+
+        /// <summary>
+        /// 搜索
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public IEnumerable<BookmarkTreeViewInfo> Search(string key)
+        {
+            if (CurrentBookmark != BookmarkInfo.Empty)
+            {
+                if (CurrentBookmark.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    yield return this;
+                }
+            }
+            else
+            {
+                if (CurrentFolder.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+                {
+                    yield return this;
+                }
+
+                foreach (var item in children)
+                {
+                    foreach (var temp in item.Search(key))
+                    {
+                        yield return temp;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -179,6 +225,13 @@ namespace ExplorerTabUtility.Models
         public void Delete(BookmarkTreeViewInfo info)
         {
             Children.Remove(info);
+            RaisePropertyChanged(nameof(HasVisibilityItems));
+        }
+
+        public void Add(BookmarkTreeViewInfo info)
+        {
+            Children.Add(info);
+            RaisePropertyChanged(nameof(HasVisibilityItems));
         }
 
         private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)

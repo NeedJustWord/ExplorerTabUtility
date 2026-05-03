@@ -25,7 +25,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BookmarkManager()
         {
-            var popup = new BookmarkManagePopup(explorerWatcher, windowHandle);
+            var popup = new BookmarkManagePopup(explorerWatcher, windowHandle, true);
             EntryDialog();
             if (popup.ShowDialog() == true)
             {

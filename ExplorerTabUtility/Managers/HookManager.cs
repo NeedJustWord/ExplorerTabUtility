@@ -77,7 +77,7 @@ public sealed class HookManager
             case HotKeyAction.NavigateUp:
                 NavigateUp(e.ForegroundWindow, e.MousePosition);
                 break;
-            
+
             case HotKeyAction.NavigateForward:
                 NavigateBackForward(e.ForegroundWindow, e.MousePosition, isForward: true);
                 break;
@@ -110,7 +110,7 @@ public sealed class HookManager
                 break;
 
             case HotKeyAction.BookmarkManage:
-                _syncContext.Post(_ => new BookmarkManagePopup(_windowHook, e.ForegroundWindow).Show(), null);
+                _syncContext.Post(_ => new BookmarkManagePopup(_windowHook, e.ForegroundWindow, false).Show(), null);
                 break;
 
             case HotKeyAction.BookmarkNavigate:

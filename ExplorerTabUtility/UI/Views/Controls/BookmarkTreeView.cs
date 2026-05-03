@@ -44,6 +44,23 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         #region 功能
         /// <summary>
+        /// 搜索
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public IEnumerable<BookmarkTreeViewInfo> Search(string key)
+        {
+            var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
+            foreach (var item in datas)
+            {
+                foreach (var temp in item.Search(key))
+                {
+                    yield return temp;
+                }
+            }
+        }
+
+        /// <summary>
         /// 重命名
         /// </summary>
         private void Rename()
@@ -92,7 +109,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             {
                 IsEditMode = true
             };
-            selected.Children.Add(newInfo);
+            selected.Add(newInfo);
             selected.IsExpanded = true;
             errorMsg = string.Empty;
             return true;
@@ -140,7 +157,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 int index = 0;
                 foreach (var item in folders)
                 {
-                    datas.Add(CreateItemWithBookmark(item, 0, null, index == 0));
+                    datas.Add(CreateItemWithBookmark(item, 0, null, index == 0, expandedId, true));
                     index++;
                 }
             }
@@ -149,7 +166,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 int index = 0;
                 foreach (var item in folders)
                 {
-                    datas.Add(CreateItemWithOutBookmark(item, 0, null, index == 0, expandedId, true));
+                    datas.Add(CreateItemWithOutBookmark(item, 0, null, index == 0, expandedId, false));
                     index++;
                 }
             }
@@ -163,8 +180,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <param name="level"></param>
         /// <param name="parent"></param>
         /// <param name="isSpecil"></param>
+        /// <param name="expandedId"></param>
+        /// <param name="expandedSelf"></param>
         /// <returns></returns>
-        private BookmarkTreeViewInfo CreateItemWithBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil)
+        private BookmarkTreeViewInfo CreateItemWithBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedSelf)
         {
             var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
             if (folder.Items.Count > 0)
@@ -174,13 +193,18 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 {
                     if (item is FolderInfo folderInfo)
                     {
-                        result.Children.Add(CreateItemWithBookmark(folderInfo, level, result, false));
+                        result.Add(CreateItemWithBookmark(folderInfo, level, result, false, expandedId, expandedSelf));
                     }
                     else if (item is BookmarkInfo bookmarkInfo)
                     {
-                        result.Children.Add(new BookmarkTreeViewInfo(bookmarkInfo, level, result));
+                        result.Add(new BookmarkTreeViewInfo(bookmarkInfo, level, result));
                     }
                 }
+            }
+            if (folder.Id == expandedId)
+            {
+                result.IsSelected = true;
+                Expanded(result, expandedSelf);
             }
 
             return result;
@@ -194,9 +218,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <param name="parent"></param>
         /// <param name="isSpecil"></param>
         /// <param name="expandedId"></param>
-        /// <param name="expandedAll"></param>
+        /// <param name="expandedSelf"></param>
         /// <returns></returns>
-        private BookmarkTreeViewInfo CreateItemWithOutBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedAll)
+        private BookmarkTreeViewInfo CreateItemWithOutBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedSelf)
         {
             var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
             if (folder.Items.Count > 0)
@@ -205,33 +229,30 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 var folders = folder.Items.OfType<FolderInfo>();
                 foreach (var folderInfo in folders)
                 {
-                    result.Children.Add(CreateItemWithOutBookmark(folderInfo, level, result, false, expandedId, expandedAll));
+                    result.Add(CreateItemWithOutBookmark(folderInfo, level, result, false, expandedId, expandedSelf));
                 }
             }
             if (folder.Id == expandedId)
             {
                 result.IsSelected = true;
-                Expanded(result, expandedAll);
+                Expanded(result, expandedSelf);
             }
 
             return result;
         }
 
-        private void Expanded(BookmarkTreeViewInfo item, bool expandedAll)
+        private void Expanded(BookmarkTreeViewInfo item, bool expandedSelf)
         {
-            if (expandedAll)
+            if (expandedSelf)
             {
-                var parent = item.Parent;
-                while (parent != null)
-                {
-                    parent.IsExpanded = true;
-                    parent = parent.Parent;
-                }
+                item.IsExpanded = true;
             }
-            else
+
+            var parent = item.Parent;
+            while (parent != null)
             {
-                var parent = item.Parent;
-                if (parent != null) parent.IsExpanded = true;
+                parent.IsExpanded = true;
+                parent = parent.Parent;
             }
         }
         #endregion
