@@ -12,10 +12,20 @@ namespace ExplorerTabUtility.UI.Views.Controls
 {
     internal class BookmarkTreeView : TreeView
     {
+        #region 事件
+        public delegate void BookmarkEventHandler(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action);
+        public event BookmarkEventHandler? BookmarkHandle;
+
+        public delegate void FolderEventHandler(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action);
+        public event FolderEventHandler? FolderHandle;
+        #endregion
+
         /// <summary>
         /// 是否有保存
         /// </summary>
         public bool HaveSave { get; private set; }
+
+        private bool withBookmark;
 
         public BookmarkTreeView()
         {
@@ -36,7 +46,14 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     Rename();
                     break;
                 case Key.Delete:
-                    Delete();
+                    if (withBookmark)
+                    {
+                        Delete(new List<BookmarkTreeViewInfo> { (BookmarkTreeViewInfo)SelectedItem });
+                    }
+                    else
+                    {
+                        Delete();
+                    }
                     break;
             }
         }
@@ -90,11 +107,20 @@ namespace ExplorerTabUtility.UI.Views.Controls
         private void Delete()
         {
             var info = (BookmarkTreeViewInfo)SelectedItem;
-            if (info == null || info.Parent == null) throw new ArgumentNullException(nameof(info.Parent));
+            if (info == null || info.Parent == null) return;
 
             BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, info.CurrentFolder);
             info.Parent.Delete(info);
             HaveSave = true;
+        }
+
+        public void Delete(List<BookmarkTreeViewInfo> infos)
+        {
+            var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
+            foreach (var item in datas)
+            {
+                item.Delete(infos);
+            }
         }
 
         /// <summary>
@@ -121,7 +147,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             }
 
             var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
-            var newInfo = new BookmarkTreeViewInfo(newFolder, selected.Level + 1, selected, false)
+            var newInfo = new BookmarkTreeViewInfo(newFolder, selected.Level + 1, selected, false, FolderMenuClickAction)
             {
                 IsEditMode = true
             };
@@ -158,6 +184,33 @@ namespace ExplorerTabUtility.UI.Views.Controls
         }
         #endregion
 
+        #region 菜单事件
+        private void BookmarkMenuClickAction(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.Edit:
+                case BookmarkBarAction.Delete:
+                case BookmarkBarAction.OpenInCurrentTab:
+                case BookmarkBarAction.OpenInNewTab:
+                case BookmarkBarAction.OpenInNewWindow:
+                    BookmarkHandle?.Invoke(info, bookmark, action);
+                    break;
+            }
+        }
+
+        private void FolderMenuClickAction(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.Delete:
+                case BookmarkBarAction.Rename:
+                    FolderHandle?.Invoke(info, folder, action);
+                    break;
+            }
+        }
+        #endregion
+
         #region 设置数据源
         /// <summary>
         /// 设置数据源
@@ -167,6 +220,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <param name="withBookmark">是否带书签</param>
         public void SetItemsSource(IReadOnlyCollection<FolderInfo> folders, Guid expandedId, bool withBookmark)
         {
+            this.withBookmark = withBookmark;
             var datas = new ObservableCollection<BookmarkTreeViewInfo>();
             if (withBookmark)
             {
@@ -201,7 +255,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <returns></returns>
         private BookmarkTreeViewInfo CreateItemWithBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedSelf)
         {
-            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
+            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil, FolderMenuClickAction);
             if (folder.Items.Count > 0)
             {
                 level++;
@@ -213,7 +267,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     }
                     else if (item is BookmarkInfo bookmarkInfo)
                     {
-                        result.Add(new BookmarkTreeViewInfo(bookmarkInfo, level, result));
+                        result.Add(new BookmarkTreeViewInfo(bookmarkInfo, level, result, BookmarkMenuClickAction));
                     }
                 }
             }
@@ -238,7 +292,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <returns></returns>
         private BookmarkTreeViewInfo CreateItemWithOutBookmark(FolderInfo folder, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Guid expandedId, bool expandedSelf)
         {
-            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil);
+            var result = new BookmarkTreeViewInfo(folder, level, parent, isSpecil, FolderMenuClickAction);
             if (folder.Items.Count > 0)
             {
                 level++;

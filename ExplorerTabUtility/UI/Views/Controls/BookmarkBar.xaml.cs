@@ -5,9 +5,10 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
+using ExplorerTabUtility.WinAPI;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
@@ -160,11 +161,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
         private void BookmarkClickAction(BookmarkBarInfo info, BookmarkInfo bookmark)
         {
             BookmarkBarAction action;
-            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
             {
                 action = BookmarkBarAction.OpenInNewTab;
             }
-            else if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            else if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Shift))
             {
                 action = BookmarkBarAction.OpenInNewWindow;
             }

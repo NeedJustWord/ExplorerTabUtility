@@ -178,6 +178,7 @@
     <!--保存书签的树形控件样式-->
     <Style x:Key="BookmarkSaveTreeViewStyle" TargetType="TreeView">
         <Setter Property="Margin" Value="4"/>
+        <Setter Property="BorderBrush" Value="{StaticResource ControlBackgroundBrush}"/>
         <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
         <Setter Property="ItemTemplate" Value="{StaticResource BookmarkSaveDisplayStyle}"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource BookmarkSaveItemContainerStyle}"/>

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
@@ -6,6 +7,7 @@ using ExplorerTabUtility.Hooks;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
+using ExplorerTabUtility.WinAPI;
 
 namespace ExplorerTabUtility.UI.Views
 {
@@ -73,6 +75,18 @@ namespace ExplorerTabUtility.UI.Views
         {
             return JsonSerializer.Serialize(t);
         }
+
+        private void DeleteSelectedItems()
+        {
+            var items = LbChildren.SelectedItems.Cast<BookmarkTreeViewInfo>().ToList();
+            if (items.Count > 0) TvFolder.Delete(items);
+        }
+
+        private void Edit(BookmarkTreeViewInfo info)
+        {
+            var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, info);
+            popup.ShowDialog();
+        }
         #endregion
 
         #region 事件注册
@@ -83,7 +97,70 @@ namespace ExplorerTabUtility.UI.Views
             BtnSave.Click += BtnSave_Click;
             BtnNewFolder.Click += BtnNewFolder_Click;
             TvFolder.SelectedItemChanged += TvFolder_SelectedItemChanged;
+            TvFolder.BookmarkHandle += TvFolder_BookmarkHandle;
+            TvFolder.FolderHandle += TvFolder_FolderHandle;
+            LbChildren.KeyDown += LbChildren_KeyDown;
+            TxtSearch.GotFocus += TxtSearch_GotFocus;
             TxtSearch.TextChanged += TxtSearch_TextChanged;
+        }
+
+        private void TxtSearch_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TxtSearch.SelectAll();
+        }
+
+        private void LbChildren_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    DeleteSelectedItems();
+                    e.Handled = true;
+                    break;
+                case Key.F2:
+                    if (LbChildren.SelectedItems.Count == 1)
+                    {
+                        var info = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
+                        Edit(info);
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        private void TvFolder_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.Delete:
+                    DeleteSelectedItems();
+                    break;
+                case BookmarkBarAction.Rename:
+                    Edit(info);
+                    break;
+            }
+        }
+
+        private async void TvFolder_BookmarkHandle(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        {
+            switch (action)
+            {
+                case BookmarkBarAction.OpenInCurrentTab:
+                    await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: true);
+                    break;
+                case BookmarkBarAction.OpenInNewTab:
+                    await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: false);
+                    break;
+                case BookmarkBarAction.OpenInNewWindow:
+                    await explorerWatcher.Open(bookmark.Location, false, windowHandle);
+                    break;
+                case BookmarkBarAction.Delete:
+                    DeleteSelectedItems();
+                    break;
+                case BookmarkBarAction.Edit:
+                    Edit(info);
+                    break;
+            }
         }
 
         private void TxtSearch_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -126,9 +203,23 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BookmarkManagePopup_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            switch (e.Key)
             {
-                CloseWindow(true);
+                case Key.Escape:
+                    CloseWindow(true);
+                    break;
+                case Key.F:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        TxtSearch.Focus();
+                    }
+                    break;
+                case Key.S:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        CloseWindow(false);
+                    }
+                    break;
             }
         }
         #endregion

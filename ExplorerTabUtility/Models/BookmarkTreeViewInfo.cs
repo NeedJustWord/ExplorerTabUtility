@@ -4,6 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using ExplorerTabUtility.UI.Commands;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
 namespace ExplorerTabUtility.Models
@@ -140,11 +142,21 @@ namespace ExplorerTabUtility.Models
         /// 是否有显示的子项
         /// </summary>
         public bool HasVisibilityItems => children.Any(t => t.Visibility == Visibility.Visible);
+
+        /// <summary>
+        /// 是否是文件夹
+        /// </summary>
+        public bool IsFolder { get; }
+
+        /// <summary>
+        /// 菜单点击事件
+        /// </summary>
+        public ICommand MenuClickCommand { get; }
         #endregion
 
         private string oldName;
 
-        public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent)
+        public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent, Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkBarAction> menuClickAction)
         {
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(bookmarkInfo.Id, bookmarkInfo.Name, bookmarkInfo.Location);
@@ -152,14 +164,23 @@ namespace ExplorerTabUtility.Models
             CurrentBookmark = bookmarkInfo;
             Level = level;
             Visibility = Visibility.Collapsed;
+            IsFolder = false;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
             icon = GetIcon(true, false, false);
             expandedIcon = icon;
             oldName = name = bookmarkInfo.Name;
+
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkBarAction action)
+                {
+                    menuClickAction.Invoke(this, CurrentBookmark, action);
+                }
+            });
         }
 
-        public BookmarkTreeViewInfo(FolderInfo folderInfo, int level, BookmarkTreeViewInfo? parent, bool isSpecil)
+        public BookmarkTreeViewInfo(FolderInfo folderInfo, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Action<BookmarkTreeViewInfo, FolderInfo, BookmarkBarAction> menuClickAction)
         {
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(folderInfo.Id, folderInfo.Name);
@@ -167,11 +188,20 @@ namespace ExplorerTabUtility.Models
             CurrentBookmark = BookmarkInfo.Empty;
             Level = level;
             Visibility = Visibility.Visible;
+            IsFolder = true;
 
             children = new ObservableCollection<BookmarkTreeViewInfo>();
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
             oldName = name = folderInfo.Name;
+
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkBarAction action)
+                {
+                    menuClickAction.Invoke(this, CurrentFolder, action);
+                }
+            });
         }
 
         /// <summary>
@@ -247,6 +277,40 @@ namespace ExplorerTabUtility.Models
         {
             Children.Remove(info);
             RaisePropertyChanged(nameof(HasVisibilityItems));
+        }
+
+        public void Delete(List<BookmarkTreeViewInfo> infos)
+        {
+            for (int i = children.Count - 1; i >= 0; i--)
+            {
+                var current = children[i];
+                var temp = infos.FirstOrDefault(t => t.Id == current.Id);
+                if (temp != null)
+                {
+                    children.RemoveAt(i);
+                    infos.Remove(temp);
+                    continue;
+                }
+
+                if (current.IsFolder)
+                {
+                    current.Delete(infos);
+                }
+            }
+        }
+
+        public void Update(string name, string location)
+        {
+            Name = name;
+            if (IsFolder)
+            {
+                CurrentFolder.Name = name;
+            }
+            else
+            {
+                CurrentBookmark.Name = name;
+                CurrentBookmark.Location = location;
+            }
         }
 
         public void Add(BookmarkTreeViewInfo info)

@@ -21,6 +21,7 @@ namespace ExplorerTabUtility.UI.Views
         private BookmarkSaveType saveType;
         private BookmarkInfo currentBookmarkInfo;
         private FolderInfo currentFolderInfo;
+        private BookmarkTreeViewInfo? bookmarkTreeViewInfo;
 
         public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
@@ -61,6 +62,40 @@ namespace ExplorerTabUtility.UI.Views
 
             Init();
             SetupEventHandlers();
+        }
+
+        public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle, BookmarkTreeViewInfo info) : base(explorerWatcher, windowHandle)
+        {
+            InitializeComponent();
+
+            bookmarkTreeViewInfo = info;
+            TxtName.Text = info.Name;
+            if (info.IsFolder)
+            {
+                currentBookmarkInfo = BookmarkInfo.Empty;
+                currentFolderInfo = info.CurrentFolder;
+
+
+                SpLocation.Visibility = Visibility.Collapsed;
+                TxtTitle.Text = "重命名";
+            }
+            else
+            {
+                currentBookmarkInfo = info.CurrentBookmark;
+                currentFolderInfo = FolderInfo.Empty;
+
+                TxtLocation.Text = currentBookmarkInfo.Location;
+                TxtTitle.Text = "编辑";
+            }
+
+            BtnNewFolder.Visibility = Visibility.Collapsed;
+            TxtFolder.Visibility = Visibility.Collapsed;
+            CbSelectSavePath.Visibility = Visibility.Collapsed;
+            TvSelectSavePath.Visibility = Visibility.Collapsed;
+            TxtName.Focus();
+            TxtName.SelectionStart = TxtName.Text.Length;
+
+            SetupBaseEventHandlers();
         }
 
         public void AddFolder(BookmarkTreeViewInfo info)
@@ -104,6 +139,8 @@ namespace ExplorerTabUtility.UI.Views
                     InitTvSelectSavePath(parentId);
                     break;
             }
+            TxtName.Focus();
+            TxtName.SelectionStart = TxtName.Text.Length;
         }
 
         private void InitCbSelectSavePath()
@@ -188,7 +225,12 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (saveType == BookmarkSaveType.FolderRename)
+            if (bookmarkTreeViewInfo != null)
+            {
+                bookmarkTreeViewInfo.Update(TxtName.Text, TxtLocation.Text);
+                DialogResult = true;
+            }
+            else if (saveType == BookmarkSaveType.FolderRename)
             {
                 if (BookmarkManager.Instance.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
                 {
