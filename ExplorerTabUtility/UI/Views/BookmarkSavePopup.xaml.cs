@@ -145,16 +145,17 @@ namespace ExplorerTabUtility.UI.Views
 
         private void InitCbSelectSavePath()
         {
-            var lastSaveFolders = BookmarkManager.Instance.LastSaveFolders
+            var lastSaveFolders = BookmarkManager.LastSaveFolders
                 .Select(t => new SaveFolderItem(t.Id, t.Name))
                 .ToList();
             CbSelectSavePath.ItemsSource = lastSaveFolders;
-            CbSelectSavePath.SelectedItem = lastSaveFolders.First();
+            CbSelectSavePath.SelectedItem = lastSaveFolders.FirstOrDefault(t => t.Key == BookmarkManager.LastSaveFolderId)
+                ?? lastSaveFolders.First();
         }
 
         private void InitTvSelectSavePath(Guid parentId)
         {
-            TvSelectSavePath.SetItemsSource(BookmarkManager.Instance.Bookmarks, parentId, false);
+            TvSelectSavePath.SetItemsSource(BookmarkManager.Bookmarks, parentId, false);
         }
 
         private SaveFolderItem? GetSaveFolder()
@@ -185,7 +186,7 @@ namespace ExplorerTabUtility.UI.Views
         {
             if (isCancel && TvSelectSavePath.HaveSave)
             {
-                BookmarkManager.Instance.RecoverConfig();
+                BookmarkManager.RecoverConfig();
             }
 
             CloseWindow();
@@ -232,7 +233,7 @@ namespace ExplorerTabUtility.UI.Views
             }
             else if (saveType == BookmarkSaveType.FolderRename)
             {
-                if (BookmarkManager.Instance.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
+                if (BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
                 {
                     ShowMessage("保存失败", Constants.AppName);
                     return;
@@ -249,7 +250,7 @@ namespace ExplorerTabUtility.UI.Views
                     return;
                 }
 
-                if (BookmarkManager.Instance.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
+                if (BookmarkManager.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
                 {
                     ShowMessage("保存失败", Constants.AppName);
                     return;
@@ -281,7 +282,10 @@ namespace ExplorerTabUtility.UI.Views
             TxtLocation.Text = currentBookmarkInfo.Location;
             TxtLocation.ToolTip = currentBookmarkInfo.Location;
 
-            InitTvSelectSavePath(BookmarkManager.Instance.LastSaveFolders.First().Id);
+            var parentId = BookmarkManager.LastSaveFolderId == Guid.Empty
+                ? BookmarkManager.LastSaveFolders.First().Id
+                : BookmarkManager.LastSaveFolderId;
+            InitTvSelectSavePath(parentId);
         }
 
         private void BookmarkSavePopup_SizeChanged(object sender, SizeChangedEventArgs e)

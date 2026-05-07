@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows;
 using System.Windows.Input;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
@@ -16,8 +16,11 @@ namespace ExplorerTabUtility.UI.Views
         {
             InitializeComponent();
 
-            Top = Left = 10;
-            BookmarkBar.Width = Width = SystemParameters.WorkArea.Width - Top * 2;
+            var margin = 10;
+            var currentScreenWorkingArea = ScreenHelper.MouseCurrentScreen.WorkingArea;
+            Top = margin + currentScreenWorkingArea.Top;
+            Left = margin + currentScreenWorkingArea.Left;
+            BookmarkBar.Width = Width = currentScreenWorkingArea.Width - margin * 2;
             BookmarkBar.InitLayout();
 
             SetupEventHandlers();

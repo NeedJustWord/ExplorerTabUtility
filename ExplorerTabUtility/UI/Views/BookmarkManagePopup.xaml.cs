@@ -41,7 +41,7 @@ namespace ExplorerTabUtility.UI.Views
         private void Init(bool needDialogResult)
         {
             this.needDialogResult = needDialogResult;
-            TvFolder.SetItemsSource(BookmarkManager.Instance.Bookmarks, BookmarkManager.Instance.Folder.Id, true);
+            TvFolder.SetItemsSource(BookmarkManager.Bookmarks, BookmarkManager.Folder.Id, true);
         }
 
         private void CloseWindow(bool isCancel)
@@ -54,12 +54,12 @@ namespace ExplorerTabUtility.UI.Views
             {
                 if (isCancel)
                 {
-                    BookmarkManager.Instance.RecoverConfig();
+                    BookmarkManager.RecoverConfig();
                 }
                 else
                 {
                     dialogResult = true;
-                    BookmarkManager.Instance.Save(infos);
+                    BookmarkManager.Save(infos);
                 }
             }
 

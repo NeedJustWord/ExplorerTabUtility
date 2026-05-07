@@ -206,7 +206,7 @@ namespace ExplorerTabUtility.Models
                                Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction,
                                bool isNotOverflowAndOtherFolder)
         {
-            IsShowContextMenu = BookmarkManager.Instance.IsOtherOrOverflowFolder(folderInfo) == false;
+            IsShowContextMenu = BookmarkManager.IsOtherOrOverflowFolder(folderInfo) == false;
             this.isNotOverflowAndOtherFolder = isNotOverflowAndOtherFolder;
             Parent = parent;
             CurrentBookmark = BookmarkInfo.Empty;
@@ -335,9 +335,9 @@ namespace ExplorerTabUtility.Models
             if (Parent == null) return Guid.Empty;
 
             var parentId = Parent.CurrentFolder.Id;
-            if (parentId == BookmarkManager.Instance.OverflowFolder.Id)
+            if (parentId == BookmarkManager.OverflowFolder.Id)
             {
-                parentId = BookmarkManager.Instance.Folder.Id;
+                parentId = BookmarkManager.Folder.Id;
             }
             return parentId;
         }
@@ -349,9 +349,9 @@ namespace ExplorerTabUtility.Models
         public Guid GetCurrentFolderId()
         {
             var id = CurrentFolder.Id;
-            if (id == BookmarkManager.Instance.OverflowFolder.Id)
+            if (id == BookmarkManager.OverflowFolder.Id)
             {
-                id = BookmarkManager.Instance.Folder.Id;
+                id = BookmarkManager.Folder.Id;
             }
             return id;
         }

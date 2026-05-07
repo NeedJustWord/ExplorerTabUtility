@@ -109,7 +109,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
 
-            BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, info.CurrentFolder);
+            BookmarkManager.Delete(info.Parent.CurrentFolder, info.CurrentFolder);
             info.Parent.Delete(info);
             HaveSave = true;
         }
@@ -166,7 +166,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         public bool AddFolder(BookmarkTreeViewInfo newInfo, out string errorMsg)
         {
 #pragma warning disable CS8602 // 解引用可能出现空引用。
-            if (BookmarkManager.Instance.Save(newInfo.Parent.Id, newInfo.CurrentFolder, newInfo.Name, false))
+            if (BookmarkManager.Save(newInfo.Parent.Id, newInfo.CurrentFolder, newInfo.Name, false))
 #pragma warning restore CS8602 // 解引用可能出现空引用。
             {
                 HaveSave = true;

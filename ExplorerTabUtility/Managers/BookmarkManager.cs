@@ -1,40 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.Managers
 {
-    internal class BookmarkManager
+    internal static class BookmarkManager
     {
-        public static BookmarkManager Instance { get; } = new BookmarkManager();
-
         /// <summary>
         /// 书签集合
         /// </summary>
-        public IReadOnlyList<FolderInfo> Bookmarks { get; }
+        public static IReadOnlyList<FolderInfo> Bookmarks { get; }
 
         /// <summary>
         /// 书签
         /// </summary>
-        public FolderInfo Folder => folderInfo;
+        public static FolderInfo Folder => folderInfo;
 
         /// <summary>
         /// 其他书签
         /// </summary>
-        public FolderInfo OtherFolder => otherFolderInfo;
+        public static FolderInfo OtherFolder => otherFolderInfo;
 
         /// <summary>
         /// 溢出书签
         /// </summary>
-        public FolderInfo OverflowFolder => overflowFolderInfo;
+        public static FolderInfo OverflowFolder => overflowFolderInfo;
 
         /// <summary>
         /// 上次保存路径
         /// </summary>
-        public IReadOnlyList<SaveFolderInfo> LastSaveFolders
+        public static IReadOnlyList<SaveFolderInfo> LastSaveFolders
         {
             get
             {
@@ -43,19 +43,31 @@ namespace ExplorerTabUtility.Managers
                 {
                     list.Add(lastSaveFolders[i]);
                 }
-                list.Add(new SaveFolderInfo(folderInfo));
-                list.Add(new SaveFolderInfo(otherFolderInfo));
+                list.Add(saveFolderInfo);
+                list.Add(otherSaveFolderInfo);
                 return list.AsReadOnly();
             }
         }
 
-        private readonly FolderInfo bookmarks;
-        private readonly FolderInfo folderInfo;
-        private readonly FolderInfo otherFolderInfo;
-        private readonly FolderInfo overflowFolderInfo;
-        private readonly List<SaveFolderInfo> lastSaveFolders;
+        /// <summary>
+        /// 最后保存路径Id
+        /// </summary>
+        public static Guid LastSaveFolderId { get; private set; }
 
-        private BookmarkManager()
+        private static readonly FolderInfo bookmarks;
+        private static readonly FolderInfo folderInfo;
+        private static readonly FolderInfo otherFolderInfo;
+        private static readonly FolderInfo overflowFolderInfo;
+        private static readonly List<SaveFolderInfo> lastSaveFolders;
+        private static readonly SaveFolderInfo saveFolderInfo;
+        private static readonly SaveFolderInfo otherSaveFolderInfo;
+        private static readonly BookmarkConfig config;
+        private static readonly string configFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            Constants.AppName,
+            Constants.BookmarksFileName);
+
+        static BookmarkManager()
         {
             lastSaveFolders = new List<SaveFolderInfo>(5);
             folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), "书签栏");
@@ -63,8 +75,32 @@ namespace ExplorerTabUtility.Managers
             overflowFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000003"), ">>");
             bookmarks = new FolderInfo(Guid.Empty, string.Empty, folderInfo, otherFolderInfo);
             Bookmarks = new ReadOnlyCollection<FolderInfo>([folderInfo, otherFolderInfo]);
+            saveFolderInfo = new SaveFolderInfo(folderInfo);
+            otherSaveFolderInfo = new SaveFolderInfo(otherFolderInfo);
+            config = InitBookmarkConfig();
 
             LoadBookmark();
+        }
+
+        private static BookmarkConfig InitBookmarkConfig()
+        {
+            var directory = Path.GetDirectoryName(configFilePath);
+            Directory.CreateDirectory(directory!);
+
+            if (!File.Exists(configFilePath))
+            {
+                return new BookmarkConfig();
+            }
+
+            try
+            {
+                var json = File.ReadAllText(configFilePath);
+                return JsonSerializer.Deserialize<BookmarkConfig>(json) ?? new BookmarkConfig();
+            }
+            catch (Exception)
+            {
+                return new BookmarkConfig();
+            }
         }
 
         /// <summary>
@@ -72,7 +108,7 @@ namespace ExplorerTabUtility.Managers
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        public bool IsOtherOrOverflowFolder(FolderInfo info)
+        public static bool IsOtherOrOverflowFolder(FolderInfo info)
         {
             return info.Id == otherFolderInfo.Id || info.Id == overflowFolderInfo.Id;
         }
@@ -80,7 +116,7 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 恢复配置
         /// </summary>
-        public void RecoverConfig()
+        public static void RecoverConfig()
         {
             lastSaveFolders.Clear();
             folderInfo.Items.Clear();
@@ -89,35 +125,23 @@ namespace ExplorerTabUtility.Managers
             LoadBookmark();
         }
 
-        private void LoadBookmark()
+        private static void LoadBookmark()
         {
-            try
+            var folder = config.Bookmarks.FirstOrDefault(t => t.Id == folderInfo.Id);
+            if (folder?.Items.Count > 0)
             {
-                var bookmarks = JsonSerializer.Deserialize<List<FolderInfo>>(SettingsManager.Bookmarks);
-                if (bookmarks != null)
-                {
-                    var folder = bookmarks.FirstOrDefault(t => t.Id == folderInfo.Id);
-                    if (folder?.Items.Count > 0)
-                    {
-                        folderInfo.AddRange(folder.Items);
-                    }
-
-                    folder = bookmarks.FirstOrDefault(t => t.Id == otherFolderInfo.Id);
-                    if (folder?.Items.Count > 0)
-                    {
-                        otherFolderInfo.AddRange(folder.Items);
-                    }
-                }
-
-                var lastSaveFolders = JsonSerializer.Deserialize<List<SaveFolderInfo>>(SettingsManager.LastSaveFolders);
-                if (lastSaveFolders != null)
-                {
-                    this.lastSaveFolders.AddRange(lastSaveFolders);
-                }
+                folderInfo.AddRange(folder.Items);
             }
-            catch
+
+            folder = config.Bookmarks.FirstOrDefault(t => t.Id == otherFolderInfo.Id);
+            if (folder?.Items.Count > 0)
             {
+                otherFolderInfo.AddRange(folder.Items);
             }
+
+            lastSaveFolders.AddRange(config.LastSaveFolders);
+
+            LastSaveFolderId = config.LastSaveFolderId;
         }
 
         /// <summary>
@@ -130,7 +154,7 @@ namespace ExplorerTabUtility.Managers
         /// <param name="newName">新书签名称</param>
         /// <param name="newLocation">新书签路径</param>
         /// <returns></returns>
-        public bool Save(bool isEdit, Guid lastParentId, Guid currentParentId, BookmarkInfo bookmark, string newName, string newLocation)
+        public static bool Save(bool isEdit, Guid lastParentId, Guid currentParentId, BookmarkInfo bookmark, string newName, string newLocation)
         {
             if (GetTargetFolderInfoFault(currentParentId, out var currentParentFolder)) return false;
 
@@ -166,7 +190,7 @@ namespace ExplorerTabUtility.Managers
         /// <param name="newName">新文件夹名</param>
         /// <param name="saveConfig">是否保存配置</param>
         /// <returns></returns>
-        public bool Save(Guid parentId, FolderInfo saveFolder, string newName, bool saveConfig)
+        public static bool Save(Guid parentId, FolderInfo saveFolder, string newName, bool saveConfig)
         {
             if (saveFolder.Id == Guid.Empty)
             {
@@ -197,7 +221,7 @@ namespace ExplorerTabUtility.Managers
         /// 保存
         /// </summary>
         /// <param name="folders"></param>
-        public void Save(List<FolderInfo> folders)
+        public static void Save(List<FolderInfo> folders)
         {
             foreach (var item in folders)
             {
@@ -219,7 +243,7 @@ namespace ExplorerTabUtility.Managers
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="current"></param>
-        public void Delete(FolderInfo parent, BookmarkInfo current)
+        public static void Delete(FolderInfo parent, BookmarkInfo current)
         {
             parent.Remove(current.Id);
         }
@@ -229,7 +253,7 @@ namespace ExplorerTabUtility.Managers
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="current"></param>
-        public void Delete(FolderInfo parent, FolderInfo current)
+        public static void Delete(FolderInfo parent, FolderInfo current)
         {
             if (parent == overflowFolderInfo)
             {
@@ -243,8 +267,7 @@ namespace ExplorerTabUtility.Managers
             var deleteIds = current.GetFolderIds().ToList();
             for (int i = lastSaveFolders.Count - 1; i >= 0; i--)
             {
-                var folder = lastSaveFolders[i];
-                if (deleteIds.Contains(folder.Id))
+                if (deleteIds.Contains(lastSaveFolders[i].Id))
                 {
                     lastSaveFolders.RemoveAt(i);
                 }
@@ -257,26 +280,25 @@ namespace ExplorerTabUtility.Managers
         /// <param name="folderId"></param>
         /// <param name="folder"></param>
         /// <returns></returns>
-        private bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)
+        private static bool GetTargetFolderInfoFault(Guid folderId, out FolderInfo folder)
         {
             return bookmarks.Search(folderId, out folder) == false;
         }
 
-        private void UpdateLastSaveFolderName(FolderInfo folder)
+        private static void UpdateLastSaveFolderName(FolderInfo folder)
         {
-            foreach (var item in lastSaveFolders)
+            var temp = lastSaveFolders.FirstOrDefault(t => t.Id == folder.Id);
+            if (temp != null)
             {
-                if (item.Id == folder.Id)
-                {
-                    item.Name = folder.Name;
-                    break;
-                }
+                temp.Name = folder.Name;
             }
         }
 
-        private void UpdateLastSaveFolders(FolderInfo folder)
+        private static void UpdateLastSaveFolders(FolderInfo folder)
         {
             //TODO:使用循环数组结构
+            LastSaveFolderId = folder.Id;
+
             if (folder.Id == folderInfo.Id || folder.Id == otherFolderInfo.Id) return;
 
             SaveFolderInfo info;
@@ -302,18 +324,28 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 保存配置
         /// </summary>
-        public void SaveConfig()
+        public static void SaveConfig()
         {
             try
             {
-                var bookmarks = JsonSerializer.Serialize(Bookmarks);
-                var lastSaveFolders = JsonSerializer.Serialize(this.lastSaveFolders);
-                SettingsManager.SetBookmarksAndLastSaveFolders(bookmarks, lastSaveFolders);
+                config.Bookmarks = Bookmarks.ToList();
+                config.LastSaveFolders = lastSaveFolders;
+                config.LastSaveFolderId = LastSaveFolderId;
+
+                var json = JsonSerializer.Serialize(config);
+                File.WriteAllText(configFilePath, json);
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to save bookmarks: {ex.Message}");
             }
         }
+    }
+
+    internal class BookmarkConfig
+    {
+        public List<FolderInfo> Bookmarks { get; set; } = new List<FolderInfo>();
+        public List<SaveFolderInfo> LastSaveFolders { get; set; } = new List<SaveFolderInfo>();
+        public Guid LastSaveFolderId { get; set; }
     }
 }

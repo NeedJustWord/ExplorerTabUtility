@@ -34,15 +34,15 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             InitializeComponent();
 
-            allBookmark = new BookmarkBarInfo(BookmarkManager.Instance.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
+            allBookmark = new BookmarkBarInfo(BookmarkManager.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
             mainBookmarks = new ObservableCollection<BookmarkBarInfo>();
             overflowBookmarks = new ObservableCollection<BookmarkBarInfo>
             {
-                new BookmarkBarInfo(BookmarkManager.Instance.OverflowFolder, 0, null)
+                new BookmarkBarInfo(BookmarkManager.OverflowFolder, 0, null)
             };
             otherBookmarks = new ObservableCollection<BookmarkBarInfo>
             {
-                new BookmarkBarInfo(BookmarkManager.Instance.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false)
+                new BookmarkBarInfo(BookmarkManager.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false)
             };
         }
 
@@ -62,10 +62,12 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             var allBookmarks = allBookmark.Children;
             var overflowBookmark = overflowBookmarks[0];
+            var otherBookmark = otherBookmarks[0];
 
-            //清空主书签和溢出书签
+            //清空主书签和溢出书签，设置分隔符是否显示
             mainBookmarks.Clear();
             overflowBookmark.Children.Clear();
+            TxtSeparator.Visibility = otherBookmark.IsVisibility ? Visibility.Visible : Visibility.Collapsed;
 
             //所有书签数量为0直接返回
             if (allBookmarks.Count == 0) return;
@@ -74,7 +76,6 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var availableWidth = Width;
 
             //其他书签有子集合，就会显示，减去其宽度
-            var otherBookmark = otherBookmarks[0];
             if (otherBookmark.Children.Count > 0)
             {
                 if (otherBookmark.Width == 0)
@@ -124,8 +125,6 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 item.PlacementMode = PlacementMode.Right;
                 overflowBookmark.Children.Add(item);
             }
-
-            TxtSeparator.Visibility = otherBookmark.IsVisibility ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private int GetItemWidth(string name)
@@ -192,9 +191,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     break;
                 case BookmarkBarAction.Delete:
 #pragma warning disable CS8602 // 解引用可能出现空引用。
-                    BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, bookmark);
+                    BookmarkManager.Delete(info.Parent.CurrentFolder, bookmark);
 #pragma warning restore CS8602 // 解引用可能出现空引用。
-                    BookmarkManager.Instance.SaveConfig();
+                    BookmarkManager.SaveConfig();
 
                     info.Parent.Delete(info);
                     Delete(info);
@@ -214,9 +213,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     break;
                 case BookmarkBarAction.Delete:
 #pragma warning disable CS8602 // 解引用可能出现空引用。
-                    BookmarkManager.Instance.Delete(info.Parent.CurrentFolder, folder);
+                    BookmarkManager.Delete(info.Parent.CurrentFolder, folder);
 #pragma warning restore CS8602 // 解引用可能出现空引用。
-                    BookmarkManager.Instance.SaveConfig();
+                    BookmarkManager.SaveConfig();
 
                     info.Parent.Delete(info);
                     Delete(info);
@@ -275,8 +274,8 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         public void Refresh()
         {
-            allBookmark = new BookmarkBarInfo(BookmarkManager.Instance.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
-            otherBookmarks[0] = new BookmarkBarInfo(BookmarkManager.Instance.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false);
+            allBookmark = new BookmarkBarInfo(BookmarkManager.Folder, -1, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
+            otherBookmarks[0] = new BookmarkBarInfo(BookmarkManager.OtherFolder, 0, null, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, false);
 
             UpdateMenuLayout();
         }
@@ -302,7 +301,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var parentId = info.GetCurrentFolderId();
             var newInfo = new BookmarkBarInfo(folder, info.Level + 1, info, BookmarkClickAction, BookmarkMenuClickAction, FolderMenuClickAction, true);
 
-            if (parentId == BookmarkManager.Instance.Folder.Id)
+            if (parentId == BookmarkManager.Folder.Id)
             {
                 allBookmark.Add(newInfo);
             }
@@ -330,7 +329,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             if (mainBookmarks.Contains(info) || otherBookmarks.First().Children.Contains(info)) return true;
             if (newParentId == Guid.Empty) return false;
 
-            return newParentId == BookmarkManager.Instance.Folder.Id || newParentId == BookmarkManager.Instance.OtherFolder.Id;
+            return newParentId == BookmarkManager.Folder.Id || newParentId == BookmarkManager.OtherFolder.Id;
         }
     }
 }
