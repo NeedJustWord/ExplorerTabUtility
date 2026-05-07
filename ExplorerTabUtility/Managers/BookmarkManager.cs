@@ -34,20 +34,7 @@ namespace ExplorerTabUtility.Managers
         /// <summary>
         /// 上次保存路径
         /// </summary>
-        public static IReadOnlyList<SaveFolderInfo> LastSaveFolders
-        {
-            get
-            {
-                var list = new List<SaveFolderInfo>(lastSaveFolders.Count + 2);
-                for (int i = lastSaveFolders.Count - 1; i >= 0; i--)
-                {
-                    list.Add(lastSaveFolders[i]);
-                }
-                list.Add(saveFolderInfo);
-                list.Add(otherSaveFolderInfo);
-                return list.AsReadOnly();
-            }
-        }
+        public static IReadOnlyList<SaveFolderInfo> LastSaveFolders => lastSaveFolders.ToList(true).AsReadOnly();
 
         /// <summary>
         /// 最后保存路径Id
@@ -58,7 +45,7 @@ namespace ExplorerTabUtility.Managers
         private static readonly FolderInfo folderInfo;
         private static readonly FolderInfo otherFolderInfo;
         private static readonly FolderInfo overflowFolderInfo;
-        private static readonly List<SaveFolderInfo> lastSaveFolders;
+        private static readonly LRUCache<Guid, SaveFolderInfo> lastSaveFolders;
         private static readonly SaveFolderInfo saveFolderInfo;
         private static readonly SaveFolderInfo otherSaveFolderInfo;
         private static readonly BookmarkConfig config;
@@ -69,7 +56,6 @@ namespace ExplorerTabUtility.Managers
 
         static BookmarkManager()
         {
-            lastSaveFolders = new List<SaveFolderInfo>(5);
             folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), "书签栏");
             otherFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000002"), "其他书签");
             overflowFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000003"), ">>");
@@ -77,6 +63,7 @@ namespace ExplorerTabUtility.Managers
             Bookmarks = new ReadOnlyCollection<FolderInfo>([folderInfo, otherFolderInfo]);
             saveFolderInfo = new SaveFolderInfo(folderInfo);
             otherSaveFolderInfo = new SaveFolderInfo(otherFolderInfo);
+            lastSaveFolders = new LRUCache<Guid, SaveFolderInfo>(5, saveFolderInfo, otherSaveFolderInfo);
             config = InitBookmarkConfig();
 
             LoadBookmark();
@@ -139,7 +126,11 @@ namespace ExplorerTabUtility.Managers
                 otherFolderInfo.AddRange(folder.Items);
             }
 
-            lastSaveFolders.AddRange(config.LastSaveFolders);
+            for (int i = config.LastSaveFolders.Count - 1; i >= 0; i--)
+            {
+                var temp = config.LastSaveFolders[i];
+                lastSaveFolders.Add(temp.Id, temp);
+            }
 
             LastSaveFolderId = config.LastSaveFolderId;
         }
@@ -265,13 +256,7 @@ namespace ExplorerTabUtility.Managers
             }
 
             var deleteIds = current.GetFolderIds().ToList();
-            for (int i = lastSaveFolders.Count - 1; i >= 0; i--)
-            {
-                if (deleteIds.Contains(lastSaveFolders[i].Id))
-                {
-                    lastSaveFolders.RemoveAt(i);
-                }
-            }
+            lastSaveFolders.Delete(deleteIds.Contains);
         }
 
         /// <summary>
@@ -287,7 +272,7 @@ namespace ExplorerTabUtility.Managers
 
         private static void UpdateLastSaveFolderName(FolderInfo folder)
         {
-            var temp = lastSaveFolders.FirstOrDefault(t => t.Id == folder.Id);
+            var temp = lastSaveFolders.Get(folder.Id);
             if (temp != null)
             {
                 temp.Name = folder.Name;
@@ -296,29 +281,16 @@ namespace ExplorerTabUtility.Managers
 
         private static void UpdateLastSaveFolders(FolderInfo folder)
         {
-            //TODO:使用循环数组结构
             LastSaveFolderId = folder.Id;
 
             if (folder.Id == folderInfo.Id || folder.Id == otherFolderInfo.Id) return;
 
-            SaveFolderInfo info;
-            var index = lastSaveFolders.FindIndex(t => t.Id == folder.Id);
-            if (index == -1)
+            var info = lastSaveFolders.Get(folder.Id);
+            if (info == null)
             {
                 info = new SaveFolderInfo(folder);
             }
-            else
-            {
-                info = lastSaveFolders[index];
-                lastSaveFolders.RemoveAt(index);
-            }
-
-            if (lastSaveFolders.Count == 5)
-            {
-                lastSaveFolders.RemoveAt(0);
-            }
-
-            lastSaveFolders.Add(info);
+            lastSaveFolders.Add(folder.Id, info);
         }
 
         /// <summary>
@@ -329,7 +301,7 @@ namespace ExplorerTabUtility.Managers
             try
             {
                 config.Bookmarks = Bookmarks.ToList();
-                config.LastSaveFolders = lastSaveFolders;
+                config.LastSaveFolders = lastSaveFolders.ToList(false);
                 config.LastSaveFolderId = LastSaveFolderId;
 
                 var json = JsonSerializer.Serialize(config);
@@ -340,12 +312,84 @@ namespace ExplorerTabUtility.Managers
                 System.Diagnostics.Debug.WriteLine($"Failed to save bookmarks: {ex.Message}");
             }
         }
-    }
 
-    internal class BookmarkConfig
-    {
-        public List<FolderInfo> Bookmarks { get; set; } = new List<FolderInfo>();
-        public List<SaveFolderInfo> LastSaveFolders { get; set; } = new List<SaveFolderInfo>();
-        public Guid LastSaveFolderId { get; set; }
+        internal class BookmarkConfig
+        {
+            public List<FolderInfo> Bookmarks { get; set; } = new List<FolderInfo>();
+            public List<SaveFolderInfo> LastSaveFolders { get; set; } = new List<SaveFolderInfo>();
+            public Guid LastSaveFolderId { get; set; }
+        }
+
+        internal class LRUCache<TKey, TValue> where TKey : notnull
+        {
+            private readonly Dictionary<TKey, LinkedListNode<TValue>> dict;
+            private readonly LinkedList<TValue> linkedList;
+            private readonly List<TValue> list;
+            private readonly TValue[] array;
+            private readonly int capacity;
+
+            public LRUCache(int capacity, params TValue[] array)
+            {
+                dict = new Dictionary<TKey, LinkedListNode<TValue>>(capacity);
+                linkedList = new LinkedList<TValue>();
+                list = new List<TValue>(capacity + array.Length);
+                this.capacity = capacity;
+                this.array = array;
+            }
+
+            public TValue? Get(TKey key)
+            {
+                return dict.TryGetValue(key, out var node) ? node.Value : default;
+            }
+
+            public void Add(TKey key, TValue value, bool update = false)
+            {
+                if (dict.TryGetValue(key, out var item))
+                {
+                    if (update) item.Value = value;
+                    linkedList.Remove(item);
+                    linkedList.AddFirst(item);
+                }
+                else
+                {
+                    if (linkedList.Count == capacity)
+                    {
+                        linkedList.RemoveLast();
+                    }
+
+                    item = new LinkedListNode<TValue>(value);
+                    dict[key] = item;
+                    linkedList.AddFirst(item);
+                }
+            }
+
+            public void Delete(Func<TKey, bool> predicate)
+            {
+                var keys = dict.Keys.Where(predicate).ToList();
+                foreach (var key in keys)
+                {
+                    if (dict.TryGetValue(key, out var item))
+                    {
+                        dict.Remove(key);
+                        linkedList.Remove(item);
+                    }
+                }
+            }
+
+            public void Clear()
+            {
+                linkedList.Clear();
+                dict.Clear();
+            }
+
+            public List<TValue> ToList(bool withArray)
+            {
+                list.Clear();
+                list.AddRange(linkedList);
+                if (withArray) list.AddRange(array);
+
+                return list;
+            }
+        }
     }
 }
