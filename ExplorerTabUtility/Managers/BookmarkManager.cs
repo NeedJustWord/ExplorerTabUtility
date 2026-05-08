@@ -260,6 +260,15 @@ namespace ExplorerTabUtility.Managers
         }
 
         /// <summary>
+        /// 上次保存路径删除文件夹
+        /// </summary>
+        /// <param name="deleteFolderIds">要删除的文件夹Id</param>
+        public static void LastSaveFoldersDelete(List<Guid> deleteFolderIds)
+        {
+            lastSaveFolders.Delete(deleteFolderIds.Contains);
+        }
+
+        /// <summary>
         /// 查找目标目录是否失败
         /// </summary>
         /// <param name="folderId"></param>

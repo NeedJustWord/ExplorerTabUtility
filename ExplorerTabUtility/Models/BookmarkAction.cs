@@ -3,7 +3,7 @@
     /// <summary>
     /// 书签操作
     /// </summary>
-    public enum BookmarkBarAction
+    public enum BookmarkAction
     {
         /// <summary>
         /// 在当前标签页打开
@@ -48,6 +48,6 @@
         /// <summary>
         /// 书签管理
         /// </summary>
-        BookmarkManager,
+        BookmarkManage,
     }
 }

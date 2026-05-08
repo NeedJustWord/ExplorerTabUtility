@@ -71,11 +71,11 @@ namespace ExplorerTabUtility.UI.Views
             BookmarkBar.FolderHandle += BookmarkBar_FolderHandle;
         }
 
-        private void BookmarkBar_FolderHandle(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action)
+        private void BookmarkBar_FolderHandle(BookmarkBarInfo info, FolderInfo folder, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.Rename:
+                case BookmarkAction.Rename:
                     var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, folder, Guid.Empty);
                     EntryDialog();
                     if (popup.ShowDialog() == true)
@@ -84,35 +84,35 @@ namespace ExplorerTabUtility.UI.Views
                     }
                     ExitDialog();
                     break;
-                case BookmarkBarAction.BookmarkManager:
+                case BookmarkAction.BookmarkManage:
                     BookmarkManager();
                     break;
-                case BookmarkBarAction.NewBookmark:
+                case BookmarkAction.NewBookmark:
                     NewBookmark(folder.Id);
                     break;
-                case BookmarkBarAction.NewFolder:
+                case BookmarkAction.NewFolder:
                     NewFolder(info);
                     break;
             }
         }
 
-        private async void BookmarkBar_BookmarkHandle(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        private async void BookmarkBar_BookmarkHandle(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.OpenInCurrentTab:
+                case BookmarkAction.OpenInCurrentTab:
                     await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: true);
                     CloseWindow();
                     break;
-                case BookmarkBarAction.OpenInNewTab:
+                case BookmarkAction.OpenInNewTab:
                     await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: false);
                     CloseWindow();
                     break;
-                case BookmarkBarAction.OpenInNewWindow:
+                case BookmarkAction.OpenInNewWindow:
                     await explorerWatcher.Open(bookmark.Location, false, windowHandle);
                     CloseWindow();
                     break;
-                case BookmarkBarAction.Edit:
+                case BookmarkAction.Edit:
                     var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, bookmark, info.GetParentId());
                     EntryDialog();
                     if (popup.ShowDialog() == true)
@@ -121,13 +121,13 @@ namespace ExplorerTabUtility.UI.Views
                     }
                     ExitDialog();
                     break;
-                case BookmarkBarAction.BookmarkManager:
+                case BookmarkAction.BookmarkManage:
                     BookmarkManager();
                     break;
-                case BookmarkBarAction.NewBookmark:
+                case BookmarkAction.NewBookmark:
                     NewBookmark(info.GetParentId());
                     break;
-                case BookmarkBarAction.NewFolder:
+                case BookmarkAction.NewFolder:
 #pragma warning disable CS8604 // 引用类型参数可能为 null。
                     NewFolder(info.Parent);
 #pragma warning restore CS8604 // 引用类型参数可能为 null。

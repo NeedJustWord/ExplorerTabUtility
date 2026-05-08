@@ -50,37 +50,37 @@
     <ContextMenu x:Key="BookmarkListBoxMultiSelectContextMenu">
         <MenuItem Header="删除"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.Delete}"/>
     </ContextMenu>
 
     <!-- 文件夹的右键菜单 -->
     <ContextMenu x:Key="FolderListBoxItemContextMenu">
         <MenuItem Header="重命名"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.Rename}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.Rename}"/>
         <MenuItem Header="删除"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.Delete}"/>
     </ContextMenu>
 
     <!-- 书签的右键菜单 -->
     <ContextMenu x:Key="BookmarkListBoxItemContextMenu">
         <MenuItem Header="编辑"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.Edit}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.Edit}"/>
         <MenuItem Header="删除"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.Delete}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.Delete}"/>
         <Separator/>
         <MenuItem Header="在当前标签页打开"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInCurrentTab}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.OpenInCurrentTab}"/>
         <MenuItem Header="在新标签页打开"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInNewTab}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.OpenInNewTab}"/>
         <MenuItem Header="在新窗口打开"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static model:BookmarkBarAction.OpenInNewWindow}"/>
+                  CommandParameter="{x:Static model:BookmarkAction.OpenInNewWindow}"/>
     </ContextMenu>
 
     <!-- Bookmark ListBox Icon Style -->

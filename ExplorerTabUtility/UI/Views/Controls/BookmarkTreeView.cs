@@ -13,10 +13,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
     internal class BookmarkTreeView : TreeView
     {
         #region 事件
-        public delegate void BookmarkEventHandler(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action);
+        public delegate void BookmarkEventHandler(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkAction action);
         public event BookmarkEventHandler? BookmarkHandle;
 
-        public delegate void FolderEventHandler(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action);
+        public delegate void FolderEventHandler(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action);
         public event FolderEventHandler? FolderHandle;
         #endregion
 
@@ -71,7 +71,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
             foreach (var item in datas)
             {
-                list.Add(item.CopyFolderInfo());
+                list.Add(item.CopyFolderInfo(true));
             }
             return list;
         }
@@ -116,6 +116,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         public void Delete(List<BookmarkTreeViewInfo> infos)
         {
+            var deleteFolderIds = infos.SelectMany(t => t.CopyFolderInfo(false).GetFolderIds()).ToList();
+            BookmarkManager.LastSaveFoldersDelete(deleteFolderIds);
+
             var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
             foreach (var item in datas)
             {
@@ -185,26 +188,26 @@ namespace ExplorerTabUtility.UI.Views.Controls
         #endregion
 
         #region 菜单事件
-        private void BookmarkMenuClickAction(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        private void BookmarkMenuClickAction(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.Edit:
-                case BookmarkBarAction.Delete:
-                case BookmarkBarAction.OpenInCurrentTab:
-                case BookmarkBarAction.OpenInNewTab:
-                case BookmarkBarAction.OpenInNewWindow:
+                case BookmarkAction.Edit:
+                case BookmarkAction.Delete:
+                case BookmarkAction.OpenInCurrentTab:
+                case BookmarkAction.OpenInNewTab:
+                case BookmarkAction.OpenInNewWindow:
                     BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
             }
         }
 
-        private void FolderMenuClickAction(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action)
+        private void FolderMenuClickAction(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.Delete:
-                case BookmarkBarAction.Rename:
+                case BookmarkAction.Delete:
+                case BookmarkAction.Rename:
                     FolderHandle?.Invoke(info, folder, action);
                     break;
             }

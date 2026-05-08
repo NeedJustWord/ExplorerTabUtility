@@ -229,6 +229,10 @@ namespace ExplorerTabUtility.UI.Views
             if (bookmarkTreeViewInfo != null)
             {
                 bookmarkTreeViewInfo.Update(TxtName.Text, TxtLocation.Text);
+                if (bookmarkTreeViewInfo.IsFolder)
+                {
+                    BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, false);
+                }
                 DialogResult = true;
             }
             else if (saveType == BookmarkSaveType.FolderRename)

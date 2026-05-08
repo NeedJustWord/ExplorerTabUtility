@@ -156,7 +156,7 @@ namespace ExplorerTabUtility.Models
 
         private string oldName;
 
-        public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent, Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkBarAction> menuClickAction)
+        public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent, Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkAction> menuClickAction)
         {
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(bookmarkInfo.Id, bookmarkInfo.Name, bookmarkInfo.Location);
@@ -173,14 +173,14 @@ namespace ExplorerTabUtility.Models
 
             MenuClickCommand = new RelayCommand((args) =>
             {
-                if (args is BookmarkBarAction action)
+                if (args is BookmarkAction action)
                 {
                     menuClickAction.Invoke(this, CurrentBookmark, action);
                 }
             });
         }
 
-        public BookmarkTreeViewInfo(FolderInfo folderInfo, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Action<BookmarkTreeViewInfo, FolderInfo, BookmarkBarAction> menuClickAction)
+        public BookmarkTreeViewInfo(FolderInfo folderInfo, int level, BookmarkTreeViewInfo? parent, bool isSpecil, Action<BookmarkTreeViewInfo, FolderInfo, BookmarkAction> menuClickAction)
         {
             Parent = parent;
             SaveFolderItem = new SaveFolderItem(folderInfo.Id, folderInfo.Name);
@@ -197,7 +197,7 @@ namespace ExplorerTabUtility.Models
 
             MenuClickCommand = new RelayCommand((args) =>
             {
-                if (args is BookmarkBarAction action)
+                if (args is BookmarkAction action)
                 {
                     menuClickAction.Invoke(this, CurrentFolder, action);
                 }
@@ -238,20 +238,20 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 复制文件夹信息
         /// </summary>
+        /// <param name="copyBookmark">是否复制书签</param>
         /// <returns></returns>
-        public FolderInfo CopyFolderInfo()
+        public FolderInfo CopyFolderInfo(bool copyBookmark)
         {
             var folder = CurrentFolder.Copy();
             foreach (var item in children)
             {
-                if (item.CurrentBookmark != BookmarkInfo.Empty)
+                if (item.CurrentFolder != FolderInfo.Empty)
                 {
-                    folder.Add(item.CurrentBookmark.Copy());
+                    folder.Add(item.CopyFolderInfo(copyBookmark));
+                    continue;
                 }
-                else
-                {
-                    folder.Add(item.CopyFolderInfo());
-                }
+
+                if (copyBookmark) folder.Add(item.CurrentBookmark.Copy());
             }
             return folder;
         }

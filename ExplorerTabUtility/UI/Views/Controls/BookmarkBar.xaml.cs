@@ -18,10 +18,10 @@ namespace ExplorerTabUtility.UI.Views.Controls
     public partial class BookmarkBar : UserControl
     {
         #region 事件
-        public delegate void BookmarkEventHandler(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action);
+        public delegate void BookmarkEventHandler(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkAction action);
         public event BookmarkEventHandler? BookmarkHandle;
 
-        public delegate void FolderEventHandler(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action);
+        public delegate void FolderEventHandler(BookmarkBarInfo info, FolderInfo folder, BookmarkAction action);
         public event FolderEventHandler? FolderHandle;
         #endregion
 
@@ -159,37 +159,37 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         private void BookmarkClickAction(BookmarkBarInfo info, BookmarkInfo bookmark)
         {
-            BookmarkBarAction action;
+            BookmarkAction action;
             if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
             {
-                action = BookmarkBarAction.OpenInNewTab;
+                action = BookmarkAction.OpenInNewTab;
             }
             else if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Shift))
             {
-                action = BookmarkBarAction.OpenInNewWindow;
+                action = BookmarkAction.OpenInNewWindow;
             }
             else
             {
-                action = BookmarkBarAction.OpenInCurrentTab;
+                action = BookmarkAction.OpenInCurrentTab;
             }
 
             BookmarkHandle?.Invoke(info, bookmark, action);
         }
 
-        private void BookmarkMenuClickAction(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        private void BookmarkMenuClickAction(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.BookmarkManager:
-                case BookmarkBarAction.NewBookmark:
-                case BookmarkBarAction.NewFolder:
-                case BookmarkBarAction.OpenInCurrentTab:
-                case BookmarkBarAction.OpenInNewTab:
-                case BookmarkBarAction.OpenInNewWindow:
-                case BookmarkBarAction.Edit:
+                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.NewBookmark:
+                case BookmarkAction.NewFolder:
+                case BookmarkAction.OpenInCurrentTab:
+                case BookmarkAction.OpenInNewTab:
+                case BookmarkAction.OpenInNewWindow:
+                case BookmarkAction.Edit:
                     BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
-                case BookmarkBarAction.Delete:
+                case BookmarkAction.Delete:
 #pragma warning disable CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Delete(info.Parent.CurrentFolder, bookmark);
 #pragma warning restore CS8602 // 解引用可能出现空引用。
@@ -201,17 +201,17 @@ namespace ExplorerTabUtility.UI.Views.Controls
             }
         }
 
-        private void FolderMenuClickAction(BookmarkBarInfo info, FolderInfo folder, BookmarkBarAction action)
+        private void FolderMenuClickAction(BookmarkBarInfo info, FolderInfo folder, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.BookmarkManager:
-                case BookmarkBarAction.NewBookmark:
-                case BookmarkBarAction.NewFolder:
-                case BookmarkBarAction.Rename:
+                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.NewBookmark:
+                case BookmarkAction.NewFolder:
+                case BookmarkAction.Rename:
                     FolderHandle?.Invoke(info, folder, action);
                     break;
-                case BookmarkBarAction.Delete:
+                case BookmarkAction.Delete:
 #pragma warning disable CS8602 // 解引用可能出现空引用。
                     BookmarkManager.Delete(info.Parent.CurrentFolder, folder);
 #pragma warning restore CS8602 // 解引用可能出现空引用。

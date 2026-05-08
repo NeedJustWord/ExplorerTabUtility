@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
@@ -79,7 +80,15 @@ namespace ExplorerTabUtility.UI.Views
         private void DeleteSelectedItems()
         {
             var items = LbChildren.SelectedItems.Cast<BookmarkTreeViewInfo>().ToList();
-            if (items.Count > 0) TvFolder.Delete(items);
+            if (items.Count > 0)
+            {
+                TvFolder.Delete(items);
+
+                if (LbChildren.ItemsSource is IEnumerable<BookmarkTreeViewInfo> datas)
+                {
+                    LbChildren.ItemsSource = datas.Except(items);
+                }
+            }
         }
 
         private void Edit(BookmarkTreeViewInfo info)
@@ -128,36 +137,36 @@ namespace ExplorerTabUtility.UI.Views
             }
         }
 
-        private void TvFolder_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkBarAction action)
+        private void TvFolder_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.Delete:
+                case BookmarkAction.Delete:
                     DeleteSelectedItems();
                     break;
-                case BookmarkBarAction.Rename:
+                case BookmarkAction.Rename:
                     Edit(info);
                     break;
             }
         }
 
-        private async void TvFolder_BookmarkHandle(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkBarAction action)
+        private async void TvFolder_BookmarkHandle(BookmarkTreeViewInfo info, BookmarkInfo bookmark, BookmarkAction action)
         {
             switch (action)
             {
-                case BookmarkBarAction.OpenInCurrentTab:
+                case BookmarkAction.OpenInCurrentTab:
                     await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: true);
                     break;
-                case BookmarkBarAction.OpenInNewTab:
+                case BookmarkAction.OpenInNewTab:
                     await explorerWatcher.Open(bookmark.Location, true, windowHandle, inCurrentTab: false);
                     break;
-                case BookmarkBarAction.OpenInNewWindow:
+                case BookmarkAction.OpenInNewWindow:
                     await explorerWatcher.Open(bookmark.Location, false, windowHandle);
                     break;
-                case BookmarkBarAction.Delete:
+                case BookmarkAction.Delete:
                     DeleteSelectedItems();
                     break;
-                case BookmarkBarAction.Edit:
+                case BookmarkAction.Edit:
                     Edit(info);
                     break;
             }
@@ -169,7 +178,7 @@ namespace ExplorerTabUtility.UI.Views
             if (string.IsNullOrEmpty(key))
             {
                 var info = (BookmarkTreeViewInfo)TvFolder.SelectedItem;
-                LbChildren.ItemsSource = info.Children;
+                if (info != null) LbChildren.ItemsSource = info.Children;
             }
             else
             {
@@ -179,8 +188,15 @@ namespace ExplorerTabUtility.UI.Views
 
         private void TvFolder_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var info = (BookmarkTreeViewInfo)e.NewValue;
-            if (info != null) LbChildren.ItemsSource = info.Children;
+            if (string.IsNullOrEmpty(TxtSearch.Text))
+            {
+                var info = (BookmarkTreeViewInfo)e.NewValue;
+                if (info != null) LbChildren.ItemsSource = info.Children;
+            }
+            else
+            {
+                TxtSearch.Text = string.Empty;
+            }
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)

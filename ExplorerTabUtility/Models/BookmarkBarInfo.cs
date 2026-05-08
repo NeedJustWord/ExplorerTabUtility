@@ -165,7 +165,7 @@ namespace ExplorerTabUtility.Models
                                int level,
                                BookmarkBarInfo? parent,
                                Action<BookmarkBarInfo, BookmarkInfo> clickAction,
-                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> menuClickAction)
+                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> menuClickAction)
         {
             isNotOverflowAndOtherFolder = true;
             Parent = parent;
@@ -183,7 +183,7 @@ namespace ExplorerTabUtility.Models
             });
             MenuClickCommand = new RelayCommand((args) =>
             {
-                if (args is BookmarkBarAction action)
+                if (args is BookmarkAction action)
                 {
                     menuClickAction.Invoke(this, CurrentBookmark, action);
                 }
@@ -202,8 +202,8 @@ namespace ExplorerTabUtility.Models
                                int level,
                                BookmarkBarInfo? parent,
                                Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
-                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
-                               Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction,
+                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
+                               Action<BookmarkBarInfo, FolderInfo, BookmarkAction> folderMenuClickAction,
                                bool isNotOverflowAndOtherFolder)
         {
             IsShowContextMenu = BookmarkManager.IsOtherOrOverflowFolder(folderInfo) == false;
@@ -221,7 +221,7 @@ namespace ExplorerTabUtility.Models
 
             MenuClickCommand = new RelayCommand((args) =>
             {
-                if (args is BookmarkBarAction action)
+                if (args is BookmarkAction action)
                 {
                     folderMenuClickAction.Invoke(this, CurrentFolder, action);
                 }
@@ -367,8 +367,8 @@ namespace ExplorerTabUtility.Models
         private void CreateChildren(FolderInfo folder,
                                     int level,
                                     Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
-                                    Action<BookmarkBarInfo, BookmarkInfo, BookmarkBarAction> bookmarkMenuClickAction,
-                                    Action<BookmarkBarInfo, FolderInfo, BookmarkBarAction> folderMenuClickAction)
+                                    Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
+                                    Action<BookmarkBarInfo, FolderInfo, BookmarkAction> folderMenuClickAction)
         {
             if (folder.Items.Count > 0)
             {
