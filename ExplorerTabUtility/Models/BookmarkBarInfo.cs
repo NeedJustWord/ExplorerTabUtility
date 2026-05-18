@@ -77,6 +77,11 @@ namespace ExplorerTabUtility.Models
         }
 
         /// <summary>
+        /// 是否显示图标
+        /// </summary>
+        public bool IsShowIcon => string.IsNullOrEmpty(Icon) == false;
+
+        /// <summary>
         /// 是否显示子项图标
         /// </summary>
         public bool IsShowSubIcon => IsFolder && FirstLevel == false && children.Count > 0;

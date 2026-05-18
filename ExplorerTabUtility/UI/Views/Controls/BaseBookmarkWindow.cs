@@ -7,14 +7,14 @@ using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
-    public class BaseWindow : Window
+    public class BaseBookmarkWindow : Window
     {
         protected readonly ExplorerWatcher explorerWatcher;
         protected readonly nint windowHandle;
         private bool _isShowingDialog;
         private bool _isClosing;
 
-        public BaseWindow(ExplorerWatcher explorerWatcher, nint windowHandle)
+        public BaseBookmarkWindow(ExplorerWatcher explorerWatcher, nint windowHandle)
         {
             this.explorerWatcher = explorerWatcher;
             this.windowHandle = windowHandle;

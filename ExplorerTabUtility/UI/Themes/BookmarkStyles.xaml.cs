@@ -7,7 +7,7 @@ using ExplorerTabUtility.UI.Views;
 
 namespace ExplorerTabUtility.UI.Themes
 {
-    public partial class TreeViewStyles
+    public partial class BookmarkStyles
     {
         private bool isCancel;
 

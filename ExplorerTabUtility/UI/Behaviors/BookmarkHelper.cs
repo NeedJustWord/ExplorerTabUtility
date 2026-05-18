@@ -80,6 +80,8 @@ namespace ExplorerTabUtility.UI.Behaviors
         #endregion
 
         #region 聚焦到选中行
+        public const double TreeViewItemLeftOffset = 20;
+
         public static readonly DependencyProperty IsBringIntoViewWhenSelectedProperty =
             DependencyProperty.RegisterAttached(
                 "IsBringIntoViewWhenSelected",
@@ -128,7 +130,7 @@ namespace ExplorerTabUtility.UI.Behaviors
                 if (scrollViewer != null)
                 {
                     var info = (BookmarkTreeViewInfo)selectedItem.DataContext;
-                    var left = info.Level * 20;
+                    var left = info.Level * TreeViewItemLeftOffset;
 
                     var svWidth = scrollViewer.ActualWidth;
                     var offset = scrollViewer.HorizontalOffset;

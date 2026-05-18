@@ -14,7 +14,7 @@ namespace ExplorerTabUtility.UI.Views
     /// <summary>
     /// BookmarkSavePopup.xaml 的交互逻辑
     /// </summary>
-    public partial class BookmarkSavePopup : BaseWindow
+    public partial class BookmarkSavePopup : BaseBookmarkWindow
     {
         private bool? isEdit;
         private Guid parentId;

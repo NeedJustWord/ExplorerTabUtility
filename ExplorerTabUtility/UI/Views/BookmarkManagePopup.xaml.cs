@@ -15,7 +15,7 @@ namespace ExplorerTabUtility.UI.Views
     /// <summary>
     /// BookmarkManagePopup.xaml 的交互逻辑
     /// </summary>
-    public partial class BookmarkManagePopup : BaseWindow
+    public partial class BookmarkManagePopup : BaseBookmarkWindow
     {
         private bool needDialogResult;
         private string initBookmarkJson;

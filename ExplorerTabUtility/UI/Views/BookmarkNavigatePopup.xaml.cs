@@ -10,7 +10,7 @@ namespace ExplorerTabUtility.UI.Views
     /// <summary>
     /// BookmarkNavigatePopup.xaml 的交互逻辑
     /// </summary>
-    public partial class BookmarkNavigatePopup : BaseWindow
+    public partial class BookmarkNavigatePopup : BaseBookmarkWindow
     {
         public BookmarkNavigatePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
