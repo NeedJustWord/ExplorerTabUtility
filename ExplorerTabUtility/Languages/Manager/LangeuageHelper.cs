@@ -54,10 +54,12 @@ namespace ExplorerTabUtility.Languages.Manager
         public event Action? OnLangeuageChanged;
         #endregion
 
-        private readonly string languageDir = "Languages";
+        private readonly string languageDir;
 
         private LangeuageHelper()
         {
+            languageDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Languages");
+
             LanguageFields = new LanguageFields();
             Languages = GetLanguages();
 

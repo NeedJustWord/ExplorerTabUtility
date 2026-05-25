@@ -1014,6 +1014,17 @@ namespace ExplorerTabUtility.Languages.Manager
         }
 
         /// <summary>
+        /// 判断值是否存在
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public bool ContainsValue(string key, string value)
+        {
+            return dictCurrentLanguageFields.TryGetValue(key, out var field) && (field.Value == value || field.DefaultValue == value);
+        }
+
+        /// <summary>
         /// 获取值
         /// </summary>
         /// <param name="key"></param>

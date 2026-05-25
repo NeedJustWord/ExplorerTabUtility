@@ -322,11 +322,11 @@ public partial class HotKeyProfileControl : UserControl, IDisposable
                 CbOpenAsTab.IsEnabled = false;
                 break;
         }
-        
+
         // If the name is empty or is an exact match of an action, set it to the hotkey.
-        var isExactMatch = Enum.GetNames(typeof(HotKeyAction)).Any(a => a == TxtName.Text);
-        if (string.IsNullOrWhiteSpace(TxtName.Text) || isExactMatch)
-            TxtName.Text = selectedAction.ToString();
+        var isExactMatch = Enum.GetNames(typeof(HotKeyAction)).Any(a => LangeuageHelper.Instance.LanguageFields.ContainsValue(a, TxtName.Text));
+        if (string.IsNullOrWhiteSpace(TxtName.Text) || TxtName.Text == TxtHotKeys.Text || isExactMatch)
+            TxtName.Text = LangeuageHelper.Instance.LanguageFields.GetValue(selectedAction.ToString());
     }
 
     private static List<ActionItem> GetAllowedActions(HotkeyScope scope)
