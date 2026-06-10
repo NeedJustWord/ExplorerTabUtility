@@ -79,8 +79,8 @@
         </Setter>
     </Style>
 
-    <!--BookmarkBar Icon Style-->
-    <Style x:Key="BookmarkBarIconStyle" TargetType="TextBlock">
+    <!--BookmarkMenu Icon Style-->
+    <Style x:Key="BookmarkMenuIconStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
         <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
@@ -94,8 +94,8 @@
         </Setter>
     </Style>
 
-    <!--BookmarkBar Display Style-->
-    <Style x:Key="BookmarkBarDisplayStyle" TargetType="{x:Type TextBlock}">
+    <!--BookmarkMenu Display Style-->
+    <Style x:Key="BookmarkMenuDisplayStyle" TargetType="{x:Type TextBlock}">
         <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
         <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
         <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
@@ -249,6 +249,20 @@
     <!--#endregion-->
 
     <!--#region MenuItem右键菜单 -->
+    <!-- 特殊文件夹的右键菜单 -->
+    <ContextMenu x:Key="SpecialFolderMenuItemContextMenu">
+        <MenuItem Header="新建文件夹"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
+        <MenuItem Header="新建书签"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static models:BookmarkAction.NewBookmark}"/>
+        <Separator/>
+        <MenuItem Header="书签管理"
+                  Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                  CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
+    </ContextMenu>
+
     <!-- 文件夹的右键菜单 -->
     <ContextMenu x:Key="FolderMenuItemContextMenu">
         <MenuItem Header="新建文件夹"
@@ -440,10 +454,10 @@
 
     <!--#region Menu样式 -->
     <!--子项容器样式-->
-    <HierarchicalDataTemplate x:Key="BookmarkBarItemTemplate" DataType="{x:Type models:BookmarkBarInfo}" ItemsSource="{Binding Path=Children}"/>
+    <HierarchicalDataTemplate x:Key="BookmarkMenuItemTemplate" DataType="{x:Type models:BookmarkMenuInfo}" ItemsSource="{Binding Path=Children}"/>
 
     <!--菜单项样式-->
-    <Style x:Key="BookmarkBarMenuItemStyle" TargetType="MenuItem">
+    <Style x:Key="BookmarkMenuItemStyle" TargetType="MenuItem">
         <Setter Property="Command" Value="{Binding ClickCommand}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -455,14 +469,14 @@
                             <ColumnDefinition Width="auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Grid.Column="0" Text="{Binding Icon}" Style="{StaticResource BookmarkBarIconStyle}"
+                        <TextBlock Grid.Column="0" Text="{Binding Icon}" Style="{StaticResource BookmarkMenuIconStyle}"
                                    Visibility="{Binding IsShowIcon,Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Visible}}"/>
 
-                        <TextBlock x:Name="TxtName" Grid.Column="1" Text="{Binding DisplayName}" Style="{StaticResource BookmarkBarDisplayStyle}"
+                        <TextBlock x:Name="TxtName" Grid.Column="1" Text="{Binding DisplayName}" Style="{StaticResource BookmarkMenuDisplayStyle}"
                                    ToolTip="{Binding NameTooltip}"
                                    Visibility="{Binding IsVisibility,Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Visible}}"/>
 
-                        <TextBlock Grid.Column="2" Text=">" Style="{StaticResource BookmarkBarIconStyle}"
+                        <TextBlock Grid.Column="2" Text="{Binding SubIcon}" Style="{StaticResource BookmarkMenuIconStyle}"
                                    Visibility="{Binding IsShowSubIcon,Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Visible}}"/>
 
                         <Popup Placement="{Binding PlacementMode}" AllowsTransparency="True" Focusable="False"
@@ -474,9 +488,13 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Self},Path=IsMouseOver}" Value="True"/>
+                                <Condition Binding="{Binding SubIcon}" Value=">"/>
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="PART_Grid" Property="Background" Value="{StaticResource ControlHoverBrush}"/>
-                        </Trigger>
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding FirstLevel}" Value="False">
                             <Setter TargetName="TxtName" Property="MinWidth" Value="200"/>
                         </DataTrigger>
@@ -489,21 +507,38 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsFolder}" Value="True"/>
-                    <Condition Binding="{Binding IsShowContextMenu}" Value="True"/>
+                    <Condition Binding="{Binding IsSpecialFolder}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="ContextMenu" Value="{StaticResource SpecialFolderMenuItemContextMenu}"/>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsFolder}" Value="True"/>
+                    <Condition Binding="{Binding IsSpecialFolder}" Value="False"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="ContextMenu" Value="{StaticResource FolderMenuItemContextMenu}"/>
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding IsFolder}" Value="False">
                 <Setter Property="ContextMenu" Value="{StaticResource BookmarkMenuItemContextMenu}"/>
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsDockRight}" Value="True">
+                <Setter Property="DockPanel.Dock" Value="Right"/>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
     <!--菜单样式-->
-    <Style x:Key="BookmarkBarMenuStyle" TargetType="{x:Type Menu}">
+    <Style x:Key="BookmarkMenuStyle" TargetType="{x:Type controls:BookmarkMenu}">
         <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
-        <Setter Property="ItemTemplate" Value="{StaticResource BookmarkBarItemTemplate}"/>
-        <Setter Property="ItemContainerStyle" Value="{StaticResource BookmarkBarMenuItemStyle}"/>
+        <Setter Property="ItemTemplate" Value="{StaticResource BookmarkMenuItemTemplate}"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource BookmarkMenuItemStyle}"/>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate >
+                    <DockPanel LastChildFill="False"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <!--#endregion-->
 

@@ -20,8 +20,8 @@ namespace ExplorerTabUtility.UI.Views
             var currentScreenWorkingArea = ScreenHelper.MouseCurrentScreen.WorkingArea;
             Top = margin + currentScreenWorkingArea.Top;
             Left = margin + currentScreenWorkingArea.Left;
-            BookmarkBar.Width = Width = currentScreenWorkingArea.Width - margin * 2;
-            BookmarkBar.InitLayout();
+            BookmarkMenu.Width = Width = currentScreenWorkingArea.Width - margin * 2;
+            BookmarkMenu.InitLayout();
 
             SetupEventHandlers();
         }
@@ -32,7 +32,7 @@ namespace ExplorerTabUtility.UI.Views
             EntryDialog();
             if (popup.ShowDialog() == true)
             {
-                BookmarkBar.Refresh();
+                BookmarkMenu.Refresh();
             }
             ExitDialog();
         }
@@ -44,19 +44,19 @@ namespace ExplorerTabUtility.UI.Views
             EntryDialog();
             if (popup.ShowDialog() == true)
             {
-                BookmarkBar.NewBookmark(bookmark);
+                BookmarkMenu.NewBookmark(bookmark);
             }
             ExitDialog();
         }
 
-        private void NewFolder(BookmarkBarInfo info)
+        private void NewFolder(BookmarkMenuInfo info)
         {
             var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
             var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, newFolder, info.GetCurrentFolderId());
             EntryDialog();
             if (popup.ShowDialog() == true)
             {
-                BookmarkBar.NewFolder(info, newFolder);
+                BookmarkMenu.NewFolder(info, newFolder);
             }
             ExitDialog();
         }
@@ -67,11 +67,11 @@ namespace ExplorerTabUtility.UI.Views
             Deactivated += BookmarkNavigatePopup_Deactivated;
             KeyDown += BookmarkNavigatePopup_KeyDown;
 
-            BookmarkBar.BookmarkHandle += BookmarkBar_BookmarkHandle;
-            BookmarkBar.FolderHandle += BookmarkBar_FolderHandle;
+            BookmarkMenu.BookmarkHandle += BookmarkMenu_BookmarkHandle;
+            BookmarkMenu.FolderHandle += BookmarkMenu_FolderHandle;
         }
 
-        private void BookmarkBar_FolderHandle(BookmarkBarInfo info, FolderInfo folder, BookmarkAction action)
+        private void BookmarkMenu_FolderHandle(BookmarkMenuInfo info, FolderInfo folder, BookmarkAction action)
         {
             switch (action)
             {
@@ -80,7 +80,7 @@ namespace ExplorerTabUtility.UI.Views
                     EntryDialog();
                     if (popup.ShowDialog() == true)
                     {
-                        BookmarkBar.RenameFolder(info, folder.Name);
+                        BookmarkMenu.RenameFolder(info, folder.Name);
                     }
                     ExitDialog();
                     break;
@@ -96,7 +96,7 @@ namespace ExplorerTabUtility.UI.Views
             }
         }
 
-        private async void BookmarkBar_BookmarkHandle(BookmarkBarInfo info, BookmarkInfo bookmark, BookmarkAction action)
+        private async void BookmarkMenu_BookmarkHandle(BookmarkMenuInfo info, BookmarkInfo bookmark, BookmarkAction action)
         {
             switch (action)
             {
@@ -117,7 +117,7 @@ namespace ExplorerTabUtility.UI.Views
                     EntryDialog();
                     if (popup.ShowDialog() == true)
                     {
-                        BookmarkBar.EditBookmark(info, bookmark);
+                        BookmarkMenu.EditBookmark(info, bookmark);
                     }
                     ExitDialog();
                     break;

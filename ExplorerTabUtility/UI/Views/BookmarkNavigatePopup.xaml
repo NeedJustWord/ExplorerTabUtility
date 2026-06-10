@@ -5,6 +5,6 @@
                              Style="{StaticResource BaseBookmarkWindowStyle}"
                              Width="500" Height="50">
     <Border Style="{StaticResource BaseBookmarkWindowBorderStyle}">
-        <controls:BookmarkBar x:Name="BookmarkBar"/>
+        <controls:BookmarkMenu x:Name="BookmarkMenu" Style="{StaticResource BookmarkMenuStyle}"/>
     </Border>
 </controls:BaseBookmarkWindow>

@@ -9,7 +9,40 @@ using ExplorerTabUtility.UI.Commands;
 
 namespace ExplorerTabUtility.Models
 {
-    public class BookmarkBarInfo : BindableBase
+    public abstract class BaseBookmarkMenuInfo : BindableBase
+    {
+        private bool isDockRight;
+        /// <summary>
+        /// 是否靠右
+        /// </summary>
+        public bool IsDockRight
+        {
+            get { return isDockRight; }
+            set { SetProperty(ref isDockRight, value); }
+        }
+
+        /// <summary>
+        /// 是否显示
+        /// </summary>
+        public abstract bool IsVisibility { get; }
+
+        /// <summary>
+        /// 是否显示图标
+        /// </summary>
+        public abstract bool IsShowIcon { get; }
+
+        /// <summary>
+        /// 是否显示子项图标
+        /// </summary>
+        public abstract bool IsShowSubIcon { get; }
+
+        /// <summary>
+        /// 子项图标
+        /// </summary>
+        public abstract string SubIcon { get; }
+    }
+
+    public class BookmarkMenuInfo : BaseBookmarkMenuInfo
     {
         #region 属性
         private string name;
@@ -66,11 +99,11 @@ namespace ExplorerTabUtility.Models
             set { SetProperty(ref placementMode, value); }
         }
 
-        private ObservableCollection<BookmarkBarInfo> children;
+        private ObservableCollection<BookmarkMenuInfo> children;
         /// <summary>
         /// 子集合
         /// </summary>
-        public ObservableCollection<BookmarkBarInfo> Children
+        public ObservableCollection<BookmarkMenuInfo> Children
         {
             get { return children; }
             set { SetProperty(ref children, value); }
@@ -79,19 +112,24 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 是否显示图标
         /// </summary>
-        public bool IsShowIcon => IsVisibility && string.IsNullOrEmpty(Icon) == false;
+        public override bool IsShowIcon => IsVisibility && string.IsNullOrEmpty(Icon) == false;
 
         /// <summary>
         /// 是否显示子项图标
         /// </summary>
-        public bool IsShowSubIcon => IsFolder && FirstLevel == false && children.Count > 0;
+        public override bool IsShowSubIcon => IsFolder && FirstLevel == false && children.Count > 0;
+
+        /// <summary>
+        /// 子项图标
+        /// </summary>
+        public override string SubIcon => ">";
 
         /// <summary>
         /// 是否显示
         /// 书签、非溢出书签文件夹和其他书签文件夹：始终显示
         /// 溢出书签文件夹和其他书签文件夹：有子项时显示
         /// </summary>
-        public bool IsVisibility => IsFolder == false || isNotOverflowAndOtherFolder || children.Count > 0;
+        public override bool IsVisibility => IsFolder == false || isNotOverflowAndOtherFolder || children.Count > 0;
 
         /// <summary>
         /// 是否是文件夹
@@ -140,7 +178,7 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 父节点
         /// </summary>
-        public BookmarkBarInfo? Parent { get; set; }
+        public BookmarkMenuInfo? Parent { get; set; }
 
         /// <summary>
         /// 宽度
@@ -148,16 +186,19 @@ namespace ExplorerTabUtility.Models
         public int Width { get; set; }
 
         /// <summary>
-        /// 是否显示右键菜单
+        /// 文件夹是否是特殊文件夹
+        /// true：显示特殊文件夹右键菜单
+        /// false：显示普通文件夹右键菜单
+        /// null：不显示右键菜单
         /// </summary>
-        public bool IsShowContextMenu { get; } = true;
+        public bool? IsSpecialFolder { get; } = false;
         #endregion
 
         /// <summary>
         /// 非溢出书签和其他书签文件夹
         /// </summary>
         private bool isNotOverflowAndOtherFolder;
-        private static ObservableCollection<BookmarkBarInfo> emptyChildren = new ObservableCollection<BookmarkBarInfo>();
+        private static ObservableCollection<BookmarkMenuInfo> emptyChildren = new ObservableCollection<BookmarkMenuInfo>();
 
         /// <summary>
         /// 书签
@@ -166,11 +207,11 @@ namespace ExplorerTabUtility.Models
         /// <param name="level"></param>
         /// <param name="parent"></param>
         /// <param name="clickAction"></param>
-        public BookmarkBarInfo(BookmarkInfo bookmarkInfo,
+        public BookmarkMenuInfo(BookmarkInfo bookmarkInfo,
                                int level,
-                               BookmarkBarInfo? parent,
-                               Action<BookmarkBarInfo, BookmarkInfo> clickAction,
-                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> menuClickAction)
+                               BookmarkMenuInfo? parent,
+                               Action<BookmarkMenuInfo, BookmarkInfo> clickAction,
+                               Action<BookmarkMenuInfo, BookmarkInfo, BookmarkAction> menuClickAction)
         {
             isNotOverflowAndOtherFolder = true;
             Parent = parent;
@@ -203,15 +244,15 @@ namespace ExplorerTabUtility.Models
         /// <param name="parent"></param>
         /// <param name="bookmarkClickAction"></param>
         /// <param name="isNotOverflowAndOtherFolder">非溢出书签和其他书签</param>
-        public BookmarkBarInfo(FolderInfo folderInfo,
+        public BookmarkMenuInfo(FolderInfo folderInfo,
                                int level,
-                               BookmarkBarInfo? parent,
-                               Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
-                               Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
-                               Action<BookmarkBarInfo, FolderInfo, BookmarkAction> folderMenuClickAction,
+                               BookmarkMenuInfo? parent,
+                               Action<BookmarkMenuInfo, BookmarkInfo> bookmarkClickAction,
+                               Action<BookmarkMenuInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
+                               Action<BookmarkMenuInfo, FolderInfo, BookmarkAction> folderMenuClickAction,
                                bool isNotOverflowAndOtherFolder)
         {
-            IsShowContextMenu = BookmarkManager.IsOtherOrOverflowFolder(folderInfo) == false;
+            IsSpecialFolder = BookmarkManager.IsOtherOrOverflowFolder(folderInfo);
             this.isNotOverflowAndOtherFolder = isNotOverflowAndOtherFolder;
             Parent = parent;
             CurrentBookmark = BookmarkInfo.Empty;
@@ -221,7 +262,7 @@ namespace ExplorerTabUtility.Models
             icon = "📁";
             Init(true, level);
 
-            children = new ObservableCollection<BookmarkBarInfo>();
+            children = new ObservableCollection<BookmarkMenuInfo>();
             CreateChildren(folderInfo, level, bookmarkClickAction, bookmarkMenuClickAction, folderMenuClickAction);
 
             MenuClickCommand = new RelayCommand((args) =>
@@ -239,9 +280,9 @@ namespace ExplorerTabUtility.Models
         /// <param name="folderInfo"></param>
         /// <param name="level"></param>
         /// <param name="parent"></param>
-        public BookmarkBarInfo(FolderInfo folderInfo, int level, BookmarkBarInfo? parent)
+        public BookmarkMenuInfo(FolderInfo folderInfo, int level, BookmarkMenuInfo? parent)
         {
-            IsShowContextMenu = false;
+            IsSpecialFolder = null;
             isNotOverflowAndOtherFolder = false;
             Parent = parent;
             CurrentBookmark = BookmarkInfo.Empty;
@@ -251,7 +292,7 @@ namespace ExplorerTabUtility.Models
             icon = "";
             Init(true, level);
 
-            children = new ObservableCollection<BookmarkBarInfo>();
+            children = new ObservableCollection<BookmarkMenuInfo>();
         }
 
 #pragma warning disable CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 "required" 修饰符或声明为可为 null。
@@ -259,10 +300,10 @@ namespace ExplorerTabUtility.Models
         /// 搜索专用
         /// </summary>
         /// <param name="child"></param>
-        private BookmarkBarInfo(IEnumerable<BookmarkBarInfo> child)
+        private BookmarkMenuInfo(IEnumerable<BookmarkMenuInfo> child)
         {
             CurrentFolder = FolderInfo.Empty;
-            children = new ObservableCollection<BookmarkBarInfo>(child);
+            children = new ObservableCollection<BookmarkMenuInfo>(child);
         }
 #pragma warning restore CS8618 // 在退出构造函数时，不可为 null 的字段必须包含非 null 值。请考虑添加 "required" 修饰符或声明为可为 null。
 
@@ -272,9 +313,9 @@ namespace ExplorerTabUtility.Models
         /// <param name="searchData"></param>
         /// <param name="searchFolderId"></param>
         /// <returns></returns>
-        public static BookmarkBarInfo? SearchFolder(IEnumerable<BookmarkBarInfo> searchData, Guid searchFolderId)
+        public static BookmarkMenuInfo? SearchFolder(IEnumerable<BookmarkMenuInfo> searchData, Guid searchFolderId)
         {
-            var info = new BookmarkBarInfo(searchData);
+            var info = new BookmarkMenuInfo(searchData);
             return info.SearchFolder(searchFolderId);
         }
 
@@ -283,7 +324,7 @@ namespace ExplorerTabUtility.Models
         /// </summary>
         /// <param name="folderId"></param>
         /// <returns></returns>
-        private BookmarkBarInfo? SearchFolder(Guid folderId)
+        private BookmarkMenuInfo? SearchFolder(Guid folderId)
         {
             if (CurrentFolder.Id == folderId)
             {
@@ -308,7 +349,7 @@ namespace ExplorerTabUtility.Models
         /// 添加节点
         /// </summary>
         /// <param name="info"></param>
-        public void Add(BookmarkBarInfo info)
+        public void Add(BookmarkMenuInfo info)
         {
             Children.Add(info);
             info.Parent = this;
@@ -319,7 +360,7 @@ namespace ExplorerTabUtility.Models
         /// 删除节点
         /// </summary>
         /// <param name="deleteInfo"></param>
-        public void Delete(BookmarkBarInfo deleteInfo)
+        public void Delete(BookmarkMenuInfo deleteInfo)
         {
             Children.Remove(deleteInfo);
             NoticeChanged();
@@ -327,6 +368,7 @@ namespace ExplorerTabUtility.Models
 
         private void NoticeChanged()
         {
+            RaisePropertyChanged(nameof(IsShowIcon));
             RaisePropertyChanged(nameof(IsShowSubIcon));
             RaisePropertyChanged(nameof(IsVisibility));
         }
@@ -371,9 +413,9 @@ namespace ExplorerTabUtility.Models
 
         private void CreateChildren(FolderInfo folder,
                                     int level,
-                                    Action<BookmarkBarInfo, BookmarkInfo> bookmarkClickAction,
-                                    Action<BookmarkBarInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
-                                    Action<BookmarkBarInfo, FolderInfo, BookmarkAction> folderMenuClickAction)
+                                    Action<BookmarkMenuInfo, BookmarkInfo> bookmarkClickAction,
+                                    Action<BookmarkMenuInfo, BookmarkInfo, BookmarkAction> bookmarkMenuClickAction,
+                                    Action<BookmarkMenuInfo, FolderInfo, BookmarkAction> folderMenuClickAction)
         {
             if (folder.Items.Count > 0)
             {
@@ -382,11 +424,11 @@ namespace ExplorerTabUtility.Models
                 {
                     if (item is FolderInfo folderInfo)
                     {
-                        children.Add(new BookmarkBarInfo(folderInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction, folderMenuClickAction, true));
+                        children.Add(new BookmarkMenuInfo(folderInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction, folderMenuClickAction, true));
                     }
                     else if (item is BookmarkInfo bookmarkInfo)
                     {
-                        children.Add(new BookmarkBarInfo(bookmarkInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction));
+                        children.Add(new BookmarkMenuInfo(bookmarkInfo, level, this, bookmarkClickAction, bookmarkMenuClickAction));
                     }
                 }
             }
@@ -435,6 +477,24 @@ namespace ExplorerTabUtility.Models
         private List<int> GetByteCount(string str)
         {
             return str.Select(c => c > 255 ? 2 : 1).ToList();
+        }
+    }
+
+    public class BookmarkMenuSeparatorInfo : BaseBookmarkMenuInfo
+    {
+        public override bool IsVisibility => false;
+
+        public override bool IsShowIcon => false;
+
+        public override string SubIcon => "|";
+
+        private bool isShowSubIcon;
+        public override bool IsShowSubIcon => isShowSubIcon;
+
+        public void SetIsShowSubIcon(bool isShowSubIcon)
+        {
+            this.isShowSubIcon = isShowSubIcon;
+            RaisePropertyChanged(nameof(IsShowSubIcon));
         }
     }
 }
