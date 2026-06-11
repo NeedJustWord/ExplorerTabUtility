@@ -154,7 +154,7 @@ namespace ExplorerTabUtility.Models
         public ICommand MenuClickCommand { get; }
         #endregion
 
-        private string oldName;
+        private readonly string oldName;
 
         public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent, Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkAction> menuClickAction)
         {
@@ -166,7 +166,7 @@ namespace ExplorerTabUtility.Models
             Visibility = Visibility.Collapsed;
             IsFolder = false;
 
-            children = new ObservableCollection<BookmarkTreeViewInfo>();
+            children = [];
             icon = GetIcon(true, false, false);
             expandedIcon = icon;
             oldName = name = bookmarkInfo.Name;
@@ -190,7 +190,7 @@ namespace ExplorerTabUtility.Models
             Visibility = Visibility.Visible;
             IsFolder = true;
 
-            children = new ObservableCollection<BookmarkTreeViewInfo>();
+            children = [];
             icon = GetIcon(false, false, isSpecil);
             expandedIcon = GetIcon(false, true, isSpecil);
             oldName = name = folderInfo.Name;
@@ -213,14 +213,22 @@ namespace ExplorerTabUtility.Models
         {
             if (CurrentBookmark != BookmarkInfo.Empty)
             {
+#if NET481
                 if (CurrentBookmark.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+#elif NET9_0
+                if (CurrentBookmark.Name.Contains(key, StringComparison.OrdinalIgnoreCase))
+#endif
                 {
                     yield return this;
                 }
             }
             else
             {
+#if NET481
                 if (CurrentFolder.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+#elif NET9_0
+                if (CurrentFolder.Name.Contains(key, StringComparison.OrdinalIgnoreCase))
+#endif
                 {
                     yield return this;
                 }
@@ -319,7 +327,7 @@ namespace ExplorerTabUtility.Models
             RaisePropertyChanged(nameof(HasVisibilityItems));
         }
 
-        private string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)
+        private static string GetIcon(bool isBookmark, bool isExpanded, bool isSpecil)
         {
             if (isBookmark) return "📄";
             if (isSpecil) return "⭐";

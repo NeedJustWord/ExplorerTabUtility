@@ -294,11 +294,7 @@ namespace ExplorerTabUtility.Managers
 
             if (folder.Id == folderInfo.Id || folder.Id == otherFolderInfo.Id) return;
 
-            var info = lastSaveFolders.Get(folder.Id);
-            if (info == null)
-            {
-                info = new SaveFolderInfo(folder);
-            }
+            var info = lastSaveFolders.Get(folder.Id) ?? new SaveFolderInfo(folder);
             lastSaveFolders.Add(folder.Id, info);
         }
 
@@ -309,7 +305,7 @@ namespace ExplorerTabUtility.Managers
         {
             try
             {
-                config.Bookmarks = Bookmarks.ToList();
+                config.Bookmarks = [.. Bookmarks];
                 config.LastSaveFolders = lastSaveFolders.ToList(false);
                 config.LastSaveFolderId = LastSaveFolderId;
 
@@ -324,27 +320,18 @@ namespace ExplorerTabUtility.Managers
 
         internal class BookmarkConfig
         {
-            public List<FolderInfo> Bookmarks { get; set; } = new List<FolderInfo>();
-            public List<SaveFolderInfo> LastSaveFolders { get; set; } = new List<SaveFolderInfo>();
+            public List<FolderInfo> Bookmarks { get; set; } = [];
+            public List<SaveFolderInfo> LastSaveFolders { get; set; } = [];
             public Guid LastSaveFolderId { get; set; }
         }
 
-        internal class LRUCache<TKey, TValue> where TKey : notnull
+        internal class LRUCache<TKey, TValue>(int capacity, params TValue[] array) where TKey : notnull
         {
-            private readonly Dictionary<TKey, LinkedListNode<TValue>> dict;
-            private readonly LinkedList<TValue> linkedList;
-            private readonly List<TValue> list;
-            private readonly TValue[] array;
-            private readonly int capacity;
-
-            public LRUCache(int capacity, params TValue[] array)
-            {
-                dict = new Dictionary<TKey, LinkedListNode<TValue>>(capacity);
-                linkedList = new LinkedList<TValue>();
-                list = new List<TValue>(capacity + array.Length);
-                this.capacity = capacity;
-                this.array = array;
-            }
+            private readonly Dictionary<TKey, LinkedListNode<TValue>> dict = new(capacity);
+            private readonly LinkedList<TValue> linkedList = new();
+            private readonly List<TValue> list = new(capacity + array.Length);
+            private readonly TValue[] array = array;
+            private readonly int capacity = capacity;
 
             public TValue? Get(TKey key)
             {

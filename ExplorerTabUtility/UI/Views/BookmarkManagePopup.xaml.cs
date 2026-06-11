@@ -18,7 +18,7 @@ namespace ExplorerTabUtility.UI.Views
     public partial class BookmarkManagePopup : BaseBookmarkWindow
     {
         private bool needDialogResult;
-        private string initBookmarkJson;
+        private readonly string initBookmarkJson;
 
         public BookmarkManagePopup(ExplorerWatcher explorerWatcher, nint windowHandle, bool needDialogResult) : base(explorerWatcher, windowHandle)
         {
@@ -72,7 +72,7 @@ namespace ExplorerTabUtility.UI.Views
             CloseWindow();
         }
 
-        private string GetJson<T>(T t)
+        private static string GetJson<T>(T t)
         {
             return JsonSerializer.Serialize(t);
         }

@@ -16,12 +16,12 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkSavePopup : BaseBookmarkWindow
     {
-        private bool? isEdit;
-        private Guid parentId;
         private BookmarkSaveType saveType;
-        private BookmarkInfo currentBookmarkInfo;
-        private FolderInfo currentFolderInfo;
-        private BookmarkTreeViewInfo? bookmarkTreeViewInfo;
+        private readonly bool? isEdit;
+        private readonly Guid parentId;
+        private readonly BookmarkInfo currentBookmarkInfo;
+        private readonly FolderInfo currentFolderInfo;
+        private readonly BookmarkTreeViewInfo? bookmarkTreeViewInfo;
 
         public BookmarkSavePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
@@ -124,7 +124,7 @@ namespace ExplorerTabUtility.UI.Views
                     BtnNewFolder.Visibility = Visibility.Collapsed;
                     TvSelectSavePath.Visibility = Visibility.Collapsed;
 
-                    TxtName.Text = GetName(currentBookmarkInfo.Location);
+                    TxtName.Text = currentBookmarkInfo.Name;
 
                     InitCbSelectSavePath();
                     break;
@@ -160,26 +160,21 @@ namespace ExplorerTabUtility.UI.Views
 
         private SaveFolderItem? GetSaveFolder()
         {
-            switch (saveType)
+            return saveType switch
             {
-                case BookmarkSaveType.ComboBox:
-                    return (SaveFolderItem)CbSelectSavePath.SelectedItem;
-                case BookmarkSaveType.TreeView:
-                    return TvSelectSavePath.GetSaveFolderItem();
-                default:
-                    return null;
-            }
+                BookmarkSaveType.ComboBox => (SaveFolderItem)CbSelectSavePath.SelectedItem,
+                BookmarkSaveType.TreeView => TvSelectSavePath.GetSaveFolderItem(),
+                _ => null,
+            };
         }
 
         private string GetSaveLocation()
         {
-            switch (saveType)
+            return saveType switch
             {
-                case BookmarkSaveType.ComboBox:
-                    return currentBookmarkInfo.Location;
-                default:
-                    return TxtLocation.Text;
-            }
+                BookmarkSaveType.ComboBox => currentBookmarkInfo.Location,
+                _ => TxtLocation.Text,
+            };
         }
 
         private void CloseWindow(bool isCancel)
@@ -287,7 +282,7 @@ namespace ExplorerTabUtility.UI.Views
             TxtLocation.ToolTip = currentBookmarkInfo.Location;
 
             var parentId = BookmarkManager.LastSaveFolderId == Guid.Empty
-                ? BookmarkManager.LastSaveFolders.First().Id
+                ? BookmarkManager.LastSaveFolders[0].Id
                 : BookmarkManager.LastSaveFolderId;
             InitTvSelectSavePath(parentId);
         }

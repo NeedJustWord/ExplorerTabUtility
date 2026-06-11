@@ -7,18 +7,12 @@ using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
 {
-    public class BaseBookmarkWindow : Window
+    public class BaseBookmarkWindow(ExplorerWatcher explorerWatcher, nint windowHandle) : Window
     {
-        protected readonly ExplorerWatcher explorerWatcher;
-        protected readonly nint windowHandle;
+        protected readonly ExplorerWatcher explorerWatcher = explorerWatcher;
+        protected readonly nint windowHandle = windowHandle;
         private bool _isShowingDialog;
         private bool _isClosing;
-
-        public BaseBookmarkWindow(ExplorerWatcher explorerWatcher, nint windowHandle)
-        {
-            this.explorerWatcher = explorerWatcher;
-            this.windowHandle = windowHandle;
-        }
 
         public new void Show()
         {
@@ -45,26 +39,18 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// </summary>
         /// <param name="location"></param>
         /// <returns></returns>
-        protected string GetName(string location)
+        protected static string GetName(string location)
         {
-            string name;
-            switch (location)
+            return location switch
             {
-                case "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}":
-                    name = "此电脑";
-                    break;
-                default:
-                    if (location.EndsWith(":"))
-                    {
-                        name = $"{location.TrimEnd(':')}盘";
-                    }
-                    else
-                    {
-                        name = Path.GetFileName(location);
-                    }
-                    break;
-            }
-            return name;
+                "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}" => "此电脑",
+                "shell:::{645FF040-5081-101B-9F08-00AA002F954E}" => "回收站",
+#if NET481
+                _ => location.EndsWith(":") ? $"{location.TrimEnd(':')}盘" : Path.GetFileName(location),
+#elif NET9_0
+                _ => location.EndsWith(':') ? $"{location.TrimEnd(':')}盘" : Path.GetFileName(location),
+#endif
+            };
         }
 
         protected bool CanClose()

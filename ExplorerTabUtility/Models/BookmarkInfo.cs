@@ -8,23 +8,17 @@ namespace ExplorerTabUtility.Models
     [JsonDerivedType(typeof(SaveFolderInfo), typeDiscriminator: "SaveFolder")]
     [JsonDerivedType(typeof(BookmarkInfo), typeDiscriminator: "Bookmark")]
     [JsonDerivedType(typeof(FolderInfo), typeDiscriminator: "Folder")]
-    public abstract class BaseBookmarkInfo
+    public abstract class BaseBookmarkInfo(Guid id, string name)
     {
         /// <summary>
         /// 唯一主键
         /// </summary>
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = id;
 
         /// <summary>
         /// 名称，书签名称或文件夹名
         /// </summary>
-        public string Name { get; set; }
-
-        public BaseBookmarkInfo(Guid id, string name)
-        {
-            Id = id;
-            Name = name;
-        }
+        public string Name { get; set; } = name;
 
         [JsonConstructor]
         private BaseBookmarkInfo() : this(Guid.Empty, string.Empty)
@@ -32,9 +26,9 @@ namespace ExplorerTabUtility.Models
         }
     }
 
-    public class BookmarkInfo : BaseBookmarkInfo
+    public class BookmarkInfo(Guid id, string name, string location) : BaseBookmarkInfo(id, name)
     {
-        public static readonly BookmarkInfo Empty = new BookmarkInfo();
+        public static readonly BookmarkInfo Empty = new();
 
         /// <summary>
         /// 父节点Id
@@ -45,12 +39,7 @@ namespace ExplorerTabUtility.Models
         /// <summary>
         /// 书签路径
         /// </summary>
-        public string Location { get; set; }
-
-        public BookmarkInfo(Guid id, string name, string location) : base(id, name)
-        {
-            Location = location;
-        }
+        public string Location { get; set; } = location;
 
         [JsonConstructor]
         private BookmarkInfo() : this(Guid.Empty, string.Empty, string.Empty)
@@ -69,7 +58,7 @@ namespace ExplorerTabUtility.Models
 
     public class FolderInfo : BaseBookmarkInfo
     {
-        public static readonly FolderInfo Empty = new FolderInfo();
+        public static readonly FolderInfo Empty = new();
 
         /// <summary>
         /// 子项
@@ -78,7 +67,7 @@ namespace ExplorerTabUtility.Models
 
         public FolderInfo(Guid id, string name) : base(id, name)
         {
-            Items = new List<BaseBookmarkInfo>();
+            Items = [];
         }
 
         public FolderInfo(Guid id, string name, FolderInfo folder, FolderInfo otherFolder) : base(id, name)

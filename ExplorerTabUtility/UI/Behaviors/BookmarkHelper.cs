@@ -48,7 +48,7 @@ namespace ExplorerTabUtility.UI.Behaviors
 
             if (!fe.IsVisible)
             {
-                fe.IsVisibleChanged += new DependencyPropertyChangedEventHandler(fe_IsVisibleChanged);
+                fe.IsVisibleChanged += new DependencyPropertyChangedEventHandler(FrameworkElement_IsVisibleChanged);
             }
 
             if ((bool)e.NewValue)
@@ -58,12 +58,12 @@ namespace ExplorerTabUtility.UI.Behaviors
             }
         }
 
-        private static void fe_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private static void FrameworkElement_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var fe = (FrameworkElement)sender;
             if (fe.IsVisible && (bool)((FrameworkElement)sender).GetValue(IsFocusedProperty))
             {
-                fe.IsVisibleChanged -= fe_IsVisibleChanged;
+                fe.IsVisibleChanged -= FrameworkElement_IsVisibleChanged;
                 fe.Focus();
             }
         }

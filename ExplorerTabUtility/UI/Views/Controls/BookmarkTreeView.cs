@@ -48,7 +48,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 case Key.Delete:
                     if (withBookmark)
                     {
-                        Delete(new List<BookmarkTreeViewInfo> { (BookmarkTreeViewInfo)SelectedItem });
+                        Delete([(BookmarkTreeViewInfo)SelectedItem]);
                     }
                     else
                     {
@@ -314,7 +314,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return result;
         }
 
-        private void Expanded(BookmarkTreeViewInfo item, bool expandedSelf)
+        private static void Expanded(BookmarkTreeViewInfo item, bool expandedSelf)
         {
             if (expandedSelf)
             {
