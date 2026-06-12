@@ -49,5 +49,20 @@
         /// 书签管理
         /// </summary>
         BookmarkManage,
+
+        /// <summary>
+        /// 剪切
+        /// </summary>
+        Cut,
+
+        /// <summary>
+        /// 复制
+        /// </summary>
+        Copy,
+
+        /// <summary>
+        /// 粘贴
+        /// </summary>
+        Paste,
     }
 }

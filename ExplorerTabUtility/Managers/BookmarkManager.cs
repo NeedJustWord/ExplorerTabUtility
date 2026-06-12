@@ -41,6 +41,11 @@ namespace ExplorerTabUtility.Managers
         /// </summary>
         public static Guid LastSaveFolderId { get; private set; }
 
+        /// <summary>
+        /// 剪切板
+        /// </summary>
+        public static Clipboard ClipboardManager { get; } = new Clipboard();
+
         private static readonly FolderInfo bookmarks;
         private static readonly FolderInfo folderInfo;
         private static readonly FolderInfo otherFolderInfo;
@@ -315,6 +320,19 @@ namespace ExplorerTabUtility.Managers
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Failed to save bookmarks: {ex.Message}");
+            }
+        }
+
+        internal class Clipboard : BindableBase
+        {
+            private bool canPaste;
+            /// <summary>
+            /// 是否可以粘贴
+            /// </summary>
+            public bool CanPaste
+            {
+                get { return canPaste; }
+                set { SetProperty(ref canPaste, value); }
             }
         }
 

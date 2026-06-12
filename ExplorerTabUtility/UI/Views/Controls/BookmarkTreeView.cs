@@ -46,14 +46,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     Rename();
                     break;
                 case Key.Delete:
-                    if (withBookmark)
-                    {
-                        Delete([(BookmarkTreeViewInfo)SelectedItem]);
-                    }
-                    else
-                    {
-                        Delete();
-                    }
+                    Delete();
                     break;
             }
         }
@@ -106,6 +99,12 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         private void Delete()
         {
+            if (withBookmark)
+            {
+                Delete([(BookmarkTreeViewInfo)SelectedItem]);
+                return;
+            }
+
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
 
@@ -197,6 +196,9 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 case BookmarkAction.OpenInCurrentTab:
                 case BookmarkAction.OpenInNewTab:
                 case BookmarkAction.OpenInNewWindow:
+                case BookmarkAction.Cut:
+                case BookmarkAction.Copy:
+                case BookmarkAction.Paste:
                     BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
             }
@@ -207,7 +209,17 @@ namespace ExplorerTabUtility.UI.Views.Controls
             switch (action)
             {
                 case BookmarkAction.Delete:
+                    Delete();
+                    break;
                 case BookmarkAction.Rename:
+                    Rename();
+                    break;
+                case BookmarkAction.NewFolder:
+                    AddFolder(out _);
+                    break;
+                case BookmarkAction.Cut:
+                case BookmarkAction.Copy:
+                case BookmarkAction.Paste:
                     FolderHandle?.Invoke(info, folder, action);
                     break;
             }

@@ -119,6 +119,11 @@ namespace ExplorerTabUtility.Models
         public int Level { get; }
 
         /// <summary>
+        /// 是否第一层节点
+        /// </summary>
+        public bool FirstLevel => Level == 0;
+
+        /// <summary>
         /// 是否需要保存
         /// </summary>
         public bool IsNeedSave => IsAdd || name != oldName;

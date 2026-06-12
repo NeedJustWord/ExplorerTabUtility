@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
@@ -96,6 +97,24 @@ namespace ExplorerTabUtility.UI.Views
             var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, info);
             popup.ShowDialog();
         }
+
+        private void Cut(bool isFocusedTreeView)
+        {
+            //todo:Cut
+            BookmarkManager.ClipboardManager.CanPaste = true;
+        }
+
+        private void Copy(bool isFocusedTreeView)
+        {
+            //todo:Copy
+            BookmarkManager.ClipboardManager.CanPaste = true;
+        }
+
+        private void Paste(bool isFocusedTreeView)
+        {
+            //todo:Paste
+            BookmarkManager.ClipboardManager.CanPaste = false;
+        }
         #endregion
 
         #region 事件注册
@@ -141,11 +160,14 @@ namespace ExplorerTabUtility.UI.Views
         {
             switch (action)
             {
-                case BookmarkAction.Delete:
-                    DeleteSelectedItems();
+                case BookmarkAction.Cut:
+                    Cut(FocusManager.GetFocusedElement(this) is TreeViewItem);
                     break;
-                case BookmarkAction.Rename:
-                    Edit(info);
+                case BookmarkAction.Copy:
+                    Copy(FocusManager.GetFocusedElement(this) is TreeViewItem);
+                    break;
+                case BookmarkAction.Paste:
+                    Paste(FocusManager.GetFocusedElement(this) is TreeViewItem);
                     break;
             }
         }
@@ -168,6 +190,15 @@ namespace ExplorerTabUtility.UI.Views
                     break;
                 case BookmarkAction.Edit:
                     Edit(info);
+                    break;
+                case BookmarkAction.Cut:
+                    Cut(false);
+                    break;
+                case BookmarkAction.Copy:
+                    Copy(false);
+                    break;
+                case BookmarkAction.Paste:
+                    Paste(false);
                     break;
             }
         }
