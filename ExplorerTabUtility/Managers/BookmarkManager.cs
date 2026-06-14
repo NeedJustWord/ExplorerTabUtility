@@ -355,6 +355,16 @@ namespace ExplorerTabUtility.Managers
                 private set { SetProperty(ref listBoxCanPaste, value); }
             }
 
+            private bool isSearch;
+            /// <summary>
+            /// 是否搜索
+            /// </summary>
+            public bool IsSearch
+            {
+                get { return isSearch; }
+                set { SetProperty(ref isSearch, value); }
+            }
+
             private bool isCopy;
             private List<BookmarkTreeViewInfo> infos = new List<BookmarkTreeViewInfo>();
 
@@ -367,6 +377,7 @@ namespace ExplorerTabUtility.Managers
             {
                 this.infos = infos;
                 ListBoxCanPaste = isNotSearch;
+                IsSearch = isNotSearch == false;
                 TreeViewCanPaste = true;
                 isCopy = false;
             }
@@ -380,6 +391,7 @@ namespace ExplorerTabUtility.Managers
             {
                 this.infos = infos;
                 ListBoxCanPaste = isNotSearch;
+                IsSearch = isNotSearch == false;
                 TreeViewCanPaste = true;
                 isCopy = true;
             }
@@ -390,6 +402,7 @@ namespace ExplorerTabUtility.Managers
             /// <param name="isNotSearch"></param>
             public void SetListBoxCanPaste(bool isNotSearch)
             {
+                IsSearch = isNotSearch == false;
                 ListBoxCanPaste = infos.Count > 0 && isNotSearch;
             }
 

@@ -241,6 +241,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 case BookmarkAction.Cut:
                 case BookmarkAction.Copy:
                 case BookmarkAction.Paste:
+                case BookmarkAction.ShowInFolder:
                     BookmarkHandle?.Invoke(info, bookmark, action);
                     break;
             }
@@ -258,6 +259,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                 case BookmarkAction.Cut:
                 case BookmarkAction.Copy:
                 case BookmarkAction.Paste:
+                case BookmarkAction.ShowInFolder:
                     FolderHandle?.Invoke(info, folder, action);
                     break;
             }
@@ -364,7 +366,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             return result;
         }
 
-        private static void Expanded(BookmarkTreeViewInfo item, bool expandedSelf)
+        public static void Expanded(BookmarkTreeViewInfo item, bool expandedSelf)
         {
             if (expandedSelf)
             {

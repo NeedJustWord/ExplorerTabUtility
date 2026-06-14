@@ -64,5 +64,10 @@
         /// 粘贴
         /// </summary>
         Paste,
+
+        /// <summary>
+        /// 在文件夹中显示
+        /// </summary>
+        ShowInFolder,
     }
 }

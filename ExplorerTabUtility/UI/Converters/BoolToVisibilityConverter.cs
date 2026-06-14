@@ -10,7 +10,7 @@ namespace ExplorerTabUtility.UI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var boolValue = (bool)value;
-            Visibility visValue = (Visibility)parameter;
+            Visibility visValue = parameter == null ? Visibility.Visible : (Visibility)parameter;
             if (boolValue) return visValue;
             return visValue == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         }

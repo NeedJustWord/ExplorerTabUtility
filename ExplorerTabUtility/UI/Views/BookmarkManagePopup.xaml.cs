@@ -125,6 +125,17 @@ namespace ExplorerTabUtility.UI.Views
                 ? [(BookmarkTreeViewInfo)TvFolder.SelectedItem]
                 : LbChildren.SelectedItems.Cast<BookmarkTreeViewInfo>().ToList();
         }
+
+        private void ShowInFolder()
+        {
+            var showItem = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
+            var parent = showItem.Parent;
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+            parent.IsSelected = true;
+            BookmarkTreeView.Expanded(parent, false);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
+            LbChildren.SelectedItem = showItem;
+        }
         #endregion
 
         #region 事件注册
@@ -218,6 +229,9 @@ namespace ExplorerTabUtility.UI.Views
                 case BookmarkAction.Paste:
                     Paste(isFocusedTreeView);
                     break;
+                case BookmarkAction.ShowInFolder:
+                    ShowInFolder();
+                    break;
             }
         }
 
@@ -248,6 +262,9 @@ namespace ExplorerTabUtility.UI.Views
                     break;
                 case BookmarkAction.Paste:
                     Paste(false);
+                    break;
+                case BookmarkAction.ShowInFolder:
+                    ShowInFolder();
                     break;
             }
         }
