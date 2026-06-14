@@ -80,6 +80,18 @@
         </Setter>
     </Style>
 
+    <!--Bookmark ListBoxItem Location Style-->
+    <Style x:Key="BookmarkListBoxItemLocationStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="{StaticResource DefaultFontSize}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Visibility" Value="Collapsed"/>
+        <Setter Property="Margin" Value="10 2 0 2"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Opacity" Value="0.5"/>
+    </Style>
+
     <!--BookmarkMenu Icon Style-->
     <Style x:Key="BookmarkMenuIconStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="Segoe UI Emoji"/>
@@ -478,10 +490,16 @@
                             BorderThickness="1"
                             CornerRadius="4"
                             Padding="{TemplateBinding Padding}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Icon}" Style="{StaticResource BookmarkListBoxItemIconStyle}"/>
-                            <ContentPresenter/>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto" MaxWidth="360"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Icon}" Style="{StaticResource BookmarkListBoxItemIconStyle}"/>
+                            <ContentPresenter Grid.Column="1" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" x:Name="PART_Location" Text="{Binding CurrentBookmark.Location}" Style="{StaticResource BookmarkListBoxItemLocationStyle}"/>
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
@@ -491,8 +509,37 @@
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="{StaticResource PrimaryBrush}"/>
                         </Trigger>
+                        <DataTrigger Binding="{Binding IsFolder}" Value="False">
+                            <Setter TargetName="PART_Location" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="名称" HorizontalAlignment="Right"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="："/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Name}"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="路径" HorizontalAlignment="Right"
+                               Visibility="{Binding IsFolder,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="："
+                               Visibility="{Binding IsFolder,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding CurrentBookmark.Location}"
+                               Visibility="{Binding IsFolder,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
+                </Grid>
             </Setter.Value>
         </Setter>
         <Style.Triggers>

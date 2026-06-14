@@ -158,16 +158,37 @@ namespace ExplorerTabUtility.UI.Views
 
         private void TvFolder_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action)
         {
+            var isFocusedTreeView = FocusManager.GetFocusedElement(this) is TreeViewItem;
             switch (action)
             {
+                case BookmarkAction.Delete:
+                    if (isFocusedTreeView)
+                    {
+                        TvFolder.Delete();
+                    }
+                    else
+                    {
+                        DeleteSelectedItems();
+                    }
+                    break;
+                case BookmarkAction.Rename:
+                    if (isFocusedTreeView)
+                    {
+                        TvFolder.Rename();
+                    }
+                    else
+                    {
+                        Edit(info);
+                    }
+                    break;
                 case BookmarkAction.Cut:
-                    Cut(FocusManager.GetFocusedElement(this) is TreeViewItem);
+                    Cut(isFocusedTreeView);
                     break;
                 case BookmarkAction.Copy:
-                    Copy(FocusManager.GetFocusedElement(this) is TreeViewItem);
+                    Copy(isFocusedTreeView);
                     break;
                 case BookmarkAction.Paste:
-                    Paste(FocusManager.GetFocusedElement(this) is TreeViewItem);
+                    Paste(isFocusedTreeView);
                     break;
             }
         }

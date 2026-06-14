@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.UI.Commands;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
@@ -219,9 +220,9 @@ namespace ExplorerTabUtility.Models
             if (CurrentBookmark != BookmarkInfo.Empty)
             {
 #if NET481
-                if (CurrentBookmark.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+                if (CurrentBookmark.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1 || CurrentBookmark.Location.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
 #elif NET9_0
-                if (CurrentBookmark.Name.Contains(key, StringComparison.OrdinalIgnoreCase))
+                if (CurrentBookmark.Name.Contains(key, StringComparison.OrdinalIgnoreCase) || CurrentBookmark.Location.Contains(key, StringComparison.OrdinalIgnoreCase))
 #endif
                 {
                     yield return this;
@@ -229,13 +230,16 @@ namespace ExplorerTabUtility.Models
             }
             else
             {
-#if NET481
-                if (CurrentFolder.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
-#elif NET9_0
-                if (CurrentFolder.Name.Contains(key, StringComparison.OrdinalIgnoreCase))
-#endif
+                if (BookmarkManager.IsMainOrOtherFolder(CurrentFolder) == false)
                 {
-                    yield return this;
+#if NET481
+                    if (CurrentFolder.Name.IndexOf(key, StringComparison.OrdinalIgnoreCase) != -1)
+#elif NET9_0
+                    if (CurrentFolder.Name.Contains(key, StringComparison.OrdinalIgnoreCase))
+#endif
+                    {
+                        yield return this;
+                    }
                 }
 
                 foreach (var item in children)

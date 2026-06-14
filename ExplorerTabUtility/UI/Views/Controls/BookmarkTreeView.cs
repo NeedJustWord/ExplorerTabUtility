@@ -89,7 +89,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         /// <summary>
         /// 重命名
         /// </summary>
-        private void Rename()
+        public void Rename()
         {
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
@@ -97,7 +97,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             info.IsEditMode = true;
         }
 
-        private void Delete()
+        public void Delete()
         {
             if (withBookmark)
             {
@@ -208,15 +208,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             switch (action)
             {
-                case BookmarkAction.Delete:
-                    Delete();
-                    break;
-                case BookmarkAction.Rename:
-                    Rename();
-                    break;
                 case BookmarkAction.NewFolder:
                     AddFolder(out _);
                     break;
+                case BookmarkAction.Delete:
+                case BookmarkAction.Rename:
                 case BookmarkAction.Cut:
                 case BookmarkAction.Copy:
                 case BookmarkAction.Paste:

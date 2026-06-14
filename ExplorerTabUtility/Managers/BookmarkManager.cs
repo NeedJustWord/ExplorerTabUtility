@@ -96,6 +96,16 @@ namespace ExplorerTabUtility.Managers
         }
 
         /// <summary>
+        /// 判断是否书签栏或其他书签
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static bool IsMainOrOtherFolder(FolderInfo info)
+        {
+            return info.Id == folderInfo.Id || info.Id == otherFolderInfo.Id;
+        }
+
+        /// <summary>
         /// 判断是否其他书签或溢出书签
         /// </summary>
         /// <param name="info"></param>
