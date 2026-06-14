@@ -238,7 +238,7 @@
         <MenuItem Header="粘贴"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
-                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=CanPaste}"/>
+                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
     </ContextMenu>
 
     <!-- 文件夹的右键菜单 -->
@@ -259,7 +259,7 @@
         <MenuItem Header="粘贴"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
-                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=CanPaste}"/>
+                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
     </ContextMenu>
 
     <!-- 书签的右键菜单 -->
@@ -290,7 +290,7 @@
         <MenuItem Header="粘贴"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
-                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=CanPaste}"/>
+                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
     </ContextMenu>
     <!--#endregion-->
 
@@ -401,7 +401,7 @@
         <MenuItem Header="粘贴"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
-                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=CanPaste}"/>
+                  IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=TreeViewCanPaste}"/>
     </ContextMenu>
     <!--#endregion-->
     <!--#endregion-->

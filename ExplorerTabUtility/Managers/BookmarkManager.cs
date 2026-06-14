@@ -335,14 +335,100 @@ namespace ExplorerTabUtility.Managers
 
         internal class Clipboard : BindableBase
         {
-            private bool canPaste;
+            private bool treeViewCanPaste;
             /// <summary>
-            /// 是否可以粘贴
+            /// TreeView是否可以粘贴
             /// </summary>
-            public bool CanPaste
+            public bool TreeViewCanPaste
             {
-                get { return canPaste; }
-                set { SetProperty(ref canPaste, value); }
+                get { return treeViewCanPaste; }
+                set { SetProperty(ref treeViewCanPaste, value); }
+            }
+
+            private bool listBoxCanPaste;
+            /// <summary>
+            /// ListBox是否可以粘贴
+            /// </summary>
+            public bool ListBoxCanPaste
+            {
+                get { return listBoxCanPaste; }
+                private set { SetProperty(ref listBoxCanPaste, value); }
+            }
+
+            private bool isCopy;
+            private List<BookmarkTreeViewInfo> infos = new List<BookmarkTreeViewInfo>();
+
+            /// <summary>
+            /// 剪切
+            /// </summary>
+            /// <param name="infos"></param>
+            /// <param name="isNotSearch"></param>
+            public void Cut(List<BookmarkTreeViewInfo> infos, bool isNotSearch)
+            {
+                this.infos = infos;
+                ListBoxCanPaste = isNotSearch;
+                TreeViewCanPaste = true;
+                isCopy = false;
+            }
+
+            /// <summary>
+            /// 复制
+            /// </summary>
+            /// <param name="infos"></param>
+            /// <param name="isNotSearch"></param>
+            public void Copy(List<BookmarkTreeViewInfo> infos, bool isNotSearch)
+            {
+                this.infos = infos;
+                ListBoxCanPaste = isNotSearch;
+                TreeViewCanPaste = true;
+                isCopy = true;
+            }
+
+            /// <summary>
+            /// 设置ListBox是否可以粘贴
+            /// </summary>
+            /// <param name="isNotSearch"></param>
+            public void SetListBoxCanPaste(bool isNotSearch)
+            {
+                ListBoxCanPaste = infos.Count > 0 && isNotSearch;
+            }
+
+            /// <summary>
+            /// 获取剪切板信息
+            /// </summary>
+            /// <param name="parentLevel"></param>
+            /// <returns></returns>
+            public List<BookmarkTreeViewInfo> GetInfos(int parentLevel)
+            {
+                if (isCopy)
+                {
+                    var result = new List<BookmarkTreeViewInfo>(infos.Count);
+                    foreach (var item in infos)
+                    {
+                        result.Add(item.Copy(Guid.NewGuid, parentLevel));
+                    }
+                    return result;
+                }
+                else
+                {
+                    isCopy = true;
+                    var level = parentLevel + 1;
+                    foreach (var item in infos)
+                    {
+                        SetLevel(item, level);
+                    }
+                    return infos;
+                }
+            }
+
+            private void SetLevel(BookmarkTreeViewInfo info, int level)
+            {
+                info.Level = level;
+                level++;
+                foreach (var item in info.Children)
+                {
+                    SetLevel(item, level);
+                }
             }
         }
 

@@ -94,10 +94,29 @@ namespace ExplorerTabUtility.Models
             set { SetProperty(ref children, value); }
         }
 
+        private BookmarkTreeViewInfo? parent;
         /// <summary>
         /// 父节点
         /// </summary>
-        public BookmarkTreeViewInfo? Parent { get; }
+        public BookmarkTreeViewInfo? Parent
+        {
+            get { return parent; }
+            private set { SetProperty(ref parent, value); }
+        }
+
+        private int level;
+        /// <summary>
+        /// 节点等级
+        /// </summary>
+        public int Level
+        {
+            get { return level; }
+            set
+            {
+                SetProperty(ref level, value);
+                RaisePropertyChanged(nameof(FirstLevel));
+            }
+        }
 
         /// <summary>
         /// 保存路径
@@ -113,11 +132,6 @@ namespace ExplorerTabUtility.Models
         /// 当前书签
         /// </summary>
         public BookmarkInfo CurrentBookmark { get; }
-
-        /// <summary>
-        /// 节点等级
-        /// </summary>
-        public int Level { get; }
 
         /// <summary>
         /// 是否第一层节点
@@ -161,6 +175,9 @@ namespace ExplorerTabUtility.Models
         #endregion
 
         private readonly string oldName;
+        private readonly ObservableCollection<BookmarkTreeViewInfo> emptyChildren = [];
+        private readonly Action<BookmarkTreeViewInfo, FolderInfo, BookmarkAction>? folderInfoMenuClickAction;
+        private readonly Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkAction>? bookmarkInfoMenuClickAction;
 
         public BookmarkTreeViewInfo(BookmarkInfo bookmarkInfo, int level, BookmarkTreeViewInfo? parent, Action<BookmarkTreeViewInfo, BookmarkInfo, BookmarkAction> menuClickAction)
         {
@@ -172,11 +189,12 @@ namespace ExplorerTabUtility.Models
             Visibility = Visibility.Collapsed;
             IsFolder = false;
 
-            children = [];
+            children = emptyChildren;
             icon = GetIcon(true, false, false);
             expandedIcon = icon;
             oldName = name = bookmarkInfo.Name;
 
+            bookmarkInfoMenuClickAction = menuClickAction;
             MenuClickCommand = new RelayCommand((args) =>
             {
                 if (args is BookmarkAction action)
@@ -201,11 +219,71 @@ namespace ExplorerTabUtility.Models
             expandedIcon = GetIcon(false, true, isSpecil);
             oldName = name = folderInfo.Name;
 
+            folderInfoMenuClickAction = menuClickAction;
             MenuClickCommand = new RelayCommand((args) =>
             {
                 if (args is BookmarkAction action)
                 {
                     menuClickAction.Invoke(this, CurrentFolder, action);
+                }
+            });
+        }
+
+        private BookmarkTreeViewInfo(BookmarkTreeViewInfo target, int parentLevel, BookmarkInfo bookmarkInfo)
+        {
+            Parent = target.parent;
+            SaveFolderItem = new SaveFolderItem(bookmarkInfo.Id, bookmarkInfo.Name, bookmarkInfo.Location);
+            CurrentFolder = FolderInfo.Empty;
+            CurrentBookmark = bookmarkInfo;
+            Level = parentLevel + 1;
+            Visibility = Visibility.Collapsed;
+            IsFolder = false;
+
+            children = emptyChildren;
+            icon = target.icon;
+            expandedIcon = target.expandedIcon;
+            oldName = name = bookmarkInfo.Name;
+
+            bookmarkInfoMenuClickAction = target.bookmarkInfoMenuClickAction;
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkAction action)
+                {
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+                    bookmarkInfoMenuClickAction.Invoke(this, CurrentBookmark, action);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
+                }
+            });
+        }
+
+        private BookmarkTreeViewInfo(BookmarkTreeViewInfo target, int parentLevel, FolderInfo folderInfo, Func<Guid> guidFactory)
+        {
+            Parent = target.parent;
+            SaveFolderItem = new SaveFolderItem(folderInfo.Id, folderInfo.Name);
+            CurrentFolder = folderInfo;
+            CurrentBookmark = BookmarkInfo.Empty;
+            Level = parentLevel + 1;
+            Visibility = Visibility.Visible;
+            IsFolder = true;
+
+            children = [];
+            foreach (var item in target.children)
+            {
+                children.Add(item.Copy(guidFactory, Level));
+            }
+
+            icon = target.icon;
+            expandedIcon = target.expandedIcon;
+            oldName = name = folderInfo.Name;
+
+            folderInfoMenuClickAction = target.folderInfoMenuClickAction;
+            MenuClickCommand = new RelayCommand((args) =>
+            {
+                if (args is BookmarkAction action)
+                {
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+                    folderInfoMenuClickAction.Invoke(this, CurrentFolder, action);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
                 }
             });
         }
@@ -288,6 +366,51 @@ namespace ExplorerTabUtility.Models
         {
             SaveFolderItem.Key = CurrentFolder.Id;
             SaveFolderItem.Display = CurrentFolder.Name;
+        }
+
+        /// <summary>
+        /// 复制
+        /// </summary>
+        /// <param name="guidFactory">Id工厂</param>
+        /// <param name="parentLevel">父节点等级</param>
+        /// <returns></returns>
+        public BookmarkTreeViewInfo Copy(Func<Guid> guidFactory, int parentLevel)
+        {
+            if (IsFolder)
+            {
+                var copy = CurrentFolder.Copy();
+                copy.Id = guidFactory();
+                return new BookmarkTreeViewInfo(this, parentLevel, copy, guidFactory);
+            }
+            else
+            {
+                var copy = CurrentBookmark.Copy();
+                copy.Id = guidFactory();
+                return new BookmarkTreeViewInfo(this, parentLevel, copy);
+            }
+        }
+
+        /// <summary>
+        /// 粘贴
+        /// </summary>
+        /// <param name="infos">粘贴信息</param>
+        /// <param name="index">粘贴位置</param>
+        public void Paste(List<BookmarkTreeViewInfo> infos, int index)
+        {
+            if (index == -1)
+            {
+                index = Children.Count;
+            }
+
+            BookmarkTreeViewInfo item;
+            for (int i = infos.Count - 1; i >= 0; i--)
+            {
+                item = infos[i];
+                item.Parent = this;
+                Children.Insert(index, item);
+            }
+
+            RaisePropertyChanged(nameof(HasVisibilityItems));
         }
 
         public void Delete(BookmarkTreeViewInfo info)

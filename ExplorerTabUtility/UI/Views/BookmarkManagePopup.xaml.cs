@@ -100,20 +100,30 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Cut(bool isFocusedTreeView)
         {
-            //todo:Cut
-            BookmarkManager.ClipboardManager.CanPaste = true;
+            var cutInfos = GetOperateInfos(isFocusedTreeView);
+            BookmarkManager.ClipboardManager.Cut(cutInfos, string.IsNullOrEmpty(TxtSearch.Text));
+            TvFolder.Cut(cutInfos);
         }
 
         private void Copy(bool isFocusedTreeView)
         {
-            //todo:Copy
-            BookmarkManager.ClipboardManager.CanPaste = true;
+            var cutInfos = GetOperateInfos(isFocusedTreeView);
+            BookmarkManager.ClipboardManager.Copy(cutInfos, string.IsNullOrEmpty(TxtSearch.Text));
         }
 
         private void Paste(bool isFocusedTreeView)
         {
-            //todo:Paste
-            BookmarkManager.ClipboardManager.CanPaste = false;
+            var parent = (BookmarkTreeViewInfo)TvFolder.SelectedItem;
+            var infos = BookmarkManager.ClipboardManager.GetInfos(parent.Level);
+            parent.Paste(infos, isFocusedTreeView ? -1 : LbChildren.SelectedIndex + 1);
+            parent.IsSelected = true;
+        }
+
+        private List<BookmarkTreeViewInfo> GetOperateInfos(bool isFocusedTreeView)
+        {
+            return isFocusedTreeView
+                ? [(BookmarkTreeViewInfo)TvFolder.SelectedItem]
+                : LbChildren.SelectedItems.Cast<BookmarkTreeViewInfo>().ToList();
         }
         #endregion
 
@@ -151,6 +161,24 @@ namespace ExplorerTabUtility.UI.Views
                         var info = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
                         Edit(info);
                         e.Handled = true;
+                    }
+                    break;
+                case Key.X:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
+                    {
+                        Cut(false);
+                    }
+                    break;
+                case Key.C:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
+                    {
+                        Copy(false);
+                    }
+                    break;
+                case Key.V:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
+                    {
+                        Paste(false);
                     }
                     break;
             }
@@ -229,11 +257,13 @@ namespace ExplorerTabUtility.UI.Views
             var key = TxtSearch.Text;
             if (string.IsNullOrEmpty(key))
             {
+                BookmarkManager.ClipboardManager.SetListBoxCanPaste(true);
                 var info = (BookmarkTreeViewInfo)TvFolder.SelectedItem;
                 if (info != null) LbChildren.ItemsSource = info.Children;
             }
             else
             {
+                BookmarkManager.ClipboardManager.SetListBoxCanPaste(false);
                 LbChildren.ItemsSource = TvFolder.Search(key);
             }
         }

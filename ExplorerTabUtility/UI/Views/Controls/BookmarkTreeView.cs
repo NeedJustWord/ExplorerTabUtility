@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
+using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
+using ExplorerTabUtility.WinAPI;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
 namespace ExplorerTabUtility.UI.Views.Controls
@@ -47,6 +49,36 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     break;
                 case Key.Delete:
                     Delete();
+                    break;
+                case Key.X:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        var info = (BookmarkTreeViewInfo)SelectedItem;
+                        if (info != null)
+                        {
+                            FolderHandle?.Invoke(info, info.CurrentFolder, BookmarkAction.Cut);
+                        }
+                    }
+                    break;
+                case Key.C:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        var info = (BookmarkTreeViewInfo)SelectedItem;
+                        if (info != null)
+                        {
+                            FolderHandle?.Invoke(info, info.CurrentFolder, BookmarkAction.Copy);
+                        }
+                    }
+                    break;
+                case Key.V:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        var info = (BookmarkTreeViewInfo)SelectedItem;
+                        if (info != null)
+                        {
+                            FolderHandle?.Invoke(info, info.CurrentFolder, BookmarkAction.Paste);
+                        }
+                    }
                     break;
             }
         }
@@ -122,6 +154,16 @@ namespace ExplorerTabUtility.UI.Views.Controls
             foreach (var item in datas)
             {
                 item.Delete(infos);
+            }
+        }
+
+        public void Cut(List<BookmarkTreeViewInfo> infos)
+        {
+            foreach (var item in infos)
+            {
+#pragma warning disable CS8602 // 解引用可能出现空引用。
+                item.Parent.Delete(item);
+#pragma warning restore CS8602 // 解引用可能出现空引用。
             }
         }
 
