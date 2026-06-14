@@ -193,6 +193,7 @@ namespace ExplorerTabUtility.UI.Views
             KeyDown += BookmarkSavePopup_KeyDown;
             BtnSave.Click += BtnSave_Click;
             BtnCancel.Click += BtnCancel_Click;
+            TvSelectSavePath.FolderHandle += TvSelectSavePath_FolderHandle;
         }
 
         private void SetupEventHandlers()
@@ -206,6 +207,19 @@ namespace ExplorerTabUtility.UI.Views
             if (saveType == BookmarkSaveType.ComboBox)
             {
                 CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
+            }
+        }
+
+        private void TvSelectSavePath_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action)
+        {
+            switch (action)
+            {
+                case BookmarkAction.Rename:
+                    TvSelectSavePath.Rename();
+                    break;
+                case BookmarkAction.Delete:
+                    TvSelectSavePath.Delete();
+                    break;
             }
         }
 

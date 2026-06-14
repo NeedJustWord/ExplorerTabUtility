@@ -229,17 +229,17 @@
     <!--#region ListBoxItem右键菜单 -->
     <!-- 多选右键菜单 -->
     <ContextMenu x:Key="MultiSelectListBoxItemContextMenu">
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Delete"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
-        <MenuItem Header="剪切"
+        <MenuItem Header="剪切" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+X"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Cut}"/>
-        <MenuItem Header="复制"
+        <MenuItem Header="复制" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+C"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Copy}"/>
-        <MenuItem Header="粘贴"
+        <MenuItem Header="粘贴" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+V"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
                   IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
@@ -247,24 +247,24 @@
 
     <!-- 文件夹的右键菜单 -->
     <ContextMenu x:Key="FolderListBoxItemContextMenu">
-        <MenuItem Header="在文件夹中显示"
+        <MenuItem Header="在文件夹中显示" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+G"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.ShowInFolder}"
                   Visibility="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=IsSearch,Converter={StaticResource BoolToVisibilityConverter}}"/>
-        <MenuItem Header="重命名"
+        <MenuItem Header="重命名" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="F2"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Rename}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Delete"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
-        <MenuItem Header="剪切"
+        <MenuItem Header="剪切" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+X"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Cut}"/>
-        <MenuItem Header="复制"
+        <MenuItem Header="复制" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+C"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Copy}"/>
-        <MenuItem Header="粘贴"
+        <MenuItem Header="粘贴" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+V"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
                   IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
@@ -272,34 +272,34 @@
 
     <!-- 书签的右键菜单 -->
     <ContextMenu x:Key="BookmarkListBoxItemContextMenu">
-        <MenuItem Header="在文件夹中显示"
+        <MenuItem Header="在文件夹中显示" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+G"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.ShowInFolder}"
                   Visibility="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=IsSearch,Converter={StaticResource BoolToVisibilityConverter}}"/>
-        <MenuItem Header="编辑"
+        <MenuItem Header="编辑" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="F2"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Edit}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Delete"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
-        <MenuItem Header="在当前标签页打开"
+        <MenuItem Header="在当前标签页打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+O"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInCurrentTab}"/>
-        <MenuItem Header="在新标签页打开"
+        <MenuItem Header="在新标签页打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+T"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInNewTab}"/>
-        <MenuItem Header="在新窗口打开"
+        <MenuItem Header="在新窗口打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+W"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInNewWindow}"/>
         <Separator/>
-        <MenuItem Header="剪切"
+        <MenuItem Header="剪切" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+X"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Cut}"/>
-        <MenuItem Header="复制"
+        <MenuItem Header="复制" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+C"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Copy}"/>
-        <MenuItem Header="粘贴"
+        <MenuItem Header="粘贴" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+V"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
                   IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ListBoxCanPaste}"/>
@@ -309,64 +309,64 @@
     <!--#region MenuItem右键菜单 -->
     <!-- 特殊文件夹的右键菜单 -->
     <ContextMenu x:Key="SpecialFolderMenuItemContextMenu">
-        <MenuItem Header="新建文件夹"
+        <MenuItem Header="新建文件夹" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
-        <MenuItem Header="新建书签"
+        <MenuItem Header="新建书签" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewBookmark}"/>
         <Separator/>
-        <MenuItem Header="书签管理"
+        <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>
 
     <!-- 文件夹的右键菜单 -->
     <ContextMenu x:Key="FolderMenuItemContextMenu">
-        <MenuItem Header="新建文件夹"
+        <MenuItem Header="新建文件夹" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
-        <MenuItem Header="新建书签"
+        <MenuItem Header="新建书签" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewBookmark}"/>
-        <MenuItem Header="重命名"
+        <MenuItem Header="重命名" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Rename}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
-        <MenuItem Header="书签管理"
+        <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>
 
     <!-- 书签的右键菜单 -->
     <ContextMenu x:Key="BookmarkMenuItemContextMenu">
-        <MenuItem Header="在当前标签页打开"
+        <MenuItem Header="在当前标签页打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="LMB"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInCurrentTab}"/>
-        <MenuItem Header="在新标签页打开"
+        <MenuItem Header="在新标签页打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+LMB"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInNewTab}"/>
-        <MenuItem Header="在新窗口打开"
+        <MenuItem Header="在新窗口打开" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Shift+LMB"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.OpenInNewWindow}"/>
         <Separator/>
-        <MenuItem Header="新建文件夹"
+        <MenuItem Header="新建文件夹" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
-        <MenuItem Header="新建书签"
+        <MenuItem Header="新建书签" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewBookmark}"/>
-        <MenuItem Header="编辑"
+        <MenuItem Header="编辑" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Edit}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
-        <MenuItem Header="书签管理"
+        <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>
@@ -375,42 +375,41 @@
     <!--#region TreeViewItem右键菜单 -->
     <!-- 保存界面右键菜单 -->
     <ContextMenu x:Key="SaveTreeViewItemContextMenu">
-        <MenuItem Header="重命名"
+        <MenuItem Header="重命名" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="F2"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Rename}"
                   Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Delete"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"
                   Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="新建文件夹"
+        <MenuItem Header="新建文件夹" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+N"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
     </ContextMenu>
 
     <!-- 管理界面右键菜单 -->
     <ContextMenu x:Key="ManageTreeViewItemContextMenu">
-        <MenuItem Header="重命名"
+        <MenuItem Header="重命名" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="F2"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Rename}"
                   Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="删除"
+        <MenuItem Header="删除" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Delete"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"
                   Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="新建文件夹"
+        <MenuItem Header="新建文件夹" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+N"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.NewFolder}"/>
         <Separator/>
-        <MenuItem Header="剪切"
+        <MenuItem Header="剪切" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+X"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Cut}"
                   Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="复制"
+        <MenuItem Header="复制" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+C"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                  CommandParameter="{x:Static models:BookmarkAction.Copy}"
-                  Visibility="{Binding FirstLevel,Converter={StaticResource BoolToVisibilityConverter},ConverterParameter={x:Static Visibility.Collapsed}}"/>
-        <MenuItem Header="粘贴"
+                  CommandParameter="{x:Static models:BookmarkAction.Copy}"/>
+        <MenuItem Header="粘贴" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+V"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.Paste}"
                   IsEnabled="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=TreeViewCanPaste}"/>

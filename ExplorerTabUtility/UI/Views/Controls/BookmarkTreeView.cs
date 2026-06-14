@@ -54,7 +54,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
                     {
                         var info = (BookmarkTreeViewInfo)SelectedItem;
-                        if (info != null)
+                        if (info != null && info.FirstLevel == false)
                         {
                             FolderHandle?.Invoke(info, info.CurrentFolder, BookmarkAction.Cut);
                         }
@@ -74,9 +74,19 @@ namespace ExplorerTabUtility.UI.Views.Controls
                     if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
                     {
                         var info = (BookmarkTreeViewInfo)SelectedItem;
-                        if (info != null)
+                        if (info != null && BookmarkManager.ClipboardManager.TreeViewCanPaste)
                         {
                             FolderHandle?.Invoke(info, info.CurrentFolder, BookmarkAction.Paste);
+                        }
+                    }
+                    break;
+                case Key.N:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        var info = (BookmarkTreeViewInfo)SelectedItem;
+                        if (info != null)
+                        {
+                            AddFolder(out _);
                         }
                     }
                     break;
@@ -131,14 +141,14 @@ namespace ExplorerTabUtility.UI.Views.Controls
 
         public void Delete()
         {
-            if (withBookmark)
-            {
-                Delete([(BookmarkTreeViewInfo)SelectedItem]);
-                return;
-            }
-
             var info = (BookmarkTreeViewInfo)SelectedItem;
             if (info == null || info.Parent == null) return;
+
+            if (withBookmark)
+            {
+                Delete([info]);
+                return;
+            }
 
             BookmarkManager.Delete(info.Parent.CurrentFolder, info.CurrentFolder);
             info.Parent.Delete(info);

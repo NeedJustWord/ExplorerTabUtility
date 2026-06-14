@@ -175,13 +175,13 @@ namespace ExplorerTabUtility.UI.Views
                     }
                     break;
                 case Key.X:
-                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
                     {
                         Cut(false);
                     }
                     break;
                 case Key.C:
-                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
                     {
                         Copy(false);
                     }
@@ -190,6 +190,42 @@ namespace ExplorerTabUtility.UI.Views
                     if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.ListBoxCanPaste)
                     {
                         Paste(false);
+                    }
+                    break;
+                case Key.G:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && BookmarkManager.ClipboardManager.IsSearch && LbChildren.SelectedItems.Count == 1)
+                    {
+                        ShowInFolder();
+                    }
+                    break;
+                case Key.O:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && LbChildren.SelectedItems.Count == 1)
+                    {
+                        var info = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
+                        if (info.IsFolder == false)
+                        {
+                            TvFolder_BookmarkHandle(info, info.CurrentBookmark, BookmarkAction.OpenInCurrentTab);
+                        }
+                    }
+                    break;
+                case Key.T:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && LbChildren.SelectedItems.Count == 1)
+                    {
+                        var info = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
+                        if (info.IsFolder == false)
+                        {
+                            TvFolder_BookmarkHandle(info, info.CurrentBookmark, BookmarkAction.OpenInNewTab);
+                        }
+                    }
+                    break;
+                case Key.W:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control) && LbChildren.SelectedItems.Count == 1)
+                    {
+                        var info = (BookmarkTreeViewInfo)LbChildren.SelectedItem;
+                        if (info.IsFolder == false)
+                        {
+                            TvFolder_BookmarkHandle(info, info.CurrentBookmark, BookmarkAction.OpenInNewWindow);
+                        }
                     }
                     break;
             }
