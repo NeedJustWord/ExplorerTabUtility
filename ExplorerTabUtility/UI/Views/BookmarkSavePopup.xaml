@@ -51,13 +51,13 @@
 
             <StackPanel Grid.Row="6" Grid.Column="0" HorizontalAlignment="Left">
                 <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"
-                        Content="新建文件夹"/>
+                        Content="新建文件夹" ToolTip="Ctrl+N"/>
             </StackPanel>
 
             <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="BtnSave" Style="{StaticResource BookmarkButtonStyle}"
+                <Button x:Name="BtnSave" Style="{StaticResource BookmarkButtonStyle}" ToolTip="Ctrl+S"
                         Content="{Binding LanguageFields.Save,Source={x:Static language:LangeuageHelper.Instance}}"/>
-                <Button x:Name="BtnCancel" Style="{StaticResource BookmarkButtonStyle}"
+                <Button x:Name="BtnCancel" Style="{StaticResource BookmarkButtonStyle}" ToolTip="Esc"
                         Content="{Binding LanguageFields.Cancel,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
         </Grid>

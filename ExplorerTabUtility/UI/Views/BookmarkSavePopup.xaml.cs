@@ -7,6 +7,7 @@ using ExplorerTabUtility.Hooks;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
+using ExplorerTabUtility.WinAPI;
 using SaveFolderItem = ExplorerTabUtility.Models.ComboBoxItemInfo<System.Guid>;
 
 namespace ExplorerTabUtility.UI.Views
@@ -187,6 +188,49 @@ namespace ExplorerTabUtility.UI.Views
             CloseWindow();
         }
 
+        private void Save()
+        {
+            if (bookmarkTreeViewInfo != null)
+            {
+                bookmarkTreeViewInfo.Update(TxtName.Text, TxtLocation.Text);
+                if (bookmarkTreeViewInfo.IsFolder)
+                {
+                    BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, false);
+                }
+                DialogResult = true;
+            }
+            else if (saveType == BookmarkSaveType.FolderRename)
+            {
+                if (BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
+                {
+                    ShowMessage("保存失败", Constants.AppName);
+                    return;
+                }
+
+                DialogResult = true;
+            }
+            else
+            {
+                var saveFolder = GetSaveFolder();
+                if (saveFolder == null)
+                {
+                    ShowMessage("请选择要保存的路径", Constants.AppName);
+                    return;
+                }
+
+                if (BookmarkManager.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
+                {
+                    ShowMessage("保存失败", Constants.AppName);
+                    return;
+                }
+
+                currentBookmarkInfo.ParentId = saveFolder.Key;
+                if (isEdit.HasValue) DialogResult = true;
+            }
+
+            CloseWindow(false);
+        }
+
         #region 事件注册
         private void SetupBaseEventHandlers()
         {
@@ -235,45 +279,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
         {
-            if (bookmarkTreeViewInfo != null)
-            {
-                bookmarkTreeViewInfo.Update(TxtName.Text, TxtLocation.Text);
-                if (bookmarkTreeViewInfo.IsFolder)
-                {
-                    BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, false);
-                }
-                DialogResult = true;
-            }
-            else if (saveType == BookmarkSaveType.FolderRename)
-            {
-                if (BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
-                {
-                    ShowMessage("保存失败", Constants.AppName);
-                    return;
-                }
-
-                DialogResult = true;
-            }
-            else
-            {
-                var saveFolder = GetSaveFolder();
-                if (saveFolder == null)
-                {
-                    ShowMessage("请选择要保存的路径", Constants.AppName);
-                    return;
-                }
-
-                if (BookmarkManager.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
-                {
-                    ShowMessage("保存失败", Constants.AppName);
-                    return;
-                }
-
-                currentBookmarkInfo.ParentId = saveFolder.Key;
-                if (isEdit.HasValue) DialogResult = true;
-            }
-
-            CloseWindow(false);
+            Save();
         }
 
         private void BtnNewFolder_Click(object sender, RoutedEventArgs e)
@@ -308,9 +314,17 @@ namespace ExplorerTabUtility.UI.Views
 
         private void BookmarkSavePopup_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            switch (e.Key)
             {
-                CloseWindow(true);
+                case Key.Escape:
+                    CloseWindow(true);
+                    break;
+                case Key.S:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        Save();
+                    }
+                    break;
             }
         }
         #endregion

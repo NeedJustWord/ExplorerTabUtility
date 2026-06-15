@@ -317,6 +317,7 @@
                   CommandParameter="{x:Static models:BookmarkAction.NewBookmark}"/>
         <Separator/>
         <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
+                  InputGestureText="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ManageHotKey}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>
@@ -337,6 +338,7 @@
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
         <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
+                  InputGestureText="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ManageHotKey}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>
@@ -367,6 +369,7 @@
                   CommandParameter="{x:Static models:BookmarkAction.Delete}"/>
         <Separator/>
         <MenuItem Header="书签管理" Style="{StaticResource TextBoxContextMenuItemStyle}"
+                  InputGestureText="{Binding Source={x:Static managers:BookmarkManager.ClipboardManager},Path=ManageHotKey}"
                   Command="{Binding PlacementTarget.DataContext.MenuClickCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                   CommandParameter="{x:Static models:BookmarkAction.BookmarkManage}"/>
     </ContextMenu>

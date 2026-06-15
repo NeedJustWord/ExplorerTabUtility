@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
+using ExplorerTabUtility.WinAPI;
+using HKey = H.Hooks.Key;
 
 namespace ExplorerTabUtility.UI.Views
 {
@@ -12,6 +18,8 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkNavigatePopup : BaseBookmarkWindow
     {
+        private Key[] hotKeys;
+
         public BookmarkNavigatePopup(ExplorerWatcher explorerWatcher, nint windowHandle) : base(explorerWatcher, windowHandle)
         {
             InitializeComponent();
@@ -23,10 +31,95 @@ namespace ExplorerTabUtility.UI.Views
             BookmarkMenu.Width = Width = currentScreenWorkingArea.Width - margin * 2;
             BookmarkMenu.InitLayout();
 
+            hotKeys = GetBookmarkManagerHotKey();
             SetupEventHandlers();
         }
 
-        private void BookmarkManager()
+        private Key[] GetBookmarkManagerHotKey()
+        {
+            var profiles = JsonSerializer.Deserialize<List<HotKeyProfile>>(SettingsManager.HotKeyProfiles);
+            var profile = profiles?.FirstOrDefault(t => t.Action == HotKeyAction.BookmarkManage);
+            if (profile != null && profile.HotKeys?.Length > 0)
+            {
+                var keys = profile.HotKeys.Select(t => TryConvert(t, out var key) ? key : Key.None).ToArray();
+                if (keys.All(t => t != Key.None))
+                {
+                    BookmarkManager.ClipboardManager.ManageHotKey = profile.HotKeys.HotKeysToString().Replace(" ", "");
+                    return keys;
+                }
+            }
+
+            BookmarkManager.ClipboardManager.ManageHotKey = "Ctrl+B";
+            return [Key.LeftCtrl, Key.B];
+        }
+
+        private bool TryConvert(HKey key, out Key result)
+        {
+            switch (key)
+            {
+                case HKey.Ctrl:
+                case HKey.LeftCtrl:
+                case HKey.RightCtrl:
+                    result = Key.LeftCtrl;
+                    return true;
+                case HKey.Shift:
+                case HKey.LeftShift:
+                case HKey.RightShift:
+                    result = Key.LeftShift;
+                    return true;
+                case HKey.Alt:
+                case HKey.LeftAlt:
+                case HKey.RightAlt:
+                    result = Key.LeftAlt;
+                    return true;
+                case HKey.LWin:
+                    result = Key.LWin;
+                    return true;
+                case HKey.RWin:
+                    result = Key.RWin;
+                    return true;
+            }
+            return Enum.TryParse(key.ToString(), out result);
+        }
+
+        private bool IsPressedBookmarkManagerHotKey(Key key)
+        {
+            foreach (var item in hotKeys)
+            {
+                VirtualKey? virtualKey = null;
+                switch (item)
+                {
+                    case Key.LeftCtrl:
+                        virtualKey = VirtualKey.Control;
+                        break;
+                    case Key.LeftShift:
+                        virtualKey = VirtualKey.Shift;
+                        break;
+                    case Key.LeftAlt:
+                        virtualKey = VirtualKey.Alt;
+                        break;
+                    case Key.LWin:
+                        virtualKey = VirtualKey.LWin;
+                        break;
+                    case Key.RWin:
+                        virtualKey = VirtualKey.RWin;
+                        break;
+                    default:
+                        if (item != key)
+                        {
+                            return false;
+                        }
+                        break;
+                }
+                if (virtualKey != null && KeyboardSimulator.IsKeyPressed((int)virtualKey) == false)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void ShowBookmarkManager()
         {
             var popup = new BookmarkManagePopup(explorerWatcher, windowHandle, true);
             EntryDialog();
@@ -85,7 +178,7 @@ namespace ExplorerTabUtility.UI.Views
                     ExitDialog();
                     break;
                 case BookmarkAction.BookmarkManage:
-                    BookmarkManager();
+                    ShowBookmarkManager();
                     break;
                 case BookmarkAction.NewBookmark:
                     NewBookmark(folder.Id);
@@ -122,7 +215,7 @@ namespace ExplorerTabUtility.UI.Views
                     ExitDialog();
                     break;
                 case BookmarkAction.BookmarkManage:
-                    BookmarkManager();
+                    ShowBookmarkManager();
                     break;
                 case BookmarkAction.NewBookmark:
                     NewBookmark(info.GetParentId());
@@ -140,6 +233,10 @@ namespace ExplorerTabUtility.UI.Views
             if (e.Key == Key.Escape)
             {
                 CloseWindow();
+            }
+            else if (IsPressedBookmarkManagerHotKey(e.Key))
+            {
+                ShowBookmarkManager();
             }
         }
 

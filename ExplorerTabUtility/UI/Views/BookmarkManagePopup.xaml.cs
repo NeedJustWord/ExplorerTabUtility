@@ -151,6 +151,16 @@ namespace ExplorerTabUtility.UI.Views
             LbChildren.KeyDown += LbChildren_KeyDown;
             TxtSearch.GotFocus += TxtSearch_GotFocus;
             TxtSearch.TextChanged += TxtSearch_TextChanged;
+            TxtSearch.KeyDown += TxtSearch_KeyDown;
+        }
+
+        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && LbChildren.ItemsSource.GetEnumerator().MoveNext())
+            {
+                LbChildren.Focus();
+                LbChildren.SelectedIndex = 0;
+            }
         }
 
         private void TxtSearch_GotFocus(object sender, RoutedEventArgs e)
@@ -305,7 +315,7 @@ namespace ExplorerTabUtility.UI.Views
             }
         }
 
-        private void TxtSearch_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             var key = TxtSearch.Text;
             if (string.IsNullOrEmpty(key))

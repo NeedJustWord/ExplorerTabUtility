@@ -365,6 +365,16 @@ namespace ExplorerTabUtility.Managers
                 set { SetProperty(ref isSearch, value); }
             }
 
+            private string? manageHotKey;
+            /// <summary>
+            /// 书签管理热键
+            /// </summary>
+            public string? ManageHotKey
+            {
+                get { return manageHotKey; }
+                set { SetProperty(ref manageHotKey, value); }
+            }
+
             private bool isCopy;
             private List<BookmarkTreeViewInfo> infos = new List<BookmarkTreeViewInfo>();
 
