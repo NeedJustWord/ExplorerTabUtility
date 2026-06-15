@@ -313,6 +313,47 @@ namespace ExplorerTabUtility.Managers
             lastSaveFolders.Add(folder.Id, info);
         }
 
+        public static string Export()
+        {
+            return JsonSerializer.Serialize(bookmarks);
+        }
+
+        public static bool Import(string json)
+        {
+            FolderInfo? data;
+            try
+            {
+                data = JsonSerializer.Deserialize<FolderInfo>(json);
+                if (data == null) return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            UpdateId(data);
+            data.Name = "导入书签";
+            folderInfo.Items.Add(data);
+
+            return true;
+        }
+
+        private static void UpdateId(FolderInfo data)
+        {
+            data.Id = Guid.NewGuid();
+            foreach (var item in data.Items)
+            {
+                if (item is FolderInfo folder)
+                {
+                    UpdateId(folder);
+                }
+                else
+                {
+                    item.Id = Guid.NewGuid();
+                }
+            }
+        }
+
         /// <summary>
         /// 保存配置
         /// </summary>

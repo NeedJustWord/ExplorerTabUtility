@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
 using ExplorerTabUtility.WinAPI;
+using Microsoft.Win32;
 
 namespace ExplorerTabUtility.UI.Views
 {
@@ -18,6 +22,7 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkManagePopup : BaseBookmarkWindow
     {
+        private string fileFilter;
         private bool needDialogResult;
         private readonly string initBookmarkJson;
 
@@ -28,6 +33,7 @@ namespace ExplorerTabUtility.UI.Views
             Init(needDialogResult);
             SetupEventHandlers();
 
+            fileFilter = GetFileFilter();
             initBookmarkJson = GetJson(TvFolder.CopyFolderInfos());
         }
 
@@ -44,6 +50,13 @@ namespace ExplorerTabUtility.UI.Views
         {
             this.needDialogResult = needDialogResult;
             TvFolder.SetItemsSource(BookmarkManager.Bookmarks, BookmarkManager.Folder.Id, true);
+        }
+
+        private string GetFileFilter()
+        {
+            var jsonFiles = LangeuageHelper.Instance.LanguageFields.JsonFiles;
+            var allFiles = LangeuageHelper.Instance.LanguageFields.AllFiles;
+            return $"{jsonFiles}|*.json|{allFiles}|*.*";
         }
 
         private void CloseWindow(bool isCancel)
@@ -136,6 +149,54 @@ namespace ExplorerTabUtility.UI.Views
 #pragma warning restore CS8602 // 解引用可能出现空引用。
             LbChildren.SelectedItem = showItem;
         }
+
+        private void Import()
+        {
+            var ofd = new OpenFileDialog
+            {
+                FileName = Constants.BookmarksFileName,
+                Filter = fileFilter,
+            };
+            if (ofd.ShowDialog() != true) return;
+
+            var jsonString = System.IO.File.ReadAllText(ofd.FileName, Encoding.UTF8);
+            if (BookmarkManager.Import(jsonString))
+            {
+                TvFolder.SetItemsSource(BookmarkManager.Bookmarks, BookmarkManager.Folder.Id, true);
+                ShowMessage("导入成功", Constants.AppName);
+            }
+            else
+            {
+                ShowMessage("导入失败", Constants.AppName, icon: MessageBoxImage.Error);
+            }
+        }
+
+        private void Export(bool save)
+        {
+            var fileName = Constants.BookmarksFileName.Insert(Constants.BookmarksFileName.IndexOf("."), DateTime.Now.ToString("yyyy-MM-dd"));
+            var sfd = new SaveFileDialog
+            {
+                FileName = fileName,
+                Filter = fileFilter,
+            };
+            if (sfd.ShowDialog() != true) return;
+
+            if (save)
+            {
+                var infos = TvFolder.CopyFolderInfos();
+                var afterJson = GetJson(infos);
+
+                if (afterJson != initBookmarkJson)
+                {
+                    BookmarkManager.Save(infos);
+                }
+            }
+
+            using var openFile = sfd.OpenFile();
+            var jsonString = BookmarkManager.Export();
+            var bytes = Encoding.UTF8.GetBytes(jsonString);
+            openFile.Write(bytes, 0, bytes.Length);
+        }
         #endregion
 
         #region 事件注册
@@ -152,6 +213,30 @@ namespace ExplorerTabUtility.UI.Views
             TxtSearch.GotFocus += TxtSearch_GotFocus;
             TxtSearch.TextChanged += TxtSearch_TextChanged;
             TxtSearch.KeyDown += TxtSearch_KeyDown;
+            MenuImport.Click += MenuImport_Click;
+            MenuExport.Click += MenuExport_Click;
+            MenuSaveAndExport.Click += MenuSaveAndExport_Click;
+            LangeuageHelper.Instance.OnLangeuageChanged += Instance_OnLangeuageChanged;
+        }
+
+        private void Instance_OnLangeuageChanged()
+        {
+            fileFilter = GetFileFilter();
+        }
+
+        private void MenuSaveAndExport_Click(object sender, RoutedEventArgs e)
+        {
+            Export(true);
+        }
+
+        private void MenuExport_Click(object sender, RoutedEventArgs e)
+        {
+            Export(false);
+        }
+
+        private void MenuImport_Click(object sender, RoutedEventArgs e)
+        {
+            Import();
         }
 
         private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
@@ -379,6 +464,25 @@ namespace ExplorerTabUtility.UI.Views
                     if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
                     {
                         CloseWindow(false);
+                    }
+                    break;
+                case Key.I:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        Import();
+                    }
+                    break;
+                case Key.E:
+                    if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Control))
+                    {
+                        if (KeyboardSimulator.IsKeyPressed((int)VirtualKey.Shift))
+                        {
+                            Export(true);
+                        }
+                        else
+                        {
+                            Export(false);
+                        }
                     }
                     break;
             }

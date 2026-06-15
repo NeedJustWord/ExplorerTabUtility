@@ -25,6 +25,28 @@
 
             <TextBlock Grid.Row="0" Text="书签管理" Style="{StaticResource BookmarkTitleTextBlockStyle}"/>
 
+            <Border Grid.Row="0" Grid.Column="2" Width="24" Height="24" CornerRadius="12" HorizontalAlignment="Right">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource ControlHoverBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <TextBlock x:Name="BtnMenu" Text="…" Style="{StaticResource BookmarkManageMenuTextBlockStyle}">
+                    <TextBlock.ContextMenu>
+                        <ContextMenu Placement="Left" HorizontalOffset="24">
+                            <MenuItem x:Name="MenuImport" Header="导入书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+I"/>
+                            <MenuItem x:Name="MenuExport" Header="导出书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+E"/>
+                            <MenuItem x:Name="MenuSaveAndExport" Header="保存并导出书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+Shift+E"/>
+                        </ContextMenu>
+                    </TextBlock.ContextMenu>
+                </TextBlock>
+            </Border>
+
             <TextBlock Grid.Row="1" Grid.Column="0" Text="书签文件夹" Style="{StaticResource BookmarkTextBlockStyle}"/>
 
             <TextBox x:Name="TxtSearch" Grid.Row="1" Grid.Column="2" Style="{StaticResource BookmarkSearchTextBoxStyle}" Tag="搜索书签(Ctrl+F)"/>

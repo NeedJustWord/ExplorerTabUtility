@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Models;
 
@@ -143,6 +144,65 @@ namespace ExplorerTabUtility.UI.Behaviors
 
                     scrollViewer.ScrollToHorizontalOffset(offset + diff);
                 }
+            }
+        }
+        #endregion
+
+        #region 左键点击时打开菜单
+        private static bool cancelOpen;
+
+        public static bool GetOpenContentMenuOnLeftClick(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(OpenContentMenuOnLeftClickProperty);
+        }
+
+        public static void SetOpenContentMenuOnLeftClick(DependencyObject obj, bool value)
+        {
+            obj.SetValue(OpenContentMenuOnLeftClickProperty, value);
+        }
+
+        public static readonly DependencyProperty OpenContentMenuOnLeftClickProperty =
+            DependencyProperty.RegisterAttached("OpenContentMenuOnLeftClick", typeof(bool), typeof(BookmarkHelper), new PropertyMetadata(false, OnOpenContentMenuOnLeftClickChanged));
+
+        private static void OnOpenContentMenuOnLeftClickChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is FrameworkElement element)
+            {
+                if ((bool)e.NewValue)
+                {
+                    element.PreviewMouseLeftButtonDown += Element_PreviewMouseLeftButtonDown;
+                    element.PreviewMouseRightButtonDown += Element_PreviewMouseRightButtonDown;
+                    element.ContextMenuOpening += Element_ContextMenuOpening;
+                }
+                else
+                {
+                    element.PreviewMouseLeftButtonDown -= Element_PreviewMouseLeftButtonDown;
+                    element.PreviewMouseRightButtonDown -= Element_PreviewMouseRightButtonDown;
+                    element.ContextMenuOpening -= Element_ContextMenuOpening;
+                }
+            }
+        }
+
+        private static void Element_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement element && element.ContextMenu != null)
+            {
+                cancelOpen = false;
+                element.ContextMenu.PlacementTarget = element;
+                element.ContextMenu.IsOpen = true;
+            }
+        }
+
+        private static void Element_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            cancelOpen = true;
+        }
+
+        private static void Element_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (cancelOpen)
+            {
+                e.Handled = true;
             }
         }
         #endregion
