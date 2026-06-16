@@ -822,16 +822,234 @@ namespace ExplorerTabUtility.Languages.Manager
         private string bookmarkManageToolTipDefaultValue = "Open bookmark manage popup to manage bookmarks.";
 
         /// <summary>
-        /// 管理书签
+        /// 导航书签
         /// </summary>
         public string BookmarkNavigate { get => Get(); set => Set(value); }
         private string bookmarkNavigateDefaultValue = "BookmarkNavigate";
 
         /// <summary>
-        /// 管理书签提示
+        /// 导航书签提示
         /// </summary>
         public string BookmarkNavigateToolTip { get => Get(); set => Set(value); }
         private string bookmarkNavigateToolTipDefaultValue = "Open bookmark navigate popup to open a new tab/window with the bookmark location.";
+        #endregion
+
+        #region 书签功能
+        #region 特殊目录名
+        /// <summary>
+        /// 此电脑
+        /// </summary>
+        public string ThisPc { get => Get(); set => Set(value); }
+        private string thisPcDefaultValue = "This PC";
+
+        /// <summary>
+        /// 回收站
+        /// </summary>
+        public string RecycleBin { get => Get(); set => Set(value); }
+        private string recycleBinDefaultValue = "Recycle Bin";
+
+        /// <summary>
+        /// 盘符名格式
+        /// </summary>
+        public string DriveFormat { get => Get(); set => Set(value); }
+        private string driveFormatDefaultValue = "{0} Drive";
+        #endregion
+
+        #region 书签操作
+        /// <summary>
+        /// 在当前标签页打开
+        /// </summary>
+        public string OpenInCurrentTab { get => Get(); set => Set(value); }
+        private string openInCurrentTabDefaultValue = "Open in current tab";
+
+        /// <summary>
+        /// 在新标签页打开
+        /// </summary>
+        public string OpenInNewTab { get => Get(); set => Set(value); }
+        private string openInNewTabDefaultValue = "Open in new tab";
+
+        /// <summary>
+        /// 在新窗口打开
+        /// </summary>
+        public string OpenInNewWindow { get => Get(); set => Set(value); }
+        private string openInNewWindowDefaultValue = "Open in new window";
+
+        /// <summary>
+        /// 重命名
+        /// </summary>
+        public string Rename { get => Get(); set => Set(value); }
+        private string renameDefaultValue = "Rename";
+
+        /// <summary>
+        /// 编辑
+        /// </summary>
+        public string Edit { get => Get(); set => Set(value); }
+        private string editDefaultValue = "Edit";
+
+        /// <summary>
+        /// 删除
+        /// </summary>
+        public string Delete { get => Get(); set => Set(value); }
+        private string deleteDefaultValue = "Delete";
+
+        /// <summary>
+        /// 新建书签
+        /// </summary>
+        public string NewBookmark { get => Get(); set => Set(value); }
+        private string newBookmarkDefaultValue = "New bookmark";
+
+        /// <summary>
+        /// 新建文件夹
+        /// </summary>
+        public string NewFolder { get => Get(); set => Set(value); }
+        private string newFolderDefaultValue = "New folder";
+
+        /// <summary>
+        /// 管理书签
+        /// </summary>
+        public string ManageBookmarks { get => Get(); set => Set(value); }
+        private string manageBookmarksDefaultValue = "Manage bookmarks";
+
+        /// <summary>
+        /// 剪切
+        /// </summary>
+        public string Cut { get => Get(); set => Set(value); }
+        private string cutDefaultValue = "Cut";
+
+        /// <summary>
+        /// 复制
+        /// </summary>
+        public string Copy { get => Get(); set => Set(value); }
+        private string copyDefaultValue = "Copy";
+
+        /// <summary>
+        /// 粘贴
+        /// </summary>
+        public string Paste { get => Get(); set => Set(value); }
+        private string pasteDefaultValue = "Paste";
+
+        /// <summary>
+        /// 在文件夹中显示
+        /// </summary>
+        public string ShowInFolder { get => Get(); set => Set(value); }
+        private string showInFolderDefaultValue = "Show in folder";
+        #endregion
+
+        #region 书签公共文本
+        /// <summary>
+        /// 请选择要新建文件夹的路径
+        /// </summary>
+        public string PleaseSelectNewFolderLocation { get => Get(); set => Set(value); }
+        private string pleaseSelectNewFolderLocationDefaultValue = "Please select new folder location";
+
+        /// <summary>
+        /// 请选择要保存的路径
+        /// </summary>
+        public string PleaseSelectSaveLocation { get => Get(); set => Set(value); }
+        private string pleaseSelectSaveLocationDefaultValue = "Please select save location";
+
+        /// <summary>
+        /// 选择其他文件夹
+        /// </summary>
+        public string SelectOtherFolder { get => Get(); set => Set(value); }
+        private string selectOtherFolderDefaultValue = "Choose another folder...";
+
+        /// <summary>
+        /// 书签栏
+        /// </summary>
+        public string BookmarkBar { get => Get(); set => Set(value); }
+        private string bookmarkBarDefaultValue = "Bookmarks bar";
+
+        /// <summary>
+        /// 其他书签
+        /// </summary>
+        public string OtherBookmark { get => Get(); set => Set(value); }
+        private string otherBookmarkDefaultValue = "Other bookmarks";
+
+        /// <summary>
+        /// 书签管理
+        /// </summary>
+        public string BookmarkManageTitle { get => Get(); set => Set(value); }
+        private string bookmarkManageTitleDefaultValue = "Bookmarks Manager";
+
+        /// <summary>
+        /// 书签文件夹
+        /// </summary>
+        public string BookmarkFolderHeader { get => Get(); set => Set(value); }
+        private string bookmarkFolderHeaderDefaultValue = "Bookmarks";
+
+        /// <summary>
+        /// 导入书签
+        /// </summary>
+        public string ImportBookmark { get => Get(); set => Set(value); }
+        private string importBookmarkDefaultValue = "Import bookmarks";
+
+        /// <summary>
+        /// 导出书签
+        /// </summary>
+        public string ExportBookmark { get => Get(); set => Set(value); }
+        private string exportBookmarkDefaultValue = "Export bookmarks";
+
+        /// <summary>
+        /// 保存并导出书签
+        /// </summary>
+        public string SaveAndExportBookmark { get => Get(); set => Set(value); }
+        private string saveAndExportBookmarkDefaultValue = "Save & export bookmarks";
+
+        /// <summary>
+        /// 导入成功
+        /// </summary>
+        public string ImportSuccessful { get => Get(); set => Set(value); }
+        private string importSuccessfulDefaultValue = "Import successful";
+
+        /// <summary>
+        /// 导入失败
+        /// </summary>
+        public string ImportFailed { get => Get(); set => Set(value); }
+        private string importFailedDefaultValue = "Import failed";
+
+        /// <summary>
+        /// 保存失败
+        /// </summary>
+        public string SaveFailed { get => Get(); set => Set(value); }
+        private string saveFailedDefaultValue = "Save failed";
+
+        /// <summary>
+        /// 添加书签
+        /// </summary>
+        public string AddBookmark { get => Get(); set => Set(value); }
+        private string addBookmarkDefaultValue = "Add bookmark";
+
+        /// <summary>
+        /// 文件夹
+        /// </summary>
+        public string BookmarkFolder { get => Get(); set => Set(value); }
+        private string bookmarkFolderDefaultValue = "Folder";
+
+        /// <summary>
+        /// 搜索书签(Ctrl+F)
+        /// </summary>
+        public string SearchBookmark { get => Get(); set => Set(value); }
+        private string searchBookmarkDefaultValue = "Search bookmarks(Ctrl+F)";
+
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string BookmarkName { get => Get(); set => Set(value); }
+        private string bookmarkNameDefaultValue = "Name";
+
+        /// <summary>
+        /// 文件夹名
+        /// </summary>
+        public string BookmarkNameTag { get => Get(); set => Set(value); }
+        private string bookmarkNameTagDefaultValue = "Folder name";
+
+        /// <summary>
+        /// 路径
+        /// </summary>
+        public string BookmarkLocation { get => Get(); set => Set(value); }
+        private string bookmarkLocationDefaultValue = "Location";
+        #endregion
         #endregion
         #endregion
 
@@ -1011,6 +1229,47 @@ namespace ExplorerTabUtility.Languages.Manager
             dictCurrentLanguageFields[nameof(BookmarkManageToolTip)] = new Field(bookmarkManageToolTipDefaultValue);
             dictCurrentLanguageFields[nameof(BookmarkNavigate)] = new Field(bookmarkNavigateDefaultValue);
             dictCurrentLanguageFields[nameof(BookmarkNavigateToolTip)] = new Field(bookmarkNavigateToolTipDefaultValue);
+
+            //特殊目录名
+            dictCurrentLanguageFields[nameof(ThisPc)] = new Field(thisPcDefaultValue);
+            dictCurrentLanguageFields[nameof(RecycleBin)] = new Field(recycleBinDefaultValue);
+            dictCurrentLanguageFields[nameof(DriveFormat)] = new Field(driveFormatDefaultValue);
+
+            //书签操作
+            dictCurrentLanguageFields[nameof(OpenInCurrentTab)] = new Field(openInCurrentTabDefaultValue);
+            dictCurrentLanguageFields[nameof(OpenInNewTab)] = new Field(openInNewTabDefaultValue);
+            dictCurrentLanguageFields[nameof(OpenInNewWindow)] = new Field(openInNewWindowDefaultValue);
+            dictCurrentLanguageFields[nameof(Rename)] = new Field(renameDefaultValue);
+            dictCurrentLanguageFields[nameof(Edit)] = new Field(editDefaultValue);
+            dictCurrentLanguageFields[nameof(Delete)] = new Field(deleteDefaultValue);
+            dictCurrentLanguageFields[nameof(NewBookmark)] = new Field(newBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(NewFolder)] = new Field(newFolderDefaultValue);
+            dictCurrentLanguageFields[nameof(ManageBookmarks)] = new Field(manageBookmarksDefaultValue);
+            dictCurrentLanguageFields[nameof(Cut)] = new Field(cutDefaultValue);
+            dictCurrentLanguageFields[nameof(Copy)] = new Field(copyDefaultValue);
+            dictCurrentLanguageFields[nameof(Paste)] = new Field(pasteDefaultValue);
+            dictCurrentLanguageFields[nameof(ShowInFolder)] = new Field(showInFolderDefaultValue);
+
+            //书签公共文本
+            dictCurrentLanguageFields[nameof(PleaseSelectNewFolderLocation)] = new Field(pleaseSelectNewFolderLocationDefaultValue);
+            dictCurrentLanguageFields[nameof(PleaseSelectSaveLocation)] = new Field(pleaseSelectSaveLocationDefaultValue);
+            dictCurrentLanguageFields[nameof(SelectOtherFolder)] = new Field(selectOtherFolderDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkBar)] = new Field(bookmarkBarDefaultValue);
+            dictCurrentLanguageFields[nameof(OtherBookmark)] = new Field(otherBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkManageTitle)] = new Field(bookmarkManageTitleDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkFolderHeader)] = new Field(bookmarkFolderHeaderDefaultValue);
+            dictCurrentLanguageFields[nameof(ImportBookmark)] = new Field(importBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(ExportBookmark)] = new Field(exportBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(SaveAndExportBookmark)] = new Field(saveAndExportBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(ImportSuccessful)] = new Field(importSuccessfulDefaultValue);
+            dictCurrentLanguageFields[nameof(ImportFailed)] = new Field(importFailedDefaultValue);
+            dictCurrentLanguageFields[nameof(SaveFailed)] = new Field(saveFailedDefaultValue);
+            dictCurrentLanguageFields[nameof(AddBookmark)] = new Field(addBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkFolder)] = new Field(bookmarkFolderDefaultValue);
+            dictCurrentLanguageFields[nameof(SearchBookmark)] = new Field(searchBookmarkDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkName)] = new Field(bookmarkNameDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkNameTag)] = new Field(bookmarkNameTagDefaultValue);
+            dictCurrentLanguageFields[nameof(BookmarkLocation)] = new Field(bookmarkLocationDefaultValue);
         }
 
         /// <summary>

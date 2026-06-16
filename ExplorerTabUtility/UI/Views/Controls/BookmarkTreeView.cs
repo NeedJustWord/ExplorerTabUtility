@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.WinAPI;
@@ -95,6 +96,24 @@ namespace ExplorerTabUtility.UI.Views.Controls
         #endregion
 
         #region 功能
+        public void OnLangeuageChanged()
+        {
+            var datas = (ObservableCollection<BookmarkTreeViewInfo>)ItemsSource;
+            if (datas == null) return;
+
+            foreach (var item in datas)
+            {
+                if (item.Id == BookmarkManager.Folder.Id)
+                {
+                    item.UpdateFolderName(LangeuageHelper.Instance.LanguageFields.BookmarkBar);
+                }
+                else if (item.Id == BookmarkManager.OtherFolder.Id)
+                {
+                    item.UpdateFolderName(LangeuageHelper.Instance.LanguageFields.OtherBookmark);
+                }
+            }
+        }
+
         /// <summary>
         /// 复制文件夹信息
         /// <para>树形结构转化而来</para>
@@ -196,11 +215,11 @@ namespace ExplorerTabUtility.UI.Views.Controls
             var selected = (BookmarkTreeViewInfo)SelectedItem;
             if (selected == null)
             {
-                errorMsg = "请选择要新建文件夹的路径";
+                errorMsg = LangeuageHelper.Instance.LanguageFields.PleaseSelectNewFolderLocation;
                 return false;
             }
 
-            var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
+            var newFolder = new FolderInfo(Guid.Empty, LangeuageHelper.Instance.LanguageFields.NewFolder);
             var newInfo = new BookmarkTreeViewInfo(newFolder, selected.Level + 1, selected, false, FolderMenuClickAction)
             {
                 IsEditMode = true
@@ -232,7 +251,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
             }
             else
             {
-                errorMsg = "保存失败";
+                errorMsg = LangeuageHelper.Instance.LanguageFields.SaveFailed;
                 return false;
             }
         }

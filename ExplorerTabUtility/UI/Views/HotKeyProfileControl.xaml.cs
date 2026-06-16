@@ -114,13 +114,11 @@ public partial class HotKeyProfileControl : UserControl, IDisposable
         }
 
         //重新设置选中项，没有的话选中项的不会更新
-        var selectedItem = CbScope.SelectedItem;
-        CbScope.SelectedItem = null;
-        CbScope.SelectedItem = selectedItem;
-
-        selectedItem = CbAction.SelectedItem;
-        CbAction.SelectedItem = null;
-        CbAction.SelectedItem = selectedItem;
+        var scopeSelectedIndex = CbScope.SelectedIndex;
+        var actionSelectedIndex = CbAction.SelectedIndex;
+        CbScope.SelectedIndex = -1;
+        CbScope.SelectedIndex = scopeSelectedIndex;
+        CbAction.SelectedIndex = actionSelectedIndex;
     }
 
     // Event handlers

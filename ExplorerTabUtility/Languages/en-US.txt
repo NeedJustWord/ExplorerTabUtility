@@ -152,3 +152,44 @@ BookmarkManage         :BookmarkManage
 BookmarkManageToolTip  :Open bookmark manage popup to manage bookmarks.
 BookmarkNavigate       :BookmarkNavigate
 BookmarkNavigateToolTip:Open bookmark navigate popup to open a new tab/window with the bookmark location.
+
+//Special Directory Name
+ThisPc      :This PC
+RecycleBin  :Recycle Bin
+DriveFormat :{0} Drive
+
+//Bookmark Action
+OpenInCurrentTab    :Open in current tab
+OpenInNewTab        :Open in new tab
+OpenInNewWindow     :Open in new window
+Rename              :Rename
+Edit                :Edit
+Delete              :Delete
+NewBookmark         :New bookmark
+NewFolder           :New folder
+ManageBookmarks     :Manage bookmarks
+Cut                 :Cut
+Copy                :Copy
+Paste               :Paste
+ShowInFolder        :Show in folder
+
+//Bookmark Common Text
+PleaseSelectNewFolderLocation   :Please select new folder location
+PleaseSelectSaveLocation        :Please select save location
+SelectOtherFolder               :Choose another folder...
+BookmarkBar                     :Bookmarks bar
+OtherBookmark                   :Other bookmarks
+BookmarkManageTitle             :Bookmarks Manager
+BookmarkFolderHeader            :Bookmarks
+ImportBookmark                  :Import bookmarks
+ExportBookmark                  :Export bookmarks
+SaveAndExportBookmark           :Save & export bookmarks
+ImportSuccessful                :Import successful
+ImportFailed                    :Import failed
+SaveFailed                      :Save failed
+AddBookmark                     :Add bookmark
+BookmarkFolder                  :Folder
+SearchBookmark                  :Search bookmarks(Ctrl+F)
+BookmarkName                    :Name
+BookmarkNameTag                 :Folder name
+BookmarkLocation                :Location

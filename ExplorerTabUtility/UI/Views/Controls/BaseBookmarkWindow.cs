@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.UI.Views.Controls
@@ -43,12 +44,12 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             return location switch
             {
-                "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}" => "此电脑",
-                "shell:::{645FF040-5081-101B-9F08-00AA002F954E}" => "回收站",
+                "shell:::{20D04FE0-3AEA-1069-A2D8-08002B30309D}" => LangeuageHelper.Instance.LanguageFields.ThisPc,
+                "shell:::{645FF040-5081-101B-9F08-00AA002F954E}" => LangeuageHelper.Instance.LanguageFields.RecycleBin,
 #if NET481
-                _ => location.EndsWith(":") ? $"{location.TrimEnd(':')}盘" : Path.GetFileName(location),
+                _ => location.EndsWith(":") ? string.Format(LangeuageHelper.Instance.LanguageFields.DriveFormat, location.TrimEnd(':')) : Path.GetFileName(location),
 #elif NET9_0
-                _ => location.EndsWith(':') ? $"{location.TrimEnd(':')}盘" : Path.GetFileName(location),
+                _ => location.EndsWith(':') ? string.Format(LangeuageHelper.Instance.LanguageFields.DriveFormat, location.TrimEnd(':')) : Path.GetFileName(location),
 #endif
             };
         }

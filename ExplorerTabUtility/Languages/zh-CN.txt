@@ -152,3 +152,44 @@ BookmarkManage         :管理书签
 BookmarkManageToolTip  :打开书签管理窗口，以管理书签
 BookmarkNavigate       :导航书签
 BookmarkNavigateToolTip:打开书签导航窗口，以在新标签页/窗口打开书签指定的路径
+
+//特殊目录名
+ThisPc      :此电脑
+RecycleBin  :回收站
+DriveFormat :{0}盘
+
+//书签操作
+OpenInCurrentTab    :在当前标签页打开
+OpenInNewTab        :在新标签页打开
+OpenInNewWindow     :在新窗口打开
+Rename              :重命名
+Edit                :编辑
+Delete              :删除
+NewBookmark         :新建书签
+NewFolder           :新建文件夹
+ManageBookmarks     :管理书签
+Cut                 :剪切
+Copy                :复制
+Paste               :粘贴
+ShowInFolder        :在文件夹中显示
+
+//书签公共文本
+PleaseSelectNewFolderLocation   :请选择要新建文件夹的路径
+PleaseSelectSaveLocation        :请选择要保存的路径
+SelectOtherFolder               :选择其他文件夹
+BookmarkBar                     :书签栏
+OtherBookmark                   :其他书签
+BookmarkManageTitle             :书签管理
+BookmarkFolderHeader            :书签文件夹
+ImportBookmark                  :导入书签
+ExportBookmark                  :导出书签
+SaveAndExportBookmark           :保存并导出书签
+ImportSuccessful                :导入成功
+ImportFailed                    :导入失败
+SaveFailed                      :保存失败
+AddBookmark                     :添加书签
+BookmarkFolder                  :文件夹
+SearchBookmark                  :搜索书签(Ctrl+F)
+BookmarkName                    :名称
+BookmarkNameTag                 :文件夹名
+BookmarkLocation                :路径

@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
@@ -41,7 +41,7 @@ namespace ExplorerTabUtility.UI.Views
             InitializeComponent();
 
             this.parentId = parentId;
-            TxtTitle.Text = folderInfo.Id == Guid.Empty ? "新建文件夹" : "重命名";
+            TxtTitle.Text = folderInfo.Id == Guid.Empty ? LangeuageHelper.Instance.LanguageFields.NewFolder : LangeuageHelper.Instance.LanguageFields.Rename;
             currentBookmarkInfo = BookmarkInfo.Empty;
             currentFolderInfo = folderInfo;
             saveType = BookmarkSaveType.FolderRename;
@@ -56,7 +56,7 @@ namespace ExplorerTabUtility.UI.Views
 
             this.parentId = parentId;
             isEdit = bookmarkInfo.Id != Guid.Empty;
-            TxtTitle.Text = isEdit.Value ? "编辑" : "添加书签";
+            TxtTitle.Text = isEdit.Value ? LangeuageHelper.Instance.LanguageFields.Edit : LangeuageHelper.Instance.LanguageFields.AddBookmark;
             currentBookmarkInfo = bookmarkInfo;
             currentFolderInfo = FolderInfo.Empty;
             saveType = BookmarkSaveType.TreeView;
@@ -78,7 +78,7 @@ namespace ExplorerTabUtility.UI.Views
 
 
                 SpLocation.Visibility = Visibility.Collapsed;
-                TxtTitle.Text = "重命名";
+                TxtTitle.Text = LangeuageHelper.Instance.LanguageFields.Rename;
             }
             else
             {
@@ -86,7 +86,7 @@ namespace ExplorerTabUtility.UI.Views
                 currentFolderInfo = FolderInfo.Empty;
 
                 TxtLocation.Text = currentBookmarkInfo.Location;
-                TxtTitle.Text = "编辑";
+                TxtTitle.Text = LangeuageHelper.Instance.LanguageFields.Edit;
             }
 
             BtnNewFolder.Visibility = Visibility.Collapsed;
@@ -146,12 +146,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void InitCbSelectSavePath()
         {
-            var lastSaveFolders = BookmarkManager.LastSaveFolders
-                .Select(t => new SaveFolderItem(t.Id, t.Name))
-                .ToList();
-            CbSelectSavePath.ItemsSource = lastSaveFolders;
-            CbSelectSavePath.SelectedItem = lastSaveFolders.FirstOrDefault(t => t.Key == BookmarkManager.LastSaveFolderId)
-                ?? lastSaveFolders.First();
+            CbSelectSavePath.SetItemsSource(BookmarkManager.LastSaveFolders, BookmarkManager.LastSaveFolderId);
         }
 
         private void InitTvSelectSavePath(Guid parentId)
@@ -185,6 +180,7 @@ namespace ExplorerTabUtility.UI.Views
                 BookmarkManager.RecoverConfig();
             }
 
+            LangeuageHelper.Instance.OnLangeuageChanged -= Instance_OnLangeuageChanged;
             CloseWindow();
         }
 
@@ -203,7 +199,7 @@ namespace ExplorerTabUtility.UI.Views
             {
                 if (BookmarkManager.Save(parentId, currentFolderInfo, TxtName.Text, true) == false)
                 {
-                    ShowMessage("保存失败", Constants.AppName);
+                    ShowMessage(LangeuageHelper.Instance.LanguageFields.SaveFailed, Constants.AppName);
                     return;
                 }
 
@@ -214,13 +210,13 @@ namespace ExplorerTabUtility.UI.Views
                 var saveFolder = GetSaveFolder();
                 if (saveFolder == null)
                 {
-                    ShowMessage("请选择要保存的路径", Constants.AppName);
+                    ShowMessage(LangeuageHelper.Instance.LanguageFields.PleaseSelectSaveLocation, Constants.AppName);
                     return;
                 }
 
                 if (BookmarkManager.Save(isEdit ?? false, parentId, saveFolder.Key, currentBookmarkInfo, TxtName.Text, GetSaveLocation()) == false)
                 {
-                    ShowMessage("保存失败", Constants.AppName);
+                    ShowMessage(LangeuageHelper.Instance.LanguageFields.SaveFailed, Constants.AppName);
                     return;
                 }
 
@@ -238,6 +234,7 @@ namespace ExplorerTabUtility.UI.Views
             BtnSave.Click += BtnSave_Click;
             BtnCancel.Click += BtnCancel_Click;
             TvSelectSavePath.FolderHandle += TvSelectSavePath_FolderHandle;
+            LangeuageHelper.Instance.OnLangeuageChanged += Instance_OnLangeuageChanged;
         }
 
         private void SetupEventHandlers()
@@ -252,6 +249,12 @@ namespace ExplorerTabUtility.UI.Views
             {
                 CbSelectSavePath.SelectOtherFolderClick += CbSelectSavePath_SelectOtherFolderClick;
             }
+        }
+
+        private void Instance_OnLangeuageChanged()
+        {
+            CbSelectSavePath.OnLangeuageChanged();
+            TvSelectSavePath.OnLangeuageChanged();
         }
 
         private void TvSelectSavePath_FolderHandle(BookmarkTreeViewInfo info, FolderInfo folder, BookmarkAction action)

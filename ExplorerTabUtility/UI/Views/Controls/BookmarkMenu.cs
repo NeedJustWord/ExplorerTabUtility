@@ -179,7 +179,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             switch (action)
             {
-                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.ManageBookmarks:
                 case BookmarkAction.NewBookmark:
                 case BookmarkAction.NewFolder:
                 case BookmarkAction.OpenInCurrentTab:
@@ -205,7 +205,7 @@ namespace ExplorerTabUtility.UI.Views.Controls
         {
             switch (action)
             {
-                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.ManageBookmarks:
                 case BookmarkAction.NewBookmark:
                 case BookmarkAction.NewFolder:
                 case BookmarkAction.Rename:

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using ExplorerTabUtility.Helpers;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Models;
 
 namespace ExplorerTabUtility.Managers
@@ -61,8 +62,8 @@ namespace ExplorerTabUtility.Managers
 
         static BookmarkManager()
         {
-            folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), "书签栏");
-            otherFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000002"), "其他书签");
+            folderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000001"), LangeuageHelper.Instance.LanguageFields.BookmarkBar);
+            otherFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000002"), LangeuageHelper.Instance.LanguageFields.OtherBookmark);
             overflowFolderInfo = new FolderInfo(Guid.Parse("00000000-0000-0000-0000-000000000003"), ">>");
             bookmarks = new FolderInfo(Guid.Empty, string.Empty, folderInfo, otherFolderInfo);
             Bookmarks = new ReadOnlyCollection<FolderInfo>([folderInfo, otherFolderInfo]);
@@ -72,6 +73,13 @@ namespace ExplorerTabUtility.Managers
             config = InitBookmarkConfig();
 
             LoadBookmark();
+            LangeuageHelper.Instance.OnLangeuageChanged += OnLangeuageChanged;
+        }
+
+        private static void OnLangeuageChanged()
+        {
+            folderInfo.Name = saveFolderInfo.Name = LangeuageHelper.Instance.LanguageFields.BookmarkBar;
+            otherFolderInfo.Name = otherSaveFolderInfo.Name = LangeuageHelper.Instance.LanguageFields.OtherBookmark;
         }
 
         private static BookmarkConfig InitBookmarkConfig()
@@ -332,7 +340,7 @@ namespace ExplorerTabUtility.Managers
             }
 
             UpdateId(data);
-            data.Name = "导入书签";
+            data.Name = LangeuageHelper.Instance.LanguageFields.ImportBookmark;
             folderInfo.Items.Add(data);
 
             return true;

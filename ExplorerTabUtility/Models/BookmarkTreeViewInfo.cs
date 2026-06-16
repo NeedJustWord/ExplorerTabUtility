@@ -440,6 +440,12 @@ namespace ExplorerTabUtility.Models
             RaisePropertyChanged(nameof(HasVisibilityItems));
         }
 
+        public void UpdateFolderName(string name)
+        {
+            Name = name;
+            CurrentFolder.Name = name;
+        }
+
         public void Update(string name, string location)
         {
             Name = name;

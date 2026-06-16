@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Windows.Input;
 using ExplorerTabUtility.Helpers;
 using ExplorerTabUtility.Hooks;
+using ExplorerTabUtility.Languages.Manager;
 using ExplorerTabUtility.Managers;
 using ExplorerTabUtility.Models;
 using ExplorerTabUtility.UI.Views.Controls;
@@ -144,7 +145,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void NewFolder(BookmarkMenuInfo info)
         {
-            var newFolder = new FolderInfo(Guid.Empty, "新建文件夹");
+            var newFolder = new FolderInfo(Guid.Empty, LangeuageHelper.Instance.LanguageFields.NewFolder);
             var popup = new BookmarkSavePopup(explorerWatcher, windowHandle, newFolder, info.GetCurrentFolderId());
             EntryDialog();
             if (popup.ShowDialog() == true)
@@ -177,7 +178,7 @@ namespace ExplorerTabUtility.UI.Views
                     }
                     ExitDialog();
                     break;
-                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.ManageBookmarks:
                     ShowBookmarkManager();
                     break;
                 case BookmarkAction.NewBookmark:
@@ -214,7 +215,7 @@ namespace ExplorerTabUtility.UI.Views
                     }
                     ExitDialog();
                     break;
-                case BookmarkAction.BookmarkManage:
+                case BookmarkAction.ManageBookmarks:
                     ShowBookmarkManager();
                     break;
                 case BookmarkAction.NewBookmark:

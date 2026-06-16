@@ -24,34 +24,37 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Name="TxtTitle" Grid.Row="0" Style="{StaticResource BookmarkTitleTextBlockStyle}"
-                        Text="添加书签"/>
+                        Text="{Binding LanguageFields.AddBookmark,Source={x:Static language:LangeuageHelper.Instance}}"/>
 
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-                <TextBlock Style="{StaticResource BookmarkHeaderTextBlockStyle}" Text="名称"/>
+                <TextBlock Style="{StaticResource BookmarkHeaderTextBlockStyle}"
+                           Text="{Binding LanguageFields.BookmarkName,Source={x:Static language:LangeuageHelper.Instance}}"/>
                 <TextBox x:Name="TxtName" Style="{StaticResource CustomTextBoxStyle}"
-                         Tag="名称"/>
+                         Tag="{Binding LanguageFields.BookmarkName,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
 
             <StackPanel x:Name="SpLocation" Grid.Row="2" Grid.ColumnSpan="2">
-                <TextBlock Style="{StaticResource BookmarkHeaderTextBlockStyle}" Text="路径"/>
+                <TextBlock Style="{StaticResource BookmarkHeaderTextBlockStyle}"
+                           Text="{Binding LanguageFields.BookmarkLocation,Source={x:Static language:LangeuageHelper.Instance}}"/>
                 <TextBox x:Name="TxtLocation" Style="{StaticResource CustomTextBoxStyle}"
-                         Tag="路径"/>
+                         Tag="{Binding LanguageFields.BookmarkLocation,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.ColumnSpan="2">
-                <TextBlock x:Name="TxtFolder" Style="{StaticResource BookmarkHeaderTextBlockStyle}" Text="文件夹"/>
+                <TextBlock x:Name="TxtFolder" Style="{StaticResource BookmarkHeaderTextBlockStyle}"
+                           Text="{Binding LanguageFields.BookmarkFolder,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
 
             <controls:BookmarkComboBox x:Name="CbSelectSavePath" Grid.Row="4" Grid.ColumnSpan="2" Style="{StaticResource BookmarkComboBoxStyle}"
-                                       behaviors:BookmarkHelper.SelectOtherFolderText="选择其他文件夹"/>
+                                       behaviors:BookmarkHelper.SelectOtherFolderText="{Binding LanguageFields.SelectOtherFolder,Source={x:Static language:LangeuageHelper.Instance}}"/>
 
             <controls:BookmarkTreeView x:Name="TvSelectSavePath" Grid.Row="5" Grid.ColumnSpan="2" Height="300" Style="{StaticResource BookmarkTreeViewStyle}"
                                        behaviors:TreeViewHelper.HaveExtraMenu="False"
                                        behaviors:TreeViewHelper.EnableRightClickSelection="True"/>
 
             <StackPanel Grid.Row="6" Grid.Column="0" HorizontalAlignment="Left">
-                <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"
-                        Content="新建文件夹" ToolTip="Ctrl+N"/>
+                <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" ToolTip="Ctrl+N" Width="110"
+                        Content="{Binding LanguageFields.NewFolder,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
 
             <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">

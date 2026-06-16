@@ -22,7 +22,6 @@ namespace ExplorerTabUtility.UI.Views
     /// </summary>
     public partial class BookmarkManagePopup : BaseBookmarkWindow
     {
-        private string fileFilter;
         private bool needDialogResult;
         private readonly string initBookmarkJson;
 
@@ -33,7 +32,6 @@ namespace ExplorerTabUtility.UI.Views
             Init(needDialogResult);
             SetupEventHandlers();
 
-            fileFilter = GetFileFilter();
             initBookmarkJson = GetJson(TvFolder.CopyFolderInfos());
         }
 
@@ -83,6 +81,7 @@ namespace ExplorerTabUtility.UI.Views
                 DialogResult = dialogResult;
             }
 
+            LangeuageHelper.Instance.OnLangeuageChanged -= Instance_OnLangeuageChanged;
             CloseWindow();
         }
 
@@ -155,7 +154,7 @@ namespace ExplorerTabUtility.UI.Views
             var ofd = new OpenFileDialog
             {
                 FileName = Constants.BookmarksFileName,
-                Filter = fileFilter,
+                Filter = GetFileFilter(),
             };
             if (ofd.ShowDialog() != true) return;
 
@@ -163,11 +162,11 @@ namespace ExplorerTabUtility.UI.Views
             if (BookmarkManager.Import(jsonString))
             {
                 TvFolder.SetItemsSource(BookmarkManager.Bookmarks, BookmarkManager.Folder.Id, true);
-                ShowMessage("导入成功", Constants.AppName);
+                ShowMessage(LangeuageHelper.Instance.LanguageFields.ImportSuccessful, Constants.AppName);
             }
             else
             {
-                ShowMessage("导入失败", Constants.AppName, icon: MessageBoxImage.Error);
+                ShowMessage(LangeuageHelper.Instance.LanguageFields.ImportFailed, Constants.AppName, icon: MessageBoxImage.Error);
             }
         }
 
@@ -177,7 +176,7 @@ namespace ExplorerTabUtility.UI.Views
             var sfd = new SaveFileDialog
             {
                 FileName = fileName,
-                Filter = fileFilter,
+                Filter = GetFileFilter(),
             };
             if (sfd.ShowDialog() != true) return;
 
@@ -221,7 +220,7 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Instance_OnLangeuageChanged()
         {
-            fileFilter = GetFileFilter();
+            TvFolder.OnLangeuageChanged();
         }
 
         private void MenuSaveAndExport_Click(object sender, RoutedEventArgs e)

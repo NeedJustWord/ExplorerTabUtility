@@ -23,7 +23,8 @@
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Text="书签管理" Style="{StaticResource BookmarkTitleTextBlockStyle}"/>
+            <TextBlock Grid.Row="0" Style="{StaticResource BookmarkTitleTextBlockStyle}"
+                       Text="{Binding LanguageFields.BookmarkManageTitle,Source={x:Static language:LangeuageHelper.Instance}}"/>
 
             <Border Grid.Row="0" Grid.Column="2" Width="24" Height="24" CornerRadius="12" HorizontalAlignment="Right">
                 <Border.Style>
@@ -39,17 +40,22 @@
                 <TextBlock x:Name="BtnMenu" Text="…" Style="{StaticResource BookmarkManageMenuTextBlockStyle}">
                     <TextBlock.ContextMenu>
                         <ContextMenu Placement="Left" HorizontalOffset="24">
-                            <MenuItem x:Name="MenuImport" Header="导入书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+I"/>
-                            <MenuItem x:Name="MenuExport" Header="导出书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+E"/>
-                            <MenuItem x:Name="MenuSaveAndExport" Header="保存并导出书签" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+Shift+E"/>
+                            <MenuItem x:Name="MenuImport" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+I"
+                                      Header="{Binding LanguageFields.ImportBookmark,Source={x:Static language:LangeuageHelper.Instance}}"/>
+                            <MenuItem x:Name="MenuExport" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+E"
+                                      Header="{Binding LanguageFields.ExportBookmark,Source={x:Static language:LangeuageHelper.Instance}}"/>
+                            <MenuItem x:Name="MenuSaveAndExport" Style="{StaticResource TextBoxContextMenuItemStyle}" InputGestureText="Ctrl+Shift+E"
+                                      Header="{Binding LanguageFields.SaveAndExportBookmark,Source={x:Static language:LangeuageHelper.Instance}}"/>
                         </ContextMenu>
                     </TextBlock.ContextMenu>
                 </TextBlock>
             </Border>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="书签文件夹" Style="{StaticResource BookmarkTextBlockStyle}"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource BookmarkTextBlockStyle}"
+                       Text="{Binding LanguageFields.BookmarkFolderHeader,Source={x:Static language:LangeuageHelper.Instance}}"/>
 
-            <TextBox x:Name="TxtSearch" Grid.Row="1" Grid.Column="2" Style="{StaticResource BookmarkSearchTextBoxStyle}" Tag="搜索书签(Ctrl+F)"/>
+            <TextBox x:Name="TxtSearch" Grid.Row="1" Grid.Column="2" Style="{StaticResource BookmarkSearchTextBoxStyle}"
+                     Tag="{Binding LanguageFields.SearchBookmark,Source={x:Static language:LangeuageHelper.Instance}}"/>
 
             <controls:BookmarkTreeView x:Name="TvFolder" Grid.Row="2" Grid.Column="0" Style="{StaticResource BookmarkTreeViewStyle}"
                                        behaviors:TreeViewHelper.HaveExtraMenu="True"
@@ -62,8 +68,8 @@
                      dd:DragDrop.IsDragSource="True"/>
 
             <StackPanel Grid.Row="3" Grid.Column="0" HorizontalAlignment="Left">
-                <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" Width="110"
-                        Content="新建文件夹" ToolTip="Ctrl+N"/>
+                <Button x:Name="BtnNewFolder" Style="{StaticResource BookmarkButtonStyle}" ToolTip="Ctrl+N" Width="110"
+                        Content="{Binding LanguageFields.NewFolder,Source={x:Static language:LangeuageHelper.Instance}}"/>
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">

@@ -46,9 +46,9 @@
         NewFolder,
 
         /// <summary>
-        /// 书签管理
+        /// 管理书签
         /// </summary>
-        BookmarkManage,
+        ManageBookmarks,
 
         /// <summary>
         /// 剪切
