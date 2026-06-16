@@ -437,6 +437,7 @@ namespace ExplorerTabUtility.Models
                     current.Delete(infos);
                 }
             }
+            RaisePropertyChanged(nameof(HasVisibilityItems));
         }
 
         public void Update(string name, string location)
