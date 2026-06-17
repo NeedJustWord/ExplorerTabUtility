@@ -151,10 +151,12 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Import()
         {
+            var title = LangeuageHelper.Instance.LanguageFields.ImportBookmark;
             var ofd = new OpenFileDialog
             {
                 FileName = Constants.BookmarksFileName,
                 Filter = GetFileFilter(),
+                Title = title,
             };
             if (ofd.ShowDialog() != true) return;
 
@@ -172,11 +174,13 @@ namespace ExplorerTabUtility.UI.Views
 
         private void Export(bool save)
         {
+            var title = save ? LangeuageHelper.Instance.LanguageFields.SaveAndExportBookmark : LangeuageHelper.Instance.LanguageFields.ExportBookmark;
             var fileName = Constants.BookmarksFileName.Insert(Constants.BookmarksFileName.IndexOf("."), DateTime.Now.ToString("yyyy-MM-dd"));
             var sfd = new SaveFileDialog
             {
                 FileName = fileName,
                 Filter = GetFileFilter(),
+                Title = title,
             };
             if (sfd.ShowDialog() != true) return;
 
